@@ -60,6 +60,7 @@ To install TikTok Downloader, Download the Latest [Release](https://github.com/J
 - [x] Download Videos & Images from Links in a Text File.
 - [x] Download All Videos from a User-Profile.
 - [ ] Download All Images from a User-Profile Without Watermark.
+- [ ] Make the GUI Better.
 - [ ] Multi-Webbrowser Support(Systems Default).
 - [ ] Multi-OS Support
   - [x] Windows Support
