@@ -49,7 +49,7 @@ I will release an installer/zip folder with the program as soon as possible so t
 ## Roadmap
 
 - [x] Download Single Videos/Images.
-- [x] Download With or Without Watermark.
+- [x] Download Videos With or Without Watermark.
 - [x] Download Images Without Watermark.
 - [x] Download Videos & Images from Links in a Text File.
 - [x] Download All Videos from a User-Profile.
