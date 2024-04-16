@@ -50,6 +50,7 @@ To make the TikTok User download work, Google Chrome must be installed since I h
 ## Installation
 
 To install TikTok Downloader, Download the Latest Install Setup from [Releases](https://github.com/Jettcodey/TikTok-Downloader/releases/latest).
+
 Also make sure u have [Microsoft .Net 6.0 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) Installed.
 
 <p align="right"><a href="#readme-top">Back to top</a></p>
