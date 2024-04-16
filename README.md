@@ -41,7 +41,7 @@ To download all videos from a TikTok user, the Application opens the specified T
 
 I will release an installer/zip folder with the program as soon as possible so that you no longer have to compile the code yourself.
 
-### Important: To make the download of all videos work, Google Chrome must be installed since I haven't had the chance to make the app use the system default browser yet, Sry Firefox users.
+### Important: To make the TikTok User download work, Google Chrome must be installed since I haven't had the chance to make the app use the system default browser yet, Sry Firefox users.
 
 <p align="right"><a href="#readme-top">Back to top</a></p>
 
@@ -49,6 +49,7 @@ I will release an installer/zip folder with the program as soon as possible so t
 ## Roadmap
 
 - [x] Download Single Videos/Images.
+- [x] Download With or Without Watermark.
 - [x] Download Images Without Watermark.
 - [x] Download Videos & Images from Links in a Text File.
 - [x] Download All Videos from a User-Profile.
@@ -57,7 +58,7 @@ I will release an installer/zip folder with the program as soon as possible so t
 - [ ] Multi-OS Support
   - [x] Windows Support
   - [ ] Linux Support 
-  - [ ] MacOs Support <-- Currently working on
+  - [ ] MacOS Support <-- Currently working on
 
 
 See the [open issues](https://github.com/Jettcodey/TikTok-Downloader/issues) for a full list of proposed features (and known issues).
