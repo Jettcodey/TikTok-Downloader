@@ -20,11 +20,12 @@
 ### Built With
 C# and PuppeteerSharp
 
-<img src="https://github.com/Jettcodey/Tiktok-Media-Downloader/assets/163922510/f45dad26-1f9e-417a-9eec-519135ce633f" width="64" height="64">
-<img src="https://github.com/Jettcodey/Tiktok-User-Downloader/assets/163922510/f2a83290-f22c-442f-9b41-690a2c6be45d" width="64" height="64">
+<img src="https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/aca578ae-4c24-490f-96f2-4c19a16fe9e6" width="64" height="64">
+<img src="https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/08a6f2f6-ecff-41fa-8f9e-4361ad178902" width="64" height="64">
 
-<!--![csharpIcon](https://github.com/Jettcodey/Tiktok-Media-Downloader/assets/163922510/f45dad26-1f9e-417a-9eec-519135ce633f)-->
-<!--![logo](https://github.com/Jettcodey/Tiktok-User-Downloader/assets/163922510/f2a83290-f22c-442f-9b41-690a2c6be45d)-->
+<!--![csharpIcon](https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/aca578ae-4c24-490f-96f2-4c19a16fe9e6)
+![logo](https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/08a6f2f6-ecff-41fa-8f9e-4361ad178902)-->
+
 
 <p align="right"><a href="#readme-top">Back to top</a></p>
 
