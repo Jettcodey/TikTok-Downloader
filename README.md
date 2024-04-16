@@ -48,7 +48,7 @@ To make the TikTok User download work, Google Chrome must be installed since I h
 <!-- Installation -->
 ## Installation
 
-To install TikTok Downloader, Download the Latest Install Setup[Release](https://github.com/Jettcodey/TikTok-Downloader/releases/latest)
+To install TikTok Downloader, Download the Latest Install Setup [Release](https://github.com/Jettcodey/TikTok-Downloader/releases/latest)
 
 <p align="right"><a href="#readme-top">Back to top</a></p>
 
