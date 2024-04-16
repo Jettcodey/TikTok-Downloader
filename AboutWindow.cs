@@ -100,8 +100,7 @@ namespace TikTok_Downloader
             // 
             // AboutWindow
             // 
-            BackColor = Color.Black;
-            BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
+            BackColor = SystemColors.ControlDarkDark;
             BackgroundImageLayout = ImageLayout.Stretch;
             ClientSize = new Size(240, 217);
             Controls.Add(label1);

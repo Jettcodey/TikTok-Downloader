@@ -12,6 +12,7 @@
     <li>
       <a href="#getting-started">Getting Started</a>
     </li>
+    <li><a href="#Installation">Installation</li>
     <li><a href="#roadmap">Roadmap</a></li>
   </ol>
 </details>
@@ -39,9 +40,14 @@ When downloading all videos from a user, the files are saved into a folder with 
 
 To download all videos from a TikTok user, the Application opens the specified TikTok user in the browser. Then, loads all video links of the user by Auto scrolling through the browser. After that, those Links get saved in a separate text file named "{@username}_video_links.txt" in the TikTokDowloads Folder. Finally the Application works through the Saved links.
 
-I will release an installer/zip folder with the program as soon as possible so that you no longer have to compile the code yourself.
-
 ### Important: To make the TikTok User download work, Google Chrome must be installed since I haven't had the chance to make the app use the system default browser yet, Sry Firefox users.
+
+<p align="right"><a href="#readme-top">Back to top</a></p>
+
+<!-- Installation -->
+## Installation
+
+To install TikTok Downloader, Download the Latest [Release](https://github.com/Jettcodey/TikTok-Downloader/releases)
 
 <p align="right"><a href="#readme-top">Back to top</a></p>
 
