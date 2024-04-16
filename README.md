@@ -47,7 +47,7 @@ To download all videos from a TikTok user, the Application opens the specified T
 <!-- Installation -->
 ## Installation
 
-To install TikTok Downloader, Download the Latest [Release](https://github.com/Jettcodey/TikTok-Downloader/releases)
+To install TikTok Downloader, Download the Latest [Release](https://github.com/Jettcodey/TikTok-Downloader/releases/latest)
 
 <p align="right"><a href="#readme-top">Back to top</a></p>
 
