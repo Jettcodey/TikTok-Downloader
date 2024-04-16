@@ -43,7 +43,7 @@ namespace TikTok_Downloader
             // 
             // urlTextBox
             // 
-            urlTextBox.Location = new Point(149, 62);
+            urlTextBox.Location = new Point(149, 73);
             urlTextBox.Name = "urlTextBox";
             urlTextBox.PlaceholderText = "Enter TikTok Video/Image Link";
             urlTextBox.Size = new Size(281, 23);
@@ -85,14 +85,14 @@ namespace TikTok_Downloader
             // 
             cmbChoice.FormattingEnabled = true;
             cmbChoice.Items.AddRange(new object[] { "Single Video/Image Download", "Mass Download by Username", "Mass Download from Text File Links" });
-            cmbChoice.Location = new Point(149, 33);
+            cmbChoice.Location = new Point(149, 36);
             cmbChoice.Name = "cmbChoice";
             cmbChoice.Size = new Size(281, 23);
             cmbChoice.TabIndex = 4;
             // 
             // txtUsername
             // 
-            txtUsername.Location = new Point(149, 96);
+            txtUsername.Location = new Point(149, 107);
             txtUsername.Name = "txtUsername";
             txtUsername.PlaceholderText = "Enter TikTok Username";
             txtUsername.Size = new Size(281, 23);
@@ -138,7 +138,7 @@ namespace TikTok_Downloader
             filePathLabel.AutoSize = true;
             filePathLabel.BackColor = Color.Transparent;
             filePathLabel.ForeColor = SystemColors.Control;
-            filePathLabel.Location = new Point(12, 136);
+            filePathLabel.Location = new Point(12, 143);
             filePathLabel.Name = "filePathLabel";
             filePathLabel.Size = new Size(136, 15);
             filePathLabel.TabIndex = 8;
@@ -146,7 +146,7 @@ namespace TikTok_Downloader
             // 
             // filePathTextBox
             // 
-            filePathTextBox.Location = new Point(149, 132);
+            filePathTextBox.Location = new Point(149, 140);
             filePathTextBox.Name = "filePathTextBox";
             filePathTextBox.PlaceholderText = "Enter/Select Path to Text File";
             filePathTextBox.Size = new Size(281, 23);
@@ -155,7 +155,7 @@ namespace TikTok_Downloader
             // 
             // browseFileButton
             // 
-            browseFileButton.Location = new Point(436, 132);
+            browseFileButton.Location = new Point(436, 140);
             browseFileButton.Name = "browseFileButton";
             browseFileButton.Size = new Size(88, 23);
             browseFileButton.TabIndex = 7;
@@ -168,7 +168,7 @@ namespace TikTok_Downloader
             label1.AutoSize = true;
             label1.BackColor = Color.Transparent;
             label1.ForeColor = SystemColors.Control;
-            label1.Location = new Point(12, 36);
+            label1.Location = new Point(12, 39);
             label1.Name = "label1";
             label1.Size = new Size(109, 15);
             label1.TabIndex = 6;
@@ -179,7 +179,7 @@ namespace TikTok_Downloader
             label2.AutoSize = true;
             label2.BackColor = Color.Transparent;
             label2.ForeColor = SystemColors.Control;
-            label2.Location = new Point(12, 99);
+            label2.Location = new Point(12, 110);
             label2.Name = "label2";
             label2.Size = new Size(130, 15);
             label2.TabIndex = 7;
@@ -203,7 +203,7 @@ namespace TikTok_Downloader
             label3.AutoSize = true;
             label3.BackColor = Color.Transparent;
             label3.ForeColor = SystemColors.Control;
-            label3.Location = new Point(12, 65);
+            label3.Location = new Point(12, 76);
             label3.Name = "label3";
             label3.Size = new Size(129, 15);
             label3.TabIndex = 9;
