@@ -34,6 +34,7 @@ namespace TikTok_Downloader
             titleLabel.AutoSize = true;
             titleLabel.BackColor = Color.Transparent;
             titleLabel.Font = new Font("Arial", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            titleLabel.ForeColor = Color.Aquamarine;
             titleLabel.Location = new Point(45, 27);
             titleLabel.Name = "titleLabel";
             titleLabel.Size = new Size(157, 19);
@@ -44,12 +45,12 @@ namespace TikTok_Downloader
             // 
             versionLabel.AutoSize = true;
             versionLabel.BackColor = Color.Transparent;
-            versionLabel.ForeColor = SystemColors.InfoText;
+            versionLabel.ForeColor = Color.Aquamarine;
             versionLabel.Location = new Point(65, 65);
             versionLabel.Name = "versionLabel";
-            versionLabel.Size = new Size(108, 15);
+            versionLabel.Size = new Size(117, 15);
             versionLabel.TabIndex = 1;
-            versionLabel.Text = "Version: Release 1.0";
+            versionLabel.Text = "Version: Release 1.0.2";
             // 
             // descriptionLabel
             // 
@@ -101,6 +102,7 @@ namespace TikTok_Downloader
             // AboutWindow
             // 
             BackColor = SystemColors.ControlDarkDark;
+            BackgroundImage = Properties.Resources.bg;
             BackgroundImageLayout = ImageLayout.Stretch;
             ClientSize = new Size(240, 217);
             Controls.Add(label1);
