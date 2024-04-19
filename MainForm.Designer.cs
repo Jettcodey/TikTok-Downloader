@@ -1,7 +1,4 @@
-﻿using System.Windows.Forms;
-using static System.Net.Mime.MediaTypeNames;
-
-namespace TikTok_Downloader
+﻿namespace TikTok_Downloader
 {
     partial class MainForm
     {
