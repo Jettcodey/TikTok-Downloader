@@ -1,5 +1,13 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Text.Json;
-using PuppeteerSharp;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.Playwright;
+using Microsoft.Win32;
+//using PuppeteerSharp;
 
 namespace TikTok_Downloader
 {
@@ -103,6 +111,52 @@ namespace TikTok_Downloader
             }
         }
 
+        internal string GetSystemDefaultBrowser()
+        {
+            string name = string.Empty;
+            RegistryKey regKey = null;
+
+            try
+            {
+                var regDefault = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.htm\\UserChoice", false);
+                var stringDefault = regDefault.GetValue("ProgId");
+
+                regKey = Registry.ClassesRoot.OpenSubKey(stringDefault + "\\shell\\open\\command", false);
+                name = regKey.GetValue(null).ToString().ToLower().Replace("" + (char)34, "");
+
+                if (!name.EndsWith("exe"))
+                    name = name.Substring(0, name.LastIndexOf(".exe") + 4);
+            }
+            catch (Exception ex)
+            {
+                name = string.Format("ERROR: An exception of type: {0} occurred in method: {1} in the following module: {2}", ex.GetType(), ex.TargetSite, this.GetType());
+            }
+            finally
+            {
+                if (regKey != null)
+                    regKey.Close();
+            }
+
+            return name;
+        }
+
+        internal IBrowserType GetBrowserTypeForExecutable(string executablePath, IPlaywright playwright)
+        {
+            if (executablePath.ToLower().Contains("firefox"))
+            {
+                return playwright.Firefox;  // Firefox doesn´t seem to work with my current playwright configuration for now.
+            }
+            else if (executablePath.ToLower().Contains("webkit"))
+            {
+                return playwright.Webkit;   // Webkit doesn´t seem to work with my current playwright configuration for now.
+            }
+            else
+            {
+                return playwright.Chromium; // Chromium-based Browsers work with playwright
+            }
+        }
+
+
         private async Task MassDownloadByUsername()
         {
             try
@@ -110,32 +164,32 @@ namespace TikTok_Downloader
                 string username = txtUsername.Text.Trim();
                 string baseUrl = $"https://www.tiktok.com/@{username}";
 
-                string chromeExecutablePath = @"C:\Program Files\Google\Chrome\Application\chrome.exe";  //<-- Change this path to ur preferred Webbrowser.
+                // Get system default browser executable path
+                string browserExecutablePath = GetSystemDefaultBrowser();
 
-                var options = new LaunchOptions
+                // Launch Playwright with the appropriate browser type, if my current configuration would work with Firefox or Webkit.
+                using var playwright = await Playwright.CreateAsync();
+                var browserType = GetBrowserTypeForExecutable(browserExecutablePath, playwright);
+
+                var browser = await browserType.LaunchAsync(new BrowserTypeLaunchOptions
                 {
-                    Headless = false,
-                    ExecutablePath = chromeExecutablePath
-                };
+                    Headless = false, // headless mode doesn´t work with TikTok for now
+                    ExecutablePath = browserExecutablePath
+                });
 
-                var browser = await Puppeteer.LaunchAsync(options);
-                var page = await browser.NewPageAsync();
-
-                var navigationOptions = new NavigationOptions
-                {
-                    Timeout = 120000
-                };
+                var context = await browser.NewContextAsync();
+                var page = await context.NewPageAsync();
 
                 // Navigate to the TikTok page
-                await page.GoToAsync(baseUrl, navigationOptions);
+                await page.GotoAsync(baseUrl, new PageGotoOptions { Timeout = 120000 });
 
                 // Scroll to the bottom of the page repeatedly until no more videos are loaded
                 while (true)
                 {
-                    long initialHeight = await page.EvaluateFunctionAsync<long>("() => document.body.scrollHeight");
-                    await page.EvaluateExpressionAsync("window.scrollTo(0, document.body.scrollHeight)");
+                    long initialHeight = await page.EvaluateAsync<long>("() => document.body.scrollHeight");
+                    await page.EvaluateAsync("window.scrollTo(0, document.body.scrollHeight)");
                     await page.WaitForTimeoutAsync(10000);
-                    long newHeight = await page.EvaluateFunctionAsync<long>("() => document.body.scrollHeight");
+                    long newHeight = await page.EvaluateAsync<long>("() => document.body.scrollHeight");
 
                     if (newHeight == initialHeight)
                     {
@@ -144,27 +198,25 @@ namespace TikTok_Downloader
                 }
 
                 // Extract all video URLs
-                var videoUrls = await page.EvaluateFunctionAsync<string[]>("() => { var videos = document.querySelectorAll('a'); var videoUrls = []; videos.forEach(video => { if (video.href.includes('/video/')) { videoUrls.push(video.href); } }); return videoUrls; }");
-
-                await browser.CloseAsync();
+                var videoUrls = await page.EvaluateAsync<string[]>("() => { var videos = document.querySelectorAll('a'); var videoUrls = []; videos.forEach(video => { if (video.href.includes('/video/')) { videoUrls.push(video.href); } }); return videoUrls; }");
 
                 // Save all video links to a text file
                 string videoLinksFilePath = Path.Combine(downloadFolderPath, $"{username}_video_links.txt");
                 await File.WriteAllLinesAsync(videoLinksFilePath, videoUrls);
 
+                // Close the browser
+                await browser.CloseAsync();
+
                 // Download all videos from the text file
                 List<string> videoLinksList = videoUrls.ToList();
                 await DownloadVideos(videoLinksList);
-            }
-            catch (TimeoutException ex)
-            {
-                Console.WriteLine($"TimeoutException occurred: {ex.Message}");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred: {ex.Message}");
             }
         }
+
 
         private void browseFileButton_Click(object sender, EventArgs e)
         {
@@ -227,7 +279,7 @@ namespace TikTok_Downloader
             string folder = (downloadFolderPath);
             Directory.CreateDirectory(folder);
 
-            // Filter out duplicate and incorrect username links, bc filtering them before caused some weird Behavior in the Browser(at least in Google Chrome).
+            // Filter out duplicate and incorrect username links, bc filtering them before caused some weird Behavior in the Browser(at least in Chromium-based Browsers).
             HashSet<string> uniqueVideoUrls = new HashSet<string>();
             foreach (var url in videoUrls)
             {

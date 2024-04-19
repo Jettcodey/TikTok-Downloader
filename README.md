@@ -18,9 +18,10 @@
 </details>
 
 ### Built With
-C# and PuppeteerSharp
+C# and Microsoft Playwright (PuppeteerSharp was used until Release 1.0.2)
 
 <img src="https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/aca578ae-4c24-490f-96f2-4c19a16fe9e6" width="64" height="64">
+<img src="https://example.com/" width="64" height="64">
 <img src="https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/08a6f2f6-ecff-41fa-8f9e-4361ad178902" width="64" height="64">
 
 <!--![csharpIcon](https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/aca578ae-4c24-490f-96f2-4c19a16fe9e6)
@@ -42,7 +43,7 @@ When downloading all videos from a user, the files are saved into a folder with 
 To download all videos from a TikTok user, the Application opens the specified TikTok user in the browser. Then, loads all video links of the user by Auto scrolling through the browser. After that, those Links get saved in a separate text file named "{@username}_video_links.txt" in the TikTokDowloads Folder. Finally the Application works through the Saved links.
 
 ### Important: 
-To make the TikTok User download work, Google Chrome must be installed since I haven't had the chance to make the app use the system default browser yet, Sry Firefox users.
+To make the TikTok User download work, you need to have a Chromium-based browser installed, because Firefox doesn't work for some reason I'm still investigating.
 
 <p align="right"><a href="#readme-top">Back to top</a></p>
 
@@ -51,7 +52,7 @@ To make the TikTok User download work, Google Chrome must be installed since I h
 
 To install TikTok Downloader, Download the Latest Setup file from [Releases](https://github.com/Jettcodey/TikTok-Downloader/releases/latest).
 
-If the Installer fails to Install it, u need to Install [Microsoft .Net 6.0 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) manually.
+If the Installer fails to Install it, u need to Install [Microsoft .Net 8.0 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) manually.
 
 <p align="right"><a href="#readme-top">Back to top</a></p>
 
@@ -64,12 +65,10 @@ If the Installer fails to Install it, u need to Install [Microsoft .Net 6.0 Desk
 - [x] Download Videos & Images from Links in a Text File.
 - [x] Download All Videos from a User-Profile.
 - [ ] Download All Images from a User-Profile Without Watermark.
+- [x] System Default Browser Support
+- [ ] Multi-Webbrowser Support
 - [ ] Make the GUI Better.
-- [ ] Multi-Webbrowser Support(Systems Default).
-- [ ] Multi-OS Support
-  - [x] Windows Support
-  - [ ] Linux Support 
-  - [ ] MacOS Support <-- Currently working on
+
 
 
 See the [open issues](https://github.com/Jettcodey/TikTok-Downloader/issues) for a full list of proposed features (and known issues).
