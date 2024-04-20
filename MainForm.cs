@@ -10,7 +10,6 @@ using Microsoft.Playwright;
 using System.Management;
 using Microsoft.Win32;
 using System.Globalization;
-//using PuppeteerSharp;
 
 namespace TikTok_Downloader
 {
@@ -28,10 +27,8 @@ namespace TikTok_Downloader
             {
                 string systemInfo = "";
 
-                // System Region and Language
                 systemInfo += $"Region and Language: {CultureInfo.CurrentCulture.DisplayName}\n";
 
-                // System CPU (Name)
                 using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Processor"))
                 {
                     foreach (var queryObj in searcher.Get())
@@ -40,7 +37,6 @@ namespace TikTok_Downloader
                     }
                 }
 
-                // System GPU
                 using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_VideoController"))
                 {
                     foreach (var queryObj in searcher.Get())
@@ -49,7 +45,6 @@ namespace TikTok_Downloader
                     }
                 }
 
-                // System RAM
                 using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem"))
                 {
                     foreach (var queryObj in searcher.Get())
@@ -61,7 +56,6 @@ namespace TikTok_Downloader
                     }
                 }
 
-                // Free Storage available on the drive used for downloads
                 var driveInfo = new DriveInfo(Path.GetPathRoot(downloadFolderPath));
                 double freeSpaceGB = driveInfo.AvailableFreeSpace / (1024 * 1024 * 1024);
                 systemInfo += $"Free Storage on Download Drive: {freeSpaceGB} GB\n";
@@ -259,7 +253,7 @@ namespace TikTok_Downloader
 
                 var browser = await browserType.LaunchAsync(new BrowserTypeLaunchOptions
                 {
-                    Headless = false, // Set to true for headless mode
+                    Headless = false, 
                     ExecutablePath = browserExecutablePath
                 });
 
@@ -569,7 +563,7 @@ namespace TikTok_Downloader
                     using (var client = new HttpClient())
                     {
                         var response = await client.GetAsync(data.Url);
-                        response.EnsureSuccessStatusCode(); // Ensure the response is successful
+                        response.EnsureSuccessStatusCode();
 
                         using (var stream = await response.Content.ReadAsStreamAsync())
                         using (var fileStream = File.Create(filePath))
@@ -586,10 +580,9 @@ namespace TikTok_Downloader
             {
                 outputTextBox.AppendText($"ERROR: An error occurred while downloading video: {ex.Message}\r\n");
 
-                // Retry downloading after 5 seconds
                 outputTextBox.AppendText("Retry continue download in 5 seconds...\r\n");
-                await Task.Delay(5000); // Wait for 5 seconds before retrying
-                await DownloadMedia(data, url); // Retry downloading
+                await Task.Delay(5000);
+                await DownloadMedia(data, url);
             }
             catch (Exception ex)
             {
