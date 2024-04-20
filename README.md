@@ -73,7 +73,7 @@ If the Installer fails to Install it, u need to Install [Microsoft .Net 8.0 Desk
 thats Microsofts fault.
     - [ ] Mozilla Firefox <-- Doesn't work for some reason, still investigating.
     - [ ] Opera GX <-- <-- Doesn't work for some reason, still investigating.
-    - [ ] Brave <-- Not tested yet.
+    - [x] Brave <-- Not tested yet, but could work.
     - [x] Chromium <-- Not tested yet, but should work.
 - [ ] Make the GUI Better.
 
