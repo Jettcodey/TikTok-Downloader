@@ -69,7 +69,8 @@ If the Installer fails to Install it, u need to Install [Microsoft .Net 8.0 Desk
 - [x] System Default Browser Support
 - [ ] Multi-Webbrowser Support
     - [x] Google Chrome
-    - [x] Microsoft Edge <-- Does the Job but the Browser doesn't Fully close after the download is finished, thats Microsofts fault.
+    - [x] Microsoft Edge <-- Does the Job but the Browser doesn't Fully close after the download is finished,
+thats Microsofts fault.
     - [ ] Mozilla Firefox <-- Doesn't work for some reason, still investigating.
     - [ ] Opera GX <-- <-- Doesn't work for some reason, still investigating.
     - [ ] Brave <-- Not tested yet.
