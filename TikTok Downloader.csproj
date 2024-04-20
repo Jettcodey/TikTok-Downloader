@@ -15,6 +15,11 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Depend\**" />
+    <EmbeddedResource Remove="Depend\**" />
+    <None Remove="Depend\**" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="bgi.png" />
     <None Remove="bgi2.png" />
     <None Remove="bgimage.png" />
@@ -30,6 +35,7 @@
     <PackageReference Include="Microsoft.WinForms.Designer.SDK" Version="1.6.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="PuppeteerSharp" Version="16.0.0" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="AboutWindow.cs">

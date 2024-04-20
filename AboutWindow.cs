@@ -1,9 +1,18 @@
 using System.Diagnostics;
+using static TikTok_Downloader.MainForm;
 
 namespace TikTok_Downloader
 {
     public partial class AboutWindow : Form
     {
+        private readonly BrowserUtility browserUtility;
+
+        internal AboutWindow(BrowserUtility browserUtility)
+        {
+            InitializeComponent();
+            this.browserUtility = browserUtility;
+        }
+
         public AboutWindow()
         {
             InitializeComponent();
@@ -48,7 +57,7 @@ namespace TikTok_Downloader
             versionLabel.Name = "versionLabel";
             versionLabel.Size = new Size(117, 15);
             versionLabel.TabIndex = 1;
-            versionLabel.Text = "Version: Release 1.1.0";
+            versionLabel.Text = "Version: Release 1.1.5";
             // 
             // descriptionLabel
             // 
@@ -128,7 +137,7 @@ namespace TikTok_Downloader
         {
             string url = linkLabel.Text;
 
-            string browserPath = @"C:\Program Files\Google\Chrome\Application\chrome.exe"; // <-- Change this path to ur preferred Webbrowser.
+            string browserPath = browserUtility.GetSystemDefaultBrowser();
 
             try
             {

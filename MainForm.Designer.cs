@@ -180,7 +180,7 @@
             label2.Name = "label2";
             label2.Size = new Size(130, 15);
             label2.TabIndex = 7;
-            label2.Text = "Downlod by Username:";
+            label2.Text = "Download by Username:";
             label2.Click += label2_Click;
             // 
             // withWatermarkCheckBox

@@ -34,16 +34,16 @@ C# and Microsoft Playwright (PuppeteerSharp was used until Release 1.0.2)
 ## About The Project
 ### For educational purposes only!
 
-Just a simple TikTok Downloader capable of downloading single videos/images, Mass Downloading from Links in a Text file or Mass downloading videos from a user profile.
+Just a simple TikTok Downloader capable of downloading single videos/images, Mass Downloading from Links in a Text file or Mass downloading from a user profile.
 
 Completed downloaded Single videos/photos or from Links in a Text file are stored individually in the Download Directory.
 
-When downloading all videos from a user, the files are saved into a folder with the video ID, one folder per video ID. The default storage location is the user's desktop in a folder named "TikTokDownloads".
+When downloading all videos from a user, The default storage location is the user's desktop in a folder named "TikTokDownloads\{@Username}\Videos&Images folders".
 
 To download all videos from a TikTok user, the Application opens the specified TikTok user in the browser. Then, loads all video links of the user by Auto scrolling through the browser. After that, those Links get saved in a separate text file named "{@username}_video_links.txt" in the TikTokDowloads Folder. Finally the Application works through the Saved links.
 
 ### Important: 
-To make the TikTok User download work, you need to have a Chromium-based browser installed, because Firefox doesn't work for some reason I'm still investigating.
+To make the TikTok User download work, you need to have a Chromium-based browser installed, because others like Firefox and Opera GX don't work for some reason, I'm still investigating.                                       
 
 <p align="right"><a href="#readme-top">Back to top</a></p>
 
@@ -64,9 +64,15 @@ If the Installer fails to Install it, u need to Install [Microsoft .Net 8.0 Desk
 - [x] Download Images Without Watermark.
 - [x] Download Videos & Images from Links in a Text File.
 - [x] Download All Videos from a User-Profile.
-- [ ] Download All Images from a User-Profile Without Watermark.
+- [x] Download All Images from a User-Profile Without Watermark.
 - [x] System Default Browser Support
 - [ ] Multi-Webbrowser Support
+    - [x] Google Chrome
+    - [x] Microsoft Edge <-- Does the Job but the Browser doesn't Fully close after the download is finished, thats Microsofts fault.
+    - [ ] Mozilla Firefox <-- Doesn't work for some reason, still investigating.
+    - [ ] Opera GX <-- <-- Doesn't work for some reason, still investigating.
+    - [ ] Brave <-- Not tested yet.
+    - [x] Chromium <-- Not tested yet, but should work.
 - [ ] Make the GUI Better.
 
 
