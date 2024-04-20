@@ -21,11 +21,12 @@
 C# and Microsoft Playwright (PuppeteerSharp was used until Release 1.0.2)
 
 <img src="https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/aca578ae-4c24-490f-96f2-4c19a16fe9e6" width="64" height="64">
-<img src="https://example.com/" width="64" height="64">
+<img src="https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/e36d2e7e-689f-4927-aadb-42b8a7d1de2d" width="64" height="64">
 <img src="https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/08a6f2f6-ecff-41fa-8f9e-4361ad178902" width="64" height="64">
 
 <!--![csharpIcon](https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/aca578ae-4c24-490f-96f2-4c19a16fe9e6)
-![logo](https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/08a6f2f6-ecff-41fa-8f9e-4361ad178902)-->
+![logo](https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/08a6f2f6-ecff-41fa-8f9e-4361ad178902)
+![Playwright](https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/e36d2e7e-689f-4927-aadb-42b8a7d1de2d)-->
 
 
 <p align="right"><a href="#readme-top">Back to top</a></p>
