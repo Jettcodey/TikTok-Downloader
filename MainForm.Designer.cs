@@ -178,7 +178,7 @@
             label2.ForeColor = SystemColors.Control;
             label2.Location = new Point(12, 110);
             label2.Name = "label2";
-            label2.Size = new Size(130, 15);
+            label2.Size = new Size(136, 15);
             label2.TabIndex = 7;
             label2.Text = "Download by Username:";
             label2.Click += label2_Click;

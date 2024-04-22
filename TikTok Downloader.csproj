@@ -6,35 +6,28 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <PlatformTarget>x64</PlatformTarget>
+    <Company>$(Authors)</Company>
+    <Authors>Jettcodey</Authors>
+    <Title>TIkTok Downloader</Title>
+    <Version>1.1.7</Version>
+    <Copyright>Jettcodey ©2024</Copyright>
+    <PackageIcon>Assets\icon.png</PackageIcon>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugType>embedded</DebugType>
+    <DebugType>none</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>embedded</DebugType>
+    <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Depend\**" />
-    <EmbeddedResource Remove="Depend\**" />
-    <None Remove="Depend\**" />
+    <Content Include="Assets\icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="bgi.png" />
-    <None Remove="bgi2.png" />
-    <None Remove="bgimage.png" />
-    <None Remove="NewReport1.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
     <PackageReference Include="Microsoft.Playwright" Version="1.43.0" />
-    <PackageReference Include="Microsoft.Playwright.NUnit" Version="1.43.0" />
-    <PackageReference Include="Microsoft.WinForms.Designer.SDK" Version="1.6.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="PuppeteerSharp" Version="16.0.0" />
     <PackageReference Include="System.Management" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
@@ -50,8 +43,14 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Assets\icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 </Project>

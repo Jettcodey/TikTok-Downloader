@@ -1,15 +1,8 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.Playwright;
-using System.Management;
 using Microsoft.Win32;
 using System.Globalization;
+using System.Management;
+using System.Text.Json;
 
 namespace TikTok_Downloader
 {
@@ -21,7 +14,7 @@ namespace TikTok_Downloader
 
         private List<string> cachedVideoUrls = new List<string>();
 
-        private async Task LogSystemInformation(string logFilePath)
+        private Task LogSystemInformation(string logFilePath)
         {
             try
             {
@@ -51,7 +44,7 @@ namespace TikTok_Downloader
                     {
                         double ramBytes = Convert.ToDouble(queryObj["TotalPhysicalMemory"]);
                         double ramGB = ramBytes / (1024 * 1024 * 1024);
-                        ramGB = Math.Ceiling(ramGB); 
+                        ramGB = Math.Ceiling(ramGB);
                         systemInfo += $"RAM: {ramGB} GB\n";
                     }
                 }
@@ -66,6 +59,8 @@ namespace TikTok_Downloader
             {
                 LogError($"Error getting system information: {ex.Message}");
             }
+
+            return Task.CompletedTask;
         }
 
         public MainForm()
@@ -160,6 +155,7 @@ namespace TikTok_Downloader
 
         private async void btnDownload_Click(object sender, EventArgs e)
         {
+            outputTextBox.Clear();
             string choice = cmbChoice.SelectedItem.ToString();
             LogMessage(logFilePath, $"Selected option: {choice}");
 
@@ -253,7 +249,7 @@ namespace TikTok_Downloader
 
                 var browser = await browserType.LaunchAsync(new BrowserTypeLaunchOptions
                 {
-                    Headless = false, 
+                    Headless = false,
                     ExecutablePath = browserExecutablePath
                 });
 
