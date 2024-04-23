@@ -66,9 +66,10 @@ If the Installer fails to Install it, u need to Install [Microsoft .Net 8.0 Desk
 - [x] Download All Images from a User-Profile Without Watermark.
 - [x] System Default Browser Support
 - [ ] Multi-Webbrowser Support
-    - [x] Google Chrome
+    - [x] Google Chrome <-- Does the Job but the Browser doesn't Fully close after the download is finished,
+Still investigating.
     - [x] Microsoft Edge <-- Does the Job but the Browser doesn't Fully close after the download is finished,
-thats Microsofts fault.
+Still investigating.
     - [ ] Mozilla Firefox <-- Doesn't work for some reason, still investigating.
     - [ ] Opera GX <-- <-- Doesn't work for some reason, still investigating.
     - [x] Brave <-- Not tested yet, but could work.
