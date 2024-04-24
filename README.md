@@ -1,4 +1,4 @@
-# Tiktok Downloader
+# TikTok Downloader
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
@@ -66,8 +66,8 @@ If the Installer fails to Install it, u need to Install [Microsoft .Net 8.0 Desk
 - [x] Download All Images from a User-Profile Without Watermark.
 - [x] System Default Browser Support
 - [ ] Multi-Webbrowser Support
-    - [x] Google Chrome
-    - [x] Microsoft Edge
+    - [x] Google Chrome --> not closing completely.
+    - [x] Microsoft Edge --> not closing completely.
     - [ ] Mozilla Firefox <-- Doesn't work for some reason, still investigating.
     - [ ] Opera GX <-- <-- Doesn't work for some reason, still investigating.
     - [x] Brave <-- Not tested yet, but could work.
