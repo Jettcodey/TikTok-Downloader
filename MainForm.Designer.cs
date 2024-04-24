@@ -40,6 +40,7 @@
             // 
             // urlTextBox
             // 
+            urlTextBox.BackColor = SystemColors.Window;
             urlTextBox.Location = new Point(149, 73);
             urlTextBox.Name = "urlTextBox";
             urlTextBox.PlaceholderText = "Enter TikTok Video/Image Link";

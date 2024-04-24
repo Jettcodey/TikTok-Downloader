@@ -2,16 +2,19 @@ using Microsoft.Playwright;
 using Microsoft.Win32;
 using System.Globalization;
 using System.Management;
+using System.Reflection;
 using System.Text.Json;
 
 namespace TikTok_Downloader
 {
     public partial class MainForm : Form
     {
+        private readonly string logFolderPath;
         private readonly string logFilePath;
         private string downloadFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TiktokDownloads");
         private readonly BrowserUtility browserUtility;
-
+        private readonly string jsonLogFilePath;
+        private readonly object jsonLock = new object();
         private List<string> cachedVideoUrls = new List<string>();
 
         private Task LogSystemInformation(string logFilePath)
@@ -66,7 +69,31 @@ namespace TikTok_Downloader
         public MainForm()
         {
             InitializeComponent();
-            logFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), $"TiktokDownloaderLog_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
+            string logFolderName = $"TTDownloader-Logs[{DateTime.Now:yyyy-MM-dd_HH-mm}]-Logs";
+            string logFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), logFolderName);
+
+            try
+            {
+                Directory.CreateDirectory(logFolderPath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error creating log directory: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Environment.Exit(1);
+            }
+
+            logFilePath = Path.Combine(logFolderPath, $"TikTokDownloaderLog_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
+            jsonLogFilePath = Path.Combine(logFolderPath, $"JSON_Log_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.json");
+
+            try
+            {
+                Directory.CreateDirectory(logFolderPath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error creating log directory: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Environment.Exit(1);
+            }
 
             Directory.CreateDirectory(downloadFolderPath);
 
@@ -96,6 +123,25 @@ namespace TikTok_Downloader
         private void LogDownload(string fileName, string url)
         {
             LogMessage(logFilePath, $"Downloaded file: {fileName}, from URL: {url}");
+        }
+        private void LogJson(string fileName, string jsonContent)
+        {
+            lock (jsonLock)
+            {
+                try
+                {
+                    using (StreamWriter writer = File.AppendText(jsonLogFilePath))
+                    {
+                        writer.WriteLine($"[{DateTime.Now}] File: {fileName}");
+                        writer.WriteLine(jsonContent);
+                        writer.WriteLine();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    outputTextBox.AppendText($"ERROR: An error occurred while logging JSON response: {ex.Message}\r\n");
+                }
+            }
         }
 
         private void LogError(string errorMessage)
@@ -296,6 +342,8 @@ namespace TikTok_Downloader
                 LogMessage(logFilePath, $"Saved {filteredUrls.Count()} URLs to file: {combinedLinksFilePath}");
 
                 // Close the browser
+                //await browserContext.CloseAsync();
+                await page.CloseAsync();
                 await browser.CloseAsync();
                 LogMessage(logFilePath, "Browser closed successfully");
 
@@ -425,6 +473,7 @@ namespace TikTok_Downloader
                 var response = await client.GetAsync(apiUrl);
                 response.EnsureSuccessStatusCode();
                 var json = await response.Content.ReadAsStringAsync();
+                LogJson($"API_Response_For_'{idVideo}'", json);
                 var data = JsonSerializer.Deserialize<ApiData>(json);
 
                 if (data?.aweme_list == null || data.aweme_list.Count == 0)
@@ -566,6 +615,10 @@ namespace TikTok_Downloader
                         {
                             await stream.CopyToAsync(fileStream);
                         }
+
+                        // JSON Logging from downloaded Media.
+                        //string jsonResponse = await response.Content.ReadAsStringAsync();
+                        //LogJson(fileName, jsonResponse);
                     }
 
                     outputTextBox.AppendText($"Downloaded Video: '{fileName}'...\r\n");
@@ -574,9 +627,26 @@ namespace TikTok_Downloader
             }
             catch (HttpRequestException ex)
             {
-                outputTextBox.AppendText($"ERROR: An error occurred while downloading video: {ex.Message}\r\n");
+                outputTextBox.AppendText($"ERROR: An error occurred while downloading Media: {ex.Message}\r\n");
 
                 outputTextBox.AppendText("Retry continue download in 5 seconds...\r\n");
+                LogMessage(logFilePath, $"ERROR: An error occurred while downloading Media: {ex.Message}");
+                await Task.Delay(5000);
+                await DownloadMedia(data, url);
+            }
+            catch (TargetInvocationException ex)
+            {
+                outputTextBox.AppendText($"ERROR: TargetInvocationException occurred: {ex.InnerException?.Message}\r\n");
+                outputTextBox.AppendText($"Inner Exception 1: {ex.InnerException?.InnerException?.Message}\r\n");
+                outputTextBox.AppendText($"Inner Exception 2: {ex.InnerException?.InnerException?.InnerException?.Message}\r\n");
+                LogMessage(logFilePath, $"ERROR: TargetInvocationException occurred: {ex.InnerException?.Message}");
+            }
+            catch (JsonException ex)
+            {
+                outputTextBox.AppendText($"ERROR: An error occurred while processing JSON response: {ex.Message}\r\n");
+
+                outputTextBox.AppendText("Retry continue download in 5 seconds...\r\n");
+                LogMessage(logFilePath, $"ERROR: An error occurred while processing JSON response: {ex.Message}");
                 await Task.Delay(5000);
                 await DownloadMedia(data, url);
             }
@@ -585,6 +655,7 @@ namespace TikTok_Downloader
                 outputTextBox.AppendText($"ERROR: An unexpected error occurred: {ex.Message}\r\n");
             }
         }
+
 
 
 
