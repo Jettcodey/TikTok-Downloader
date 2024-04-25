@@ -2,6 +2,7 @@ using Microsoft.Playwright;
 using Microsoft.Win32;
 using System.Globalization;
 using System.Management;
+using System.Net;
 using System.Reflection;
 using System.Text.Json;
 
@@ -183,18 +184,19 @@ namespace TikTok_Downloader
             public List<string> url_list { get; set; } = new List<string>();
         }
 
-        class Video
+        public class Video
         {
             public DownloadAddr download_addr { get; set; } = new DownloadAddr();
             public PlayAddr play_addr { get; set; } = new PlayAddr();
+
         }
 
-        class DownloadAddr
+        public class DownloadAddr
         {
             public List<string> url_list { get; set; } = new List<string>();
         }
 
-        class PlayAddr
+        public class PlayAddr
         {
             public List<string> url_list { get; set; } = new List<string>();
         }
@@ -279,26 +281,26 @@ namespace TikTok_Downloader
 
         private async Task MassDownloadByUsername()
         {
+            string username = txtUsername.Text.Trim();
+            LogMessage(logFilePath, $"Username selected for mass download: {username}");
+            string baseUrl = $"https://www.tiktok.com/@{username}";
+
+            // Get system default browser executable path
+            string browserExecutablePath = browserUtility.GetSystemDefaultBrowser();
+            LogMessage(logFilePath, $"System default browser executable path: {browserExecutablePath}");
+
+            // Launch Playwright with the appropriate browser type
+            using var playwright = await Playwright.CreateAsync();
+            var browserType = browserUtility.GetBrowserTypeForExecutable(browserExecutablePath, playwright);
+
+            var browser = await browserType.LaunchAsync(new BrowserTypeLaunchOptions
+            {
+                Headless = false,
+                ExecutablePath = browserExecutablePath
+            });
+
             try
             {
-                string username = txtUsername.Text.Trim();
-                LogMessage(logFilePath, $"Username selected for mass download: {username}");
-                string baseUrl = $"https://www.tiktok.com/@{username}";
-
-                // Get system default browser executable path
-                string browserExecutablePath = browserUtility.GetSystemDefaultBrowser();
-                LogMessage(logFilePath, $"System default browser executable path: {browserExecutablePath}");
-
-                // Launch Playwright with the appropriate browser type
-                using var playwright = await Playwright.CreateAsync();
-                var browserType = browserUtility.GetBrowserTypeForExecutable(browserExecutablePath, playwright);
-
-                var browser = await browserType.LaunchAsync(new BrowserTypeLaunchOptions
-                {
-                    Headless = false,
-                    ExecutablePath = browserExecutablePath
-                });
-
                 var context = await browser.NewContextAsync();
                 var page = await context.NewPageAsync();
 
@@ -341,11 +343,10 @@ namespace TikTok_Downloader
                 await File.WriteAllLinesAsync(combinedLinksFilePath, filteredUrls);
                 LogMessage(logFilePath, $"Saved {filteredUrls.Count()} URLs to file: {combinedLinksFilePath}");
 
-                // Close the browser
-                //await browserContext.CloseAsync();
+                // Close the page and context
                 await page.CloseAsync();
-                await browser.CloseAsync();
-                LogMessage(logFilePath, "Browser closed successfully");
+                await context.CloseAsync();
+                LogMessage(logFilePath, "Page and context closed successfully");
 
                 // Download all Videos and Images from the combined links file
                 await DownloadFromCombinedLinksFile(combinedLinksFilePath);
@@ -354,7 +355,14 @@ namespace TikTok_Downloader
             {
                 LogError($"An error occurred: {ex.Message}");
             }
+            finally
+            {
+                // Close the browser
+                await browser.CloseAsync();
+                LogMessage(logFilePath, "Browser closed successfully");
+            }
         }
+
 
         private async Task DownloadFromCombinedLinksFile(string filePath)
         {
@@ -470,29 +478,51 @@ namespace TikTok_Downloader
 
             using (var client = new HttpClient())
             {
-                var response = await client.GetAsync(apiUrl);
-                response.EnsureSuccessStatusCode();
-                var json = await response.Content.ReadAsStringAsync();
-                LogJson($"API_Response_For_'{idVideo}'", json);
-                var data = JsonSerializer.Deserialize<ApiData>(json);
-
-                if (data?.aweme_list == null || data.aweme_list.Count == 0)
+                try
                 {
+                    var response = await client.GetAsync(apiUrl);
+                    response.EnsureSuccessStatusCode();
+                    var json = await response.Content.ReadAsStringAsync();
+                    var data = JsonSerializer.Deserialize<ApiData>(json);
+
+                    if (data?.aweme_list == null || data.aweme_list.Count == 0)
+                    {
+                        return null;
+                    }
+
+                    var video = data.aweme_list.FirstOrDefault();
+
+                    var urlMedia = withWatermark ? video?.video?.download_addr?.url_list.FirstOrDefault() : video?.video?.play_addr?.url_list.FirstOrDefault();
+                    var imageUrls = video?.image_post_info?.images?.Select(img => img.display_image.url_list.FirstOrDefault()).ToList();
+
+                    if (urlMedia == null)
+                    {
+                        LogMessage(logFilePath, $"Skipping download link for video ID: {idVideo} due to missing media URL.");
+                        return null;
+                    }
+
+                    return new VideoData
+                    {
+                        Url = urlMedia,
+                        Images = imageUrls ?? new List<string>(),
+                        Id = idVideo
+                    };
+                }
+                catch (HttpRequestException ex) when ((int)ex.StatusCode == 404)
+                {
+                    LogMessage(logFilePath, $"Skipping download link for video ID: {idVideo} due to 404 error.");
                     return null;
                 }
-
-                var video = data.aweme_list.FirstOrDefault();
-                var urlMedia = withWatermark ? video?.video?.download_addr?.url_list.FirstOrDefault() : video?.video?.play_addr?.url_list.FirstOrDefault();
-                var imageUrls = video?.image_post_info?.images?.Select(img => img.display_image.url_list.FirstOrDefault()).ToList();
-
-                return new VideoData
+                catch (Exception ex)
                 {
-                    Url = urlMedia ?? string.Empty,
-                    Images = imageUrls ?? new List<string>(),
-                    Id = idVideo
-                };
+                    LogError($"Error getting video: {ex.Message}");
+                    return null;
+                }
             }
         }
+
+
+
 
         private async Task<string> GetIdVideo(string url)
         {
@@ -608,53 +638,66 @@ namespace TikTok_Downloader
                     using (var client = new HttpClient())
                     {
                         var response = await client.GetAsync(data.Url);
-                        response.EnsureSuccessStatusCode();
+
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            if (response.StatusCode == HttpStatusCode.NotFound)
+                            {
+                                outputTextBox.AppendText($"Download failed because of an error in the Media file hosted on the Server. Link: {url}. Skipping...\r\n");
+                                return;
+                            }
+                            else
+                            {
+                                throw new HttpRequestException($"HTTP error: {response.StatusCode}");
+                            }
+                        }
 
                         using (var stream = await response.Content.ReadAsStreamAsync())
                         using (var fileStream = File.Create(filePath))
                         {
                             await stream.CopyToAsync(fileStream);
                         }
-
-                        // JSON Logging from downloaded Media.
-                        //string jsonResponse = await response.Content.ReadAsStringAsync();
-                        //LogJson(fileName, jsonResponse);
                     }
 
                     outputTextBox.AppendText($"Downloaded Video: '{fileName}'...\r\n");
                     LogDownload(fileName, data.Url);
                 }
             }
+            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                outputTextBox.AppendText($"Error: The video download failed with a 404 error: {url}\r\n");
+                LogMessage(logFilePath, $"Error: The video download failed with a 404 error: {ex.Message}");
+                await DownloadMedia(data, url);
+            }
             catch (HttpRequestException ex)
             {
-                outputTextBox.AppendText($"ERROR: An error occurred while downloading Media: {ex.Message}\r\n");
-
+                outputTextBox.AppendText($"Error: An error occurred while downloading Media: {ex.Message}\r\n");
                 outputTextBox.AppendText("Retry continue download in 5 seconds...\r\n");
-                LogMessage(logFilePath, $"ERROR: An error occurred while downloading Media: {ex.Message}");
+                LogMessage(logFilePath, $"Error: An error occurred while downloading Media: {ex.Message}");
                 await Task.Delay(5000);
                 await DownloadMedia(data, url);
             }
             catch (TargetInvocationException ex)
             {
-                outputTextBox.AppendText($"ERROR: TargetInvocationException occurred: {ex.InnerException?.Message}\r\n");
+                outputTextBox.AppendText($"Error: TargetInvocationException occurred: {ex.InnerException?.Message}\r\n");
                 outputTextBox.AppendText($"Inner Exception 1: {ex.InnerException?.InnerException?.Message}\r\n");
                 outputTextBox.AppendText($"Inner Exception 2: {ex.InnerException?.InnerException?.InnerException?.Message}\r\n");
-                LogMessage(logFilePath, $"ERROR: TargetInvocationException occurred: {ex.InnerException?.Message}");
+                LogMessage(logFilePath, $"Error: TargetInvocationException occurred: {ex.InnerException?.Message}");
             }
             catch (JsonException ex)
             {
-                outputTextBox.AppendText($"ERROR: An error occurred while processing JSON response: {ex.Message}\r\n");
-
+                outputTextBox.AppendText($"Error: An error occurred while processing JSON response: {ex.Message}\r\n");
                 outputTextBox.AppendText("Retry continue download in 5 seconds...\r\n");
-                LogMessage(logFilePath, $"ERROR: An error occurred while processing JSON response: {ex.Message}");
+                LogMessage(logFilePath, $"Error: An error occurred while processing JSON response: {ex.Message}");
                 await Task.Delay(5000);
                 await DownloadMedia(data, url);
             }
             catch (Exception ex)
             {
-                outputTextBox.AppendText($"ERROR: An unexpected error occurred: {ex.Message}\r\n");
+                outputTextBox.AppendText($"Error: An unexpected error occurred: {ex.Message}\r\n");
             }
         }
+
 
 
 
