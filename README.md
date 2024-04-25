@@ -37,7 +37,7 @@ Just a simple TikTok Downloader capable of downloading single videos/images, Mas
 
 Completed downloaded Single videos/photos or from Links in a Text file are stored individually in the Download Directory.
 
-When downloading all videos from a user, The default storage location is the user's desktop in a folder named "TikTokDownloads\{@Username}\Videos&Images folders".
+When downloading all videos from a user, The default storage location is the user's desktop in a folder named "TikTokDownloads\{@Username}\Videos & \Images folders".
 
 To download all videos from a TikTok user, the Application opens the specified TikTok user in the browser. Then, loads all video links of the user by Auto scrolling through the browser. After that, those Links get saved in a separate text file named "{@username}_video_links.txt" in the TikTokDowloads Folder. Finally the Application works through the Saved links.
 
@@ -64,15 +64,16 @@ If the Installer fails to Install it, u need to Install [Microsoft .Net 8.0 Desk
 - [x] Download Videos & Images from Links in a Text File.
 - [x] Download All Videos from a User-Profile.
 - [x] Download All Images from a User-Profile Without Watermark.
-- [x] System Default Browser Support
+- [x] System Default Browser Support <--(only Chromium-based are Currently supported)
 - [ ] Multi-Webbrowser Support
-    - [x] Google Chrome --> not closing completely.
-    - [x] Microsoft Edge --> not closing completely.
+    - [x] Google Chrome
+    - [x] Microsoft Edge
+    - [x] Chromium
+    - [x] Brave <-- Not tested yet, but could work.
     - [ ] Mozilla Firefox <-- Doesn't work for some reason, still investigating.
     - [ ] Opera GX <-- <-- Doesn't work for some reason, still investigating.
-    - [x] Brave <-- Not tested yet, but could work.
-    - [x] Chromium <-- Not tested yet, but should work.
-- [ ] Make the GUI Better.
+- [ ] Make the GUI Better
+    - [ ] Add more Options(Settings Menu)
 
 
 
