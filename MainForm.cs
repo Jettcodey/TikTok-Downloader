@@ -12,10 +12,12 @@ namespace TikTok_Downloader
     {
         private readonly string logFolderPath;
         private readonly string logFilePath;
-        private string downloadFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TiktokDownloads");
+        string downloadFolderPath;
         private readonly BrowserUtility browserUtility;
         private readonly string jsonLogFilePath;
         private readonly object jsonLock = new object();
+        private bool useOldFileStructure;
+        private readonly AppSettings settings;
         private List<string> cachedVideoUrls = new List<string>();
 
         private Task LogSystemInformation(string logFilePath)
@@ -70,6 +72,9 @@ namespace TikTok_Downloader
         public MainForm()
         {
             InitializeComponent();
+            LoadDownloadFolderPath();
+            settings = new AppSettings();
+            settings.LoadSettings();
             string logFolderName = $"TTDownloader-Logs[{DateTime.Now:yyyy-MM-dd_HH-mm}]-Logs";
             string logFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), logFolderName);
 
@@ -112,6 +117,18 @@ namespace TikTok_Downloader
             outputTextBox.ReadOnly = true;
         }
 
+        private void LoadDownloadFolderPath()
+        {
+            AppSettings appSettings = new AppSettings();
+            appSettings.LoadSettings();
+            downloadFolderPath = appSettings.CurrentSettings.LastDownloadFolderPath;
+            if (string.IsNullOrEmpty(downloadFolderPath))
+            {
+                downloadFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TiktokDownloads");
+            }
+        }
+
+
         private void LogMessage(string logFilePath, string message)
         {
             lock (logFilePath)
@@ -141,6 +158,7 @@ namespace TikTok_Downloader
                 catch (Exception ex)
                 {
                     outputTextBox.AppendText($"ERROR: An error occurred while logging JSON response: {ex.Message}\r\n");
+                    Console.WriteLine($"Error occurred while logging JSON response: {ex}");
                 }
             }
         }
@@ -204,6 +222,7 @@ namespace TikTok_Downloader
         private async void btnDownload_Click(object sender, EventArgs e)
         {
             outputTextBox.Clear();
+            useOldFileStructure = newOldSwitchCheckBox.Checked;
             string choice = cmbChoice.SelectedItem.ToString();
             LogMessage(logFilePath, $"Selected option: {choice}");
 
@@ -357,7 +376,6 @@ namespace TikTok_Downloader
             }
             finally
             {
-                // Close the browser
                 await browser.CloseAsync();
                 LogMessage(logFilePath, "Browser closed successfully");
             }
@@ -394,7 +412,7 @@ namespace TikTok_Downloader
                         continue;
                     }
 
-                    await DownloadMedia(data, trimmedUrl);
+                    await DownloadMedia(data, trimmedUrl, useOldFileStructure);
                 }
 
                 progressBar.Value++;
@@ -432,7 +450,7 @@ namespace TikTok_Downloader
                         continue;
                     }
 
-                    await DownloadMedia(data, trimmedUrl);
+                    await DownloadMedia(data, trimmedUrl, useOldFileStructure);
                 }
 
                 progressBar.Value++;
@@ -463,7 +481,7 @@ namespace TikTok_Downloader
                     return;
                 }
 
-                await DownloadMedia(data, trimmedUrl);
+                await DownloadMedia(data, trimmedUrl, useOldFileStructure);
             }
             catch (Exception ex)
             {
@@ -483,6 +501,7 @@ namespace TikTok_Downloader
                     var response = await client.GetAsync(apiUrl);
                     response.EnsureSuccessStatusCode();
                     var json = await response.Content.ReadAsStringAsync();
+                    LogJson($"API_Response_For_'{idVideo}'", json);
                     var data = JsonSerializer.Deserialize<ApiData>(json);
 
                     if (data?.aweme_list == null || data.aweme_list.Count == 0)
@@ -522,78 +541,97 @@ namespace TikTok_Downloader
         }
 
 
-
-
         private async Task<string> GetIdVideo(string url)
         {
-            if (url.Contains("/t/"))
+            try
             {
-                using (var client = new HttpClient())
+                if (url.Contains("/t/"))
                 {
-                    var response = await client.GetAsync(url);
-                    return response.RequestMessage?.RequestUri.Segments.LastOrDefault()?.TrimEnd('/') ?? string.Empty;
+                    using (var client = new HttpClient())
+                    {
+                        var response = await client.GetAsync(url);
+                        return response.RequestMessage?.RequestUri.Segments.LastOrDefault()?.TrimEnd('/') ?? string.Empty;
+                    }
                 }
+
+                var matching = url.Contains("/video/");
+                var matchingPhoto = url.Contains("/photo/");
+                var startIndex = url.IndexOf("/video/") + 7;
+                var endIndex = url.IndexOf("/video/") + 26;
+
+                if (matchingPhoto)
+                {
+                    startIndex = url.IndexOf("/photo/") + 7;
+                    endIndex = url.IndexOf("/photo/") + 26;
+                }
+                else if (!matching)
+                {
+                    outputTextBox.AppendText($"Error: URL not found - {url}\r\n");
+                    LogMessage(logFilePath, $"Error: URL not found - {url}");
+                    return string.Empty;
+                }
+
+                if (endIndex > url.Length || startIndex < 0 || endIndex < startIndex)
+                {
+                    outputTextBox.AppendText($"Error: Invalid URL format - {url}\r\n");
+                    LogMessage(logFilePath, $"Error: Invalid URL format - {url}");
+                    return string.Empty;
+                }
+
+                var idVideo = url.Substring(startIndex, endIndex - startIndex);
+
+                return idVideo;
             }
-
-            var matching = url.Contains("/video/");
-            var matchingPhoto = url.Contains("/photo/");
-            var startIndex = url.IndexOf("/video/") + 7;
-            var endIndex = url.IndexOf("/video/") + 26;
-
-            if (matchingPhoto)
+            catch (Exception ex)
             {
-                startIndex = url.IndexOf("/photo/") + 7;
-                endIndex = url.IndexOf("/photo/") + 26;
+                outputTextBox.AppendText($"Error occurred while extracting MediaID: {ex.Message} - {url}\r\n");
+                LogMessage(logFilePath, $"Error occurred while extracting MediaID: {ex.Message} - {url}");
+                return string.Empty;
             }
-            else if (!matching)
-            {
-                throw new Exception("Error: URL not found");
-            }
-
-            if (endIndex > url.Length || startIndex < 0 || endIndex < startIndex)
-            {
-                throw new Exception("Error: Invalid URL format");
-            }
-
-            var idVideo = url.Substring(startIndex, endIndex - startIndex);
-
-            return idVideo;
         }
 
-        private async Task DownloadMedia(VideoData data, string url)
+
+        private async Task DownloadMedia(VideoData data, string url, bool useOldFileStructure)
         {
             try
             {
                 string username = ExtractUsernameFromUrl(url);
 
-                string folderName = Path.Combine(downloadFolderPath, username);
-                if (!Directory.Exists(folderName))
+                string userFolderPath = Path.Combine(downloadFolderPath, username);
+                if (!Directory.Exists(userFolderPath))
                 {
-                    Directory.CreateDirectory(folderName);
+                    Directory.CreateDirectory(userFolderPath);
                 }
 
-                string subFolderName;
+                string videosFolderPath = Path.Combine(userFolderPath, "Videos");
+                if (!Directory.Exists(videosFolderPath))
+                {
+                    Directory.CreateDirectory(videosFolderPath);
+                }
+
+                string imagesFolderPath = Path.Combine(userFolderPath, "Images");
+                if (!Directory.Exists(imagesFolderPath))
+                {
+                    Directory.CreateDirectory(imagesFolderPath);
+                }
+
+                string folderName = useOldFileStructure ? userFolderPath : videosFolderPath;
+
+                string fileName;
 
                 if (data.Images.Count > 0)
                 {
-                    subFolderName = Path.Combine(folderName, $"{data.Id}_Images");
-                }
-                else
-                {
-                    subFolderName = Path.Combine(folderName, $"{data.Id}_Video");
-                }
+                    folderName = useOldFileStructure ? Path.Combine(userFolderPath, "Images", $"{data.Id}_Images") : imagesFolderPath;
 
-                if (!Directory.Exists(subFolderName))
-                {
-                    Directory.CreateDirectory(subFolderName);
-                }
+                    if (!Directory.Exists(folderName))
+                    {
+                        Directory.CreateDirectory(folderName);
+                    }
 
-                if (data.Images.Count > 0)
-                {
                     foreach (var imageUrl in data.Images)
                     {
-                        string fileName = $"{data.Id}_{data.Images.IndexOf(imageUrl)}.jpeg";
-                        string filePath = Path.Combine(subFolderName, fileName);
+                        fileName = $"{data.Id}_{data.Images.IndexOf(imageUrl)}.jpeg";
+                        string filePath = Path.Combine(folderName, fileName);
 
                         if (File.Exists(filePath))
                         {
@@ -616,7 +654,14 @@ namespace TikTok_Downloader
                 }
                 else
                 {
-                    string fileName = $"{data.Id}";
+                    folderName = useOldFileStructure ? Path.Combine(userFolderPath, "Videos", $"{data.Id}_Video") : videosFolderPath;
+
+                    if (!Directory.Exists(folderName))
+                    {
+                        Directory.CreateDirectory(folderName);
+                    }
+
+                    fileName = $"{data.Id}";
 
                     if (withWatermarkCheckBox.Checked)
                     {
@@ -627,7 +672,7 @@ namespace TikTok_Downloader
                         fileName += "_Save.mp4";
                     }
 
-                    string filePath = Path.Combine(subFolderName, fileName);
+                    string filePath = Path.Combine(folderName, fileName);
 
                     if (File.Exists(filePath))
                     {
@@ -659,15 +704,16 @@ namespace TikTok_Downloader
                         }
                     }
 
-                    outputTextBox.AppendText($"Downloaded Video: '{fileName}'...\r\n");
+                    outputTextBox.AppendText($"Downloaded Video: '{fileName}' Successfully...\r\n");
                     LogDownload(fileName, data.Url);
                 }
+
             }
             catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
                 outputTextBox.AppendText($"Error: The video download failed with a 404 error: {url}\r\n");
                 LogMessage(logFilePath, $"Error: The video download failed with a 404 error: {ex.Message}");
-                await DownloadMedia(data, url);
+                await DownloadMedia(data, url, useOldFileStructure);
             }
             catch (HttpRequestException ex)
             {
@@ -675,7 +721,7 @@ namespace TikTok_Downloader
                 outputTextBox.AppendText("Retry continue download in 5 seconds...\r\n");
                 LogMessage(logFilePath, $"Error: An error occurred while downloading Media: {ex.Message}");
                 await Task.Delay(5000);
-                await DownloadMedia(data, url);
+                await DownloadMedia(data, url, useOldFileStructure);
             }
             catch (TargetInvocationException ex)
             {
@@ -690,16 +736,13 @@ namespace TikTok_Downloader
                 outputTextBox.AppendText("Retry continue download in 5 seconds...\r\n");
                 LogMessage(logFilePath, $"Error: An error occurred while processing JSON response: {ex.Message}");
                 await Task.Delay(5000);
-                await DownloadMedia(data, url);
+                await DownloadMedia(data, url, useOldFileStructure);
             }
             catch (Exception ex)
             {
                 outputTextBox.AppendText($"Error: An unexpected error occurred: {ex.Message}\r\n");
             }
         }
-
-
-
 
 
 
@@ -736,9 +779,14 @@ namespace TikTok_Downloader
                 {
                     downloadFolderPath = folderDialog.SelectedPath;
                     LogMessage(logFilePath, $"Changed download folder: {downloadFolderPath}");
+
+
+                    settings.CurrentSettings.LastDownloadFolderPath = downloadFolderPath;
+                    settings.SaveSettings();
                 }
             }
         }
+
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -759,6 +807,26 @@ namespace TikTok_Downloader
                     LogMessage(logFilePath, $"Selected file path: {openFileDialog.FileName}");
                 }
             }
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var settingsDialog = new SettingsDialog())
+            {
+                if (settingsDialog != null)
+                {
+                    settingsDialog.ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show("Error: Settings dialog is null.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void newOldSwitchCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
 
         private void withWatermarkRadioButton_CheckedChanged(object sender, EventArgs e)

@@ -59,7 +59,7 @@ namespace TikTok_Downloader
             versionLabel.Name = "versionLabel";
             versionLabel.Size = new Size(117, 15);
             versionLabel.TabIndex = 1;
-            versionLabel.Text = "Version: Release 1.1.9";
+            versionLabel.Text = "Version: Release 1.2.0";
             // 
             // descriptionLabel
             // 
