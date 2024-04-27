@@ -13,11 +13,16 @@ namespace TikTok_Downloader
             public string LastDownloadFolderPath { get; set; }
         }
 
-        private string filePath = "appsettings.xml";
+        private string directoryPath;
+        private string filePath;
+
         public Settings CurrentSettings { get; set; }
 
         public AppSettings()
         {
+            directoryPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Jettcodey\\TikTok Downloader");
+            filePath = Path.Combine(directoryPath, "appsettings.xml");
+
             CurrentSettings = new Settings();
         }
 
@@ -25,6 +30,12 @@ namespace TikTok_Downloader
         {
             try
             {
+                // Create the directory if it doesn't exist
+                if (!Directory.Exists(directoryPath))
+                {
+                    Directory.CreateDirectory(directoryPath);
+                }
+
                 using (var streamWriter = new StreamWriter(filePath))
                 {
                     var serializer = new XmlSerializer(typeof(Settings));

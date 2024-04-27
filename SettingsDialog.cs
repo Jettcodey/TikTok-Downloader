@@ -6,6 +6,8 @@ namespace TikTok_Downloader
 {
     public partial class SettingsDialog : Form
     {
+
+        private string SettingsFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Jettcodey", "TikTok Downloader", "appsettings.xml");
         public bool UseOldFileStructure
         {
             get { return setting3CheckBox.Checked; }
@@ -21,7 +23,6 @@ namespace TikTok_Downloader
         private CheckBox setting3CheckBox;
         private CheckBox setting4CheckBox;
         private Label label1;
-        private const string SettingsFilePath = "appsettings.xml";
         private AppSettings.Settings settings = new AppSettings.Settings();
 
         private MainForm mainForm;
