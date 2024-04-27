@@ -35,11 +35,9 @@ C# and Microsoft Playwright
 
 Just a simple TikTok Downloader capable of downloading single videos/images, Mass Downloading from Links in a Text file or Mass downloading from a user profile.
 
-Completed downloaded Single videos/photos or from Links in a Text file are stored individually in the Download Directory.
+The default storage location (if not Changed in the Menu) is the user's desktop in a folder named "TikTokDownloads\{@Username}\Videos\ & \Images\ folders".
 
-When downloading all videos from a user, The default storage location is the user's desktop in a folder named "TikTokDownloads\{@Username}\Videos & \Images folders".
-
-To download all videos from a TikTok user, the Application opens the specified TikTok user in the browser. Then, loads all video links of the user by Auto scrolling through the browser. After that, those Links get saved in a separate text file named "{@username}_video_links.txt" in the TikTokDowloads Folder. Finally the Application works through the Saved links.
+To download all videos from a TikTok user, the Application opens the specified TikTok user in the browser. Then, loads all Video/Image links of the user by Auto scrolling through the browser. After that, those Links get saved in a separate text file named "{@username}_combined_links.txt" in the TikTokDowloads Folder. Finally the Application works through the Saved links.
 
 ### Important: 
 To make the TikTok User download work, you need to have a Chromium-based browser installed, because others like Firefox and Opera GX don't work for some reason, I'm still investigating.                                       
@@ -74,6 +72,7 @@ If the Installer fails to Install it, u need to Install [Microsoft .Net 8.0 Desk
     - [ ] Opera GX <-- <-- Doesn't work for some reason, still investigating.
 - [ ] Make the GUI Better
     - [ ] Add more Options(Settings Menu)
+    - [ ] Make the GUI more appealing/better looking
 
 
 

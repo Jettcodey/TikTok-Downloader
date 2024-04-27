@@ -18,6 +18,7 @@ namespace TikTok_Downloader
         private readonly object jsonLock = new object();
         private bool useOldFileStructure;
         private readonly AppSettings settings;
+        private SettingsDialog settingsDialog;
         private List<string> cachedVideoUrls = new List<string>();
 
         private Task LogSystemInformation(string logFilePath)
@@ -75,6 +76,7 @@ namespace TikTok_Downloader
             LoadDownloadFolderPath();
             settings = new AppSettings();
             settings.LoadSettings();
+            this.settingsDialog = settingsDialog;
             string logFolderName = $"TTDownloader-Logs[{DateTime.Now:yyyy-MM-dd_HH-mm}]-Logs";
             string logFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), logFolderName);
 
@@ -222,7 +224,6 @@ namespace TikTok_Downloader
         private async void btnDownload_Click(object sender, EventArgs e)
         {
             outputTextBox.Clear();
-            useOldFileStructure = newOldSwitchCheckBox.Checked;
             string choice = cmbChoice.SelectedItem.ToString();
             LogMessage(logFilePath, $"Selected option: {choice}");
 
@@ -397,25 +398,28 @@ namespace TikTok_Downloader
             progressBar.Maximum = urls.Length;
             progressBar.Value = 0;
 
-            foreach (var url in urls)
+            using (var settingsDialog = new SettingsDialog(this))
             {
-                var trimmedUrl = url.Trim();
-                if (!string.IsNullOrWhiteSpace(trimmedUrl))
+                foreach (var url in urls)
                 {
-                    LogMessage(logFilePath, $"Downloading {trimmedUrl}...");
-
-                    var data = await GetVideo(trimmedUrl, withWatermarkCheckBox.Checked);
-
-                    if (data == null)
+                    var trimmedUrl = url.Trim();
+                    if (!string.IsNullOrWhiteSpace(trimmedUrl))
                     {
-                        LogError($"Error: Media from URL {trimmedUrl} was deleted!");
-                        continue;
+                        LogMessage(logFilePath, $"Downloading {trimmedUrl}...");
+
+                        var data = await GetVideo(trimmedUrl, withWatermarkCheckBox.Checked);
+
+                        if (data == null)
+                        {
+                            LogError($"Error: Media from URL {trimmedUrl} was deleted!");
+                            continue;
+                        }
+
+                        await DownloadMedia(data, trimmedUrl, settingsDialog.UseOldFileStructure);
                     }
 
-                    await DownloadMedia(data, trimmedUrl, useOldFileStructure);
+                    progressBar.Value++;
                 }
-
-                progressBar.Value++;
             }
         }
 
@@ -435,25 +439,30 @@ namespace TikTok_Downloader
             progressBar.Maximum = urls.Length;
             progressBar.Value = 0;
 
-            foreach (var url in urls)
+            using (var settingsDialog = new SettingsDialog(this))
             {
-                var trimmedUrl = url.Trim();
-                if (!string.IsNullOrWhiteSpace(trimmedUrl))
+                bool useOldFileStructure = settingsDialog.UseOldFileStructure;
+
+                foreach (var url in urls)
                 {
-                    LogMessage(logFilePath, $"Downloading {trimmedUrl} ...");
-
-                    var data = await GetVideo(trimmedUrl, withWatermarkCheckBox.Checked);
-
-                    if (data == null)
+                    var trimmedUrl = url.Trim();
+                    if (!string.IsNullOrWhiteSpace(trimmedUrl))
                     {
-                        LogError($"Error: Media from URL {trimmedUrl} was deleted!");
-                        continue;
+                        LogMessage(logFilePath, $"Downloading {trimmedUrl} ...");
+
+                        var data = await GetVideo(trimmedUrl, withWatermarkCheckBox.Checked);
+
+                        if (data == null)
+                        {
+                            LogError($"Error: Media from URL {trimmedUrl} was deleted!");
+                            continue;
+                        }
+
+                        await DownloadMedia(data, trimmedUrl, useOldFileStructure);
                     }
 
-                    await DownloadMedia(data, trimmedUrl, useOldFileStructure);
+                    progressBar.Value++;
                 }
-
-                progressBar.Value++;
             }
         }
 
@@ -481,7 +490,10 @@ namespace TikTok_Downloader
                     return;
                 }
 
-                await DownloadMedia(data, trimmedUrl, useOldFileStructure);
+                using (var settingsDialog = new SettingsDialog(this))
+                {
+                    await DownloadMedia(data, trimmedUrl, settingsDialog.UseOldFileStructure);
+                }
             }
             catch (Exception ex)
             {
@@ -713,7 +725,7 @@ namespace TikTok_Downloader
             {
                 outputTextBox.AppendText($"Error: The video download failed with a 404 error: {url}\r\n");
                 LogMessage(logFilePath, $"Error: The video download failed with a 404 error: {ex.Message}");
-                await DownloadMedia(data, url, useOldFileStructure);
+                await DownloadMedia(data, url, settingsDialog.UseOldFileStructure);
             }
             catch (HttpRequestException ex)
             {
@@ -721,7 +733,7 @@ namespace TikTok_Downloader
                 outputTextBox.AppendText("Retry continue download in 5 seconds...\r\n");
                 LogMessage(logFilePath, $"Error: An error occurred while downloading Media: {ex.Message}");
                 await Task.Delay(5000);
-                await DownloadMedia(data, url, useOldFileStructure);
+                await DownloadMedia(data, url, settingsDialog.UseOldFileStructure);
             }
             catch (TargetInvocationException ex)
             {
@@ -736,7 +748,7 @@ namespace TikTok_Downloader
                 outputTextBox.AppendText("Retry continue download in 5 seconds...\r\n");
                 LogMessage(logFilePath, $"Error: An error occurred while processing JSON response: {ex.Message}");
                 await Task.Delay(5000);
-                await DownloadMedia(data, url, useOldFileStructure);
+                await DownloadMedia(data, url, settingsDialog.UseOldFileStructure);
             }
             catch (Exception ex)
             {
@@ -811,23 +823,19 @@ namespace TikTok_Downloader
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (var settingsDialog = new SettingsDialog())
+            using (var settingsDialog = new SettingsDialog(this))
             {
-                if (settingsDialog != null)
-                {
-                    settingsDialog.ShowDialog();
-                }
-                else
-                {
-                    MessageBox.Show("Error: Settings dialog is null.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                settingsDialog.ShowDialog();
             }
         }
 
-        private void newOldSwitchCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
 
+
+        public void SetUseOldFileStructure(bool value)
+        {
+            useOldFileStructure = value;
         }
+
 
         private void withWatermarkRadioButton_CheckedChanged(object sender, EventArgs e)
         {

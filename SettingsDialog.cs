@@ -6,6 +6,11 @@ namespace TikTok_Downloader
 {
     public partial class SettingsDialog : Form
     {
+        public bool UseOldFileStructure
+        {
+            get { return setting3CheckBox.Checked; }
+        }
+
         private Label descriptionLabel;
         private Button okButton;
         private Button saveButton;
@@ -14,14 +19,25 @@ namespace TikTok_Downloader
         private CheckBox setting1CheckBox;
         private CheckBox setting2CheckBox;
         private CheckBox setting3CheckBox;
+        private CheckBox setting4CheckBox;
         private Label label1;
         private const string SettingsFilePath = "appsettings.xml";
         private AppSettings.Settings settings = new AppSettings.Settings();
 
-        public SettingsDialog()
+        private MainForm mainForm;
+        public SettingsDialog(MainForm mainForm)
         {
             InitializeComponent();
+            this.mainForm = mainForm;
             LoadExistingSettings();
+        }
+
+        private void Setting3CheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+            {
+                mainForm.SetUseOldFileStructure(checkBox.Checked);
+            }
         }
 
         private void InitializeComponent()
@@ -35,6 +51,7 @@ namespace TikTok_Downloader
             setting1CheckBox = new CheckBox();
             setting2CheckBox = new CheckBox();
             setting3CheckBox = new CheckBox();
+            setting4CheckBox = new CheckBox();
             label1 = new Label();
             SuspendLayout();
             // 
@@ -44,17 +61,17 @@ namespace TikTok_Downloader
             descriptionLabel.BackColor = Color.Transparent;
             descriptionLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             descriptionLabel.ForeColor = SystemColors.Control;
-            descriptionLabel.Location = new Point(30, 21);
+            descriptionLabel.Location = new Point(12, 9);
             descriptionLabel.Name = "descriptionLabel";
-            descriptionLabel.Size = new Size(107, 21);
+            descriptionLabel.Size = new Size(224, 21);
             descriptionLabel.TabIndex = 0;
-            descriptionLabel.Text = "App Settings";
+            descriptionLabel.Text = "TikTok Downloader Settings";
             descriptionLabel.TextAlign = ContentAlignment.TopCenter;
             // 
             // okButton
             // 
             okButton.BackColor = SystemColors.Control;
-            okButton.Location = new Point(40, 175);
+            okButton.Location = new Point(30, 175);
             okButton.Name = "okButton";
             okButton.Size = new Size(75, 23);
             okButton.TabIndex = 1;
@@ -76,7 +93,7 @@ namespace TikTok_Downloader
             // exportButton
             // 
             exportButton.BackColor = SystemColors.Control;
-            exportButton.Location = new Point(200, 175);
+            exportButton.Location = new Point(210, 175);
             exportButton.Name = "exportButton";
             exportButton.Size = new Size(75, 23);
             exportButton.TabIndex = 3;
@@ -87,7 +104,7 @@ namespace TikTok_Downloader
             // loadButton
             // 
             loadButton.BackColor = SystemColors.Control;
-            loadButton.Location = new Point(280, 175);
+            loadButton.Location = new Point(300, 175);
             loadButton.Name = "loadButton";
             loadButton.Size = new Size(75, 23);
             loadButton.TabIndex = 4;
@@ -100,23 +117,24 @@ namespace TikTok_Downloader
             setting1CheckBox.AutoSize = true;
             setting1CheckBox.BackColor = Color.Transparent;
             setting1CheckBox.ForeColor = SystemColors.Control;
-            setting1CheckBox.Location = new Point(45, 65);
+            setting1CheckBox.Location = new Point(245, 112);
             setting1CheckBox.Name = "setting1CheckBox";
-            setting1CheckBox.Size = new Size(72, 19);
+            setting1CheckBox.Size = new Size(146, 19);
             setting1CheckBox.TabIndex = 5;
-            setting1CheckBox.Text = "Setting 1";
+            setting1CheckBox.Text = "Download Videos Only";
             setting1CheckBox.UseVisualStyleBackColor = false;
+            setting1CheckBox.Visible = false;
             // 
             // setting2CheckBox
             // 
             setting2CheckBox.AutoSize = true;
             setting2CheckBox.BackColor = Color.Transparent;
             setting2CheckBox.ForeColor = SystemColors.Control;
-            setting2CheckBox.Location = new Point(45, 95);
+            setting2CheckBox.Location = new Point(30, 82);
             setting2CheckBox.Name = "setting2CheckBox";
-            setting2CheckBox.Size = new Size(72, 19);
+            setting2CheckBox.Size = new Size(242, 19);
             setting2CheckBox.TabIndex = 6;
-            setting2CheckBox.Text = "Setting 2";
+            setting2CheckBox.Text = "Disable Json Logs (Not implemented yet)";
             setting2CheckBox.UseVisualStyleBackColor = false;
             // 
             // setting3CheckBox
@@ -124,24 +142,38 @@ namespace TikTok_Downloader
             setting3CheckBox.AutoSize = true;
             setting3CheckBox.BackColor = Color.Transparent;
             setting3CheckBox.ForeColor = SystemColors.Control;
-            setting3CheckBox.Location = new Point(45, 125);
+            setting3CheckBox.Location = new Point(30, 57);
             setting3CheckBox.Name = "setting3CheckBox";
-            setting3CheckBox.Size = new Size(72, 19);
+            setting3CheckBox.Size = new Size(139, 19);
             setting3CheckBox.TabIndex = 7;
-            setting3CheckBox.Text = "Setting 3";
+            setting3CheckBox.Text = "Use Old File Structure";
             setting3CheckBox.UseVisualStyleBackColor = false;
+            setting3CheckBox.CheckedChanged += Setting3CheckBox_CheckedChanged;
+            // 
+            // setting4CheckBox
+            // 
+            setting4CheckBox.AutoSize = true;
+            setting4CheckBox.BackColor = Color.Transparent;
+            setting4CheckBox.ForeColor = SystemColors.Control;
+            setting4CheckBox.Location = new Point(245, 137);
+            setting4CheckBox.Name = "setting4CheckBox";
+            setting4CheckBox.Size = new Size(149, 19);
+            setting4CheckBox.TabIndex = 7;
+            setting4CheckBox.Text = "Download Images Only";
+            setting4CheckBox.UseVisualStyleBackColor = false;
+            setting4CheckBox.Visible = false;
             // 
             // label1
             // 
             label1.AutoSize = true;
             label1.BackColor = Color.Transparent;
-            label1.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            label1.Font = new Font("Arial", 13F, FontStyle.Bold);
             label1.ForeColor = SystemColors.Control;
-            label1.Location = new Point(133, 21);
+            label1.Location = new Point(238, 11);
             label1.Name = "label1";
-            label1.Size = new Size(235, 21);
+            label1.Size = new Size(132, 21);
             label1.TabIndex = 8;
-            label1.Text = "(Not Finished, Just a Dummy)";
+            label1.Text = "Experimental!";
             label1.TextAlign = ContentAlignment.TopCenter;
             // 
             // SettingsDialog
@@ -158,12 +190,13 @@ namespace TikTok_Downloader
             Controls.Add(setting1CheckBox);
             Controls.Add(setting2CheckBox);
             Controls.Add(setting3CheckBox);
+            Controls.Add(setting4CheckBox);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "SettingsDialog";
-            Text = "Settings";
+            Text = "TikTok Downloader Settings";
             ResumeLayout(false);
             PerformLayout();
         }
@@ -183,9 +216,10 @@ namespace TikTok_Downloader
         {
             try
             {
-                settings.Setting1 = setting1CheckBox.Checked;
-                settings.Setting2 = setting2CheckBox.Checked;
-                settings.Setting3 = setting3CheckBox.Checked;
+                settings.DownloadVideosOnly = setting1CheckBox.Checked;
+                settings.DownloadImagesOnly = setting4CheckBox.Checked;
+                settings.DisableJsonLogs = setting2CheckBox.Checked;
+                settings.UseOldFileStructure = setting3CheckBox.Checked;
 
                 using (StreamWriter writer = new StreamWriter(SettingsFilePath))
                 {
@@ -210,9 +244,10 @@ namespace TikTok_Downloader
                         XmlSerializer serializer = new XmlSerializer(typeof(AppSettings.Settings));
                         settings = (AppSettings.Settings)serializer.Deserialize(reader);
                     }
-                    setting1CheckBox.Checked = settings.Setting1;
-                    setting2CheckBox.Checked = settings.Setting2;
-                    setting3CheckBox.Checked = settings.Setting3;
+                    setting1CheckBox.Checked = settings.DownloadVideosOnly;
+                    setting4CheckBox.Checked = settings.DownloadImagesOnly;
+                    setting2CheckBox.Checked = settings.DisableJsonLogs;
+                    setting3CheckBox.Checked = settings.UseOldFileStructure;
                 }
                 else
                 {
@@ -248,9 +283,10 @@ namespace TikTok_Downloader
                         {
                             XmlSerializer serializer = new XmlSerializer(typeof(AppSettings.Settings));
                             AppSettings.Settings settings = (AppSettings.Settings)serializer.Deserialize(streamReader);
-                            setting1CheckBox.Checked = settings.Setting1;
-                            setting2CheckBox.Checked = settings.Setting2;
-                            setting3CheckBox.Checked = settings.Setting3;
+                            setting1CheckBox.Checked = settings.DownloadVideosOnly;
+                            setting4CheckBox.Checked = settings.DownloadImagesOnly;
+                            setting2CheckBox.Checked = settings.DisableJsonLogs;
+                            setting3CheckBox.Checked = settings.UseOldFileStructure;
                         }
                     }
                     catch (Exception ex)
@@ -277,9 +313,10 @@ namespace TikTok_Downloader
                     {
                         AppSettings.Settings settings = new AppSettings.Settings
                         {
-                            Setting1 = setting1CheckBox.Checked,
-                            Setting2 = setting2CheckBox.Checked,
-                            Setting3 = setting3CheckBox.Checked
+                            DownloadVideosOnly = setting1CheckBox.Checked,
+                            DownloadImagesOnly = setting4CheckBox.Checked,
+                            DisableJsonLogs = setting2CheckBox.Checked,
+                            UseOldFileStructure = setting3CheckBox.Checked
                         };
 
                         XmlSerializer serializer = new XmlSerializer(typeof(AppSettings.Settings));

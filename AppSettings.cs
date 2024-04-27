@@ -6,9 +6,10 @@ namespace TikTok_Downloader
     {
         public class Settings
         {
-            public bool Setting1 { get; set; }
-            public bool Setting2 { get; set; }
-            public bool Setting3 { get; set; }
+            public bool DownloadVideosOnly { get; set; }
+            public bool DownloadImagesOnly { get; set; }
+            public bool DisableJsonLogs { get; set; }
+            public bool UseOldFileStructure { get; set; }
             public string LastDownloadFolderPath { get; set; }
         }
 
@@ -42,9 +43,10 @@ namespace TikTok_Downloader
             {
                 CurrentSettings = new Settings
                 {
-                    Setting1 = false,
-                    Setting2 = false,
-                    Setting3 = false,
+                    DownloadVideosOnly = false,
+                    DownloadImagesOnly = false,
+                    DisableJsonLogs = false,
+                    UseOldFileStructure = false,
                     LastDownloadFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TiktokDownloads")
                 };
                 SaveSettings();

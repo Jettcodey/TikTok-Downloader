@@ -35,7 +35,6 @@
             withWatermarkCheckBox = new CheckBox();
             label3 = new Label();
             label4 = new Label();
-            newOldSwitchCheckBox = new CheckBox();
             settingsToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -221,19 +220,6 @@
             label4.TabIndex = 10;
             label4.Text = "Latest Download Status:";
             // 
-            // newOldSwitchCheckBox
-            // 
-            newOldSwitchCheckBox.AutoSize = true;
-            newOldSwitchCheckBox.BackColor = Color.Transparent;
-            newOldSwitchCheckBox.ForeColor = SystemColors.Control;
-            newOldSwitchCheckBox.Location = new Point(149, 178);
-            newOldSwitchCheckBox.Name = "newOldSwitchCheckBox";
-            newOldSwitchCheckBox.Size = new Size(117, 19);
-            newOldSwitchCheckBox.TabIndex = 11;
-            newOldSwitchCheckBox.Text = "Old File Structure";
-            newOldSwitchCheckBox.UseVisualStyleBackColor = false;
-            newOldSwitchCheckBox.CheckedChanged += newOldSwitchCheckBox_CheckedChanged;
-            // 
             // settingsToolStripMenuItem
             // 
             settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
@@ -263,7 +249,6 @@
             Controls.Add(progressBar);
             Controls.Add(outputTextBox);
             Controls.Add(downloadButton);
-            Controls.Add(newOldSwitchCheckBox);
             Controls.Add(urlTextBox);
             DoubleBuffered = true;
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -296,7 +281,6 @@
         private CheckBox withWatermarkCheckBox;
         private Label label3;
         private Label label4;
-        private CheckBox newOldSwitchCheckBox;
         private ToolStripMenuItem settingsToolStripMenuItem;
     }
 }
