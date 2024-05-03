@@ -36,7 +36,7 @@ Just a simple TikTok Downloader capable of downloading single videos/images, Mas
 
 The default storage location (if not Changed in the Menu) is the user's desktop in a folder named "TikTokDownloads\{@Username}\Videos\ & \Images\ folders".
 
-To download all videos from a TikTok user, the Application opens the specified TikTok user in the browser. Then, loads all Video/Image links of the user by Auto scrolling through the browser. After that, those Links get saved in a separate text file named "{@username}_combined_links.txt" in the TikTokDowloads Folder. Finally the Application works through the Saved links.
+To download all videos from a TikTok user, the Application opens the specified TikTok user in the browser. Then, loads all Video/Image links of the user by Auto scrolling through the browser. After that, those Links get saved in a separate text file named "{@username}_combined_links.txt" in the default storage location. Finally the Application works through the Saved links.
 
 The settings file is saved in the user's Documents folder at "Jettcodey\TikTok Downloader\appsettings.xml". The Settings Menu is still in development, so there aren't many options to choose from yet.
 ### Important: 
