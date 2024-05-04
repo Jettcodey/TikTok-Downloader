@@ -33,9 +33,6 @@
     <Content Include="scripts\playwright-ex.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="scripts\playwright.ps1">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="scripts\pwsh.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
