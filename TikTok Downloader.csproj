@@ -10,7 +10,7 @@
     <Company>$(Authors)</Company>
     <Authors>Jettcodey</Authors>
     <Title>TIkTok Downloader</Title>
-    <Version>1.2.1</Version>
+    <Version>1.2.2</Version>
     <Copyright>Jettcodey ©2024</Copyright>
     <PackageIcon>Assets\icon.png</PackageIcon>
     <NeutralLanguage>en-US</NeutralLanguage>
@@ -24,7 +24,21 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="scripts\playwright-ex.ps1" />
+    <None Remove="scripts\playwright.ps1" />
+    <None Remove="scripts\pwsh.bat" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Assets\icon.ico" />
+    <Content Include="scripts\playwright-ex.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="scripts\playwright.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="scripts\pwsh.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Playwright" Version="1.43.0" />
