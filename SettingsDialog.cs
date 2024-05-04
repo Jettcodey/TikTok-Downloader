@@ -22,7 +22,6 @@ namespace TikTok_Downloader
         private CheckBox setting2CheckBox;
         private CheckBox setting3CheckBox;
         private CheckBox setting4CheckBox;
-        private Label label1;
         private AppSettings.Settings settings = new AppSettings.Settings();
 
         private MainForm mainForm;
@@ -41,6 +40,14 @@ namespace TikTok_Downloader
             }
         }
 
+        private void Setting2CheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+            {
+                mainForm.LogJsonCheckBox(checkBox.Checked);
+            }
+        }
+
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsDialog));
@@ -53,7 +60,6 @@ namespace TikTok_Downloader
             setting2CheckBox = new CheckBox();
             setting3CheckBox = new CheckBox();
             setting4CheckBox = new CheckBox();
-            label1 = new Label();
             SuspendLayout();
             // 
             // descriptionLabel
@@ -62,7 +68,7 @@ namespace TikTok_Downloader
             descriptionLabel.BackColor = Color.Transparent;
             descriptionLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             descriptionLabel.ForeColor = SystemColors.Control;
-            descriptionLabel.Location = new Point(12, 9);
+            descriptionLabel.Location = new Point(12, 12);
             descriptionLabel.Name = "descriptionLabel";
             descriptionLabel.Size = new Size(224, 21);
             descriptionLabel.TabIndex = 0;
@@ -131,19 +137,20 @@ namespace TikTok_Downloader
             setting2CheckBox.AutoSize = true;
             setting2CheckBox.BackColor = Color.Transparent;
             setting2CheckBox.ForeColor = SystemColors.Control;
-            setting2CheckBox.Location = new Point(30, 82);
+            setting2CheckBox.Location = new Point(15, 70);
             setting2CheckBox.Name = "setting2CheckBox";
-            setting2CheckBox.Size = new Size(242, 19);
+            setting2CheckBox.Size = new Size(115, 19);
             setting2CheckBox.TabIndex = 6;
-            setting2CheckBox.Text = "Disable Json Logs (Not implemented yet)";
+            setting2CheckBox.Text = "Enable Json Logs";
             setting2CheckBox.UseVisualStyleBackColor = false;
+            setting2CheckBox.CheckedChanged += Setting2CheckBox_CheckedChanged;
             // 
             // setting3CheckBox
             // 
             setting3CheckBox.AutoSize = true;
             setting3CheckBox.BackColor = Color.Transparent;
             setting3CheckBox.ForeColor = SystemColors.Control;
-            setting3CheckBox.Location = new Point(30, 57);
+            setting3CheckBox.Location = new Point(15, 45);
             setting3CheckBox.Name = "setting3CheckBox";
             setting3CheckBox.Size = new Size(139, 19);
             setting3CheckBox.TabIndex = 7;
@@ -164,25 +171,11 @@ namespace TikTok_Downloader
             setting4CheckBox.UseVisualStyleBackColor = false;
             setting4CheckBox.Visible = false;
             // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.BackColor = Color.Transparent;
-            label1.Font = new Font("Arial", 13F, FontStyle.Bold);
-            label1.ForeColor = SystemColors.Control;
-            label1.Location = new Point(238, 11);
-            label1.Name = "label1";
-            label1.Size = new Size(132, 21);
-            label1.TabIndex = 8;
-            label1.Text = "Experimental!";
-            label1.TextAlign = ContentAlignment.TopCenter;
-            // 
             // SettingsDialog
             // 
             BackColor = SystemColors.ControlDarkDark;
             BackgroundImage = Properties.Resources.bg;
             ClientSize = new Size(400, 250);
-            Controls.Add(label1);
             Controls.Add(descriptionLabel);
             Controls.Add(okButton);
             Controls.Add(saveButton);
@@ -219,7 +212,7 @@ namespace TikTok_Downloader
             {
                 settings.DownloadVideosOnly = setting1CheckBox.Checked;
                 settings.DownloadImagesOnly = setting4CheckBox.Checked;
-                settings.DisableJsonLogs = setting2CheckBox.Checked;
+                settings.EnableJsonLogs = setting2CheckBox.Checked;
                 settings.UseOldFileStructure = setting3CheckBox.Checked;
 
                 using (StreamWriter writer = new StreamWriter(SettingsFilePath))
@@ -247,7 +240,7 @@ namespace TikTok_Downloader
                     }
                     setting1CheckBox.Checked = settings.DownloadVideosOnly;
                     setting4CheckBox.Checked = settings.DownloadImagesOnly;
-                    setting2CheckBox.Checked = settings.DisableJsonLogs;
+                    setting2CheckBox.Checked = settings.EnableJsonLogs;
                     setting3CheckBox.Checked = settings.UseOldFileStructure;
                 }
                 else
@@ -286,7 +279,7 @@ namespace TikTok_Downloader
                             AppSettings.Settings settings = (AppSettings.Settings)serializer.Deserialize(streamReader);
                             setting1CheckBox.Checked = settings.DownloadVideosOnly;
                             setting4CheckBox.Checked = settings.DownloadImagesOnly;
-                            setting2CheckBox.Checked = settings.DisableJsonLogs;
+                            setting2CheckBox.Checked = settings.EnableJsonLogs;
                             setting3CheckBox.Checked = settings.UseOldFileStructure;
                         }
                     }
@@ -316,7 +309,7 @@ namespace TikTok_Downloader
                         {
                             DownloadVideosOnly = setting1CheckBox.Checked,
                             DownloadImagesOnly = setting4CheckBox.Checked,
-                            DisableJsonLogs = setting2CheckBox.Checked,
+                            EnableJsonLogs = setting2CheckBox.Checked,
                             UseOldFileStructure = setting3CheckBox.Checked
                         };
 

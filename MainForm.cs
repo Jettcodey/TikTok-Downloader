@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Management;
 using System.Net;
 using System.Reflection;
+using System.Security.Policy;
 using System.Text.Json;
 
 namespace TikTok_Downloader
@@ -14,12 +15,15 @@ namespace TikTok_Downloader
         private readonly string logFilePath;
         string downloadFolderPath;
         private readonly BrowserUtility browserUtility;
+        private bool logJsonEnabled;
         private readonly string jsonLogFilePath;
         private readonly object jsonLock = new object();
-        private bool useOldFileStructure;
+        private bool useOldFileStructure;      
         private readonly AppSettings settings;
         private SettingsDialog settingsDialog;
         private List<string> cachedVideoUrls = new List<string>();
+
+
 
         private Task LogSystemInformation(string logFilePath)
         {
@@ -80,6 +84,7 @@ namespace TikTok_Downloader
             string logFolderName = $"TTDownloader-Logs[{DateTime.Now:yyyy-MM-dd_HH-mm}]-Logs";
             string logFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), logFolderName);
 
+
             try
             {
                 Directory.CreateDirectory(logFolderPath);
@@ -119,6 +124,7 @@ namespace TikTok_Downloader
             outputTextBox.ReadOnly = true;
         }
 
+
         private void LoadDownloadFolderPath()
         {
             AppSettings appSettings = new AppSettings();
@@ -144,8 +150,15 @@ namespace TikTok_Downloader
         {
             LogMessage(logFilePath, $"Downloaded file: {fileName}, from URL: {url}");
         }
-        private void LogJson(string fileName, string jsonContent)
+
+        
+        private void LogJson(string fileName, string jsonContent, bool logJsonEnabled)
         {
+            if (!logJsonEnabled)
+            {
+                return;
+            }
+
             lock (jsonLock)
             {
                 try
@@ -412,6 +425,7 @@ namespace TikTok_Downloader
                         if (data == null)
                         {
                             LogError($"Error: Media from URL {trimmedUrl} was deleted!");
+                            progressBar.Value++;
                             continue;
                         }
 
@@ -455,6 +469,7 @@ namespace TikTok_Downloader
                         if (data == null)
                         {
                             LogError($"Error: Media from URL {trimmedUrl} was deleted!");
+                            progressBar.Value++;
                             continue;
                         }
 
@@ -465,6 +480,7 @@ namespace TikTok_Downloader
                 }
             }
         }
+
 
         private async Task SingleVideoDownload()
         {
@@ -486,7 +502,7 @@ namespace TikTok_Downloader
 
                 if (data == null)
                 {
-                    LogError($"Error: Video from URL {trimmedUrl} was deleted!");
+                    LogError($"Error: Media from URL {trimmedUrl} was deleted!");
                     return;
                 }
 
@@ -513,7 +529,7 @@ namespace TikTok_Downloader
                     var response = await client.GetAsync(apiUrl);
                     response.EnsureSuccessStatusCode();
                     var json = await response.Content.ReadAsStringAsync();
-                    LogJson($"API_Response_For_'{idVideo}'", json);
+                    LogJson($"API_Response_For_'{idVideo}'", json, logJsonEnabled);
                     var data = JsonSerializer.Deserialize<ApiData>(json);
 
                     if (data?.aweme_list == null || data.aweme_list.Count == 0)
@@ -753,6 +769,7 @@ namespace TikTok_Downloader
             catch (Exception ex)
             {
                 outputTextBox.AppendText($"Error: An unexpected error occurred: {ex.Message}\r\n");
+                LogMessage(logFilePath, $"Error: An unexpected error occurred: {ex.Message}");
             }
         }
 
@@ -829,13 +846,15 @@ namespace TikTok_Downloader
             }
         }
 
-
-
         public void SetUseOldFileStructure(bool value)
         {
             useOldFileStructure = value;
         }
 
+        public void LogJsonCheckBox(bool value)
+        {
+            logJsonEnabled = value;
+        }
 
         private void withWatermarkRadioButton_CheckedChanged(object sender, EventArgs e)
         {
