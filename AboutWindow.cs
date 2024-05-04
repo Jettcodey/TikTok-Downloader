@@ -134,11 +134,11 @@ namespace TikTok_Downloader
             this.Close();
         }
 
-        private void LinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private async void LinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             string url = linkLabel.Text;
 
-            string browserPath = browserUtility.GetSystemDefaultBrowser();
+            string browserPath = await browserUtility.GetSystemDefaultBrowser();
 
             try
             {

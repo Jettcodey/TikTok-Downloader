@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Management;
 using System.Net;
 using System.Reflection;
-using System.Security.Policy;
 using System.Text.Json;
 
 namespace TikTok_Downloader
@@ -265,26 +264,32 @@ namespace TikTok_Downloader
                 this.mainForm = mainForm;
             }
 
-            public string GetSystemDefaultBrowser()
+            public async Task<string> GetSystemDefaultBrowser()
             {
-                string name = string.Empty;
+                string executablePath = string.Empty;
                 RegistryKey regKey = null;
 
                 try
                 {
-                    var regDefault = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\.htm\\UserChoice", false);
+                    var regDefault = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\Shell\\Associations\\UrlAssociations\\http\\UserChoice", false);
                     var stringDefault = regDefault.GetValue("ProgId");
 
                     regKey = Registry.ClassesRoot.OpenSubKey(stringDefault + "\\shell\\open\\command", false);
-                    name = regKey.GetValue(null).ToString().ToLower().Replace("" + (char)34, "");
+                    executablePath = regKey.GetValue(null).ToString().ToLower().Replace("" + (char)34, "");
 
-                    if (!name.EndsWith("exe"))
-                        name = name.Substring(0, name.LastIndexOf(".exe") + 4);
+                    if (!executablePath.EndsWith("exe"))
+                        executablePath = executablePath.Substring(0, executablePath.LastIndexOf(".exe") + 4);
+
+                    if (executablePath.Contains("firefox"))
+                    {
+                        var playwright = await Playwright.CreateAsync();
+                        executablePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"ms-playwright\firefox-1447\firefox\firefox.exe");
+                    }
                 }
                 catch (Exception ex)
                 {
-                    name = string.Format("ERROR: An exception of type: {0} occurred in method: {1} in the following module: {2}", ex.GetType(), ex.TargetSite, nameof(BrowserUtility));
-                    mainForm.LogError(name);
+                    executablePath = string.Format("ERROR: An exception of type: {0} occurred in method: {1} in the following module: {2}", ex.GetType(), ex.TargetSite, nameof(BrowserUtility));
+                    mainForm.LogError(executablePath);
                 }
                 finally
                 {
@@ -292,14 +297,14 @@ namespace TikTok_Downloader
                         regKey.Close();
                 }
 
-                return name;
+                return executablePath;
             }
 
             public IBrowserType GetBrowserTypeForExecutable(string executablePath, IPlaywright playwright)
             {
                 if (executablePath.ToLower().Contains("firefox"))
                 {
-                    return playwright.Firefox;  // Firefox doesn´t seem to work with my current playwright configuration for now.
+                    return playwright.Firefox;  // Firefox does seem to work now.
                 }
                 else if (executablePath.ToLower().Contains("webkit"))
                 {
@@ -307,7 +312,7 @@ namespace TikTok_Downloader
                 }
                 else
                 {
-                    return playwright.Chromium; // Chromium-based Browsers work with my playwright configuration.
+                    return playwright.Chromium;
                 }
             }
         }
@@ -319,7 +324,7 @@ namespace TikTok_Downloader
             string baseUrl = $"https://www.tiktok.com/@{username}";
 
             // Get system default browser executable path
-            string browserExecutablePath = browserUtility.GetSystemDefaultBrowser();
+            string browserExecutablePath = await browserUtility.GetSystemDefaultBrowser();
             LogMessage(logFilePath, $"System default browser executable path: {browserExecutablePath}");
 
             // Launch Playwright with the appropriate browser type

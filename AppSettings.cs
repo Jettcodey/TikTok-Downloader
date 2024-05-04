@@ -30,7 +30,6 @@ namespace TikTok_Downloader
         {
             try
             {
-                // Create the directory if it doesn't exist
                 if (!Directory.Exists(directoryPath))
                 {
                     Directory.CreateDirectory(directoryPath);
