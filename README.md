@@ -79,7 +79,7 @@ If you select "Mass Download from Text File Links," you just need (if not alread
 <!-- ROADMAP -->
 ## Roadmap
 
-- [x] Download Single Videos/Images.
+- [x] Download Single Video/Image Posts.
 - [x] Download Videos With or Without Watermark.
 - [x] Download Images Without Watermark.
 - [x] Download Videos & Images from Links in a Text File.
