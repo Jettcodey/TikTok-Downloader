@@ -1,5 +1,6 @@
 using Microsoft.Playwright;
 using Microsoft.Win32;
+using System.Diagnostics;
 using System.Globalization;
 using System.Management;
 using System.Net;
@@ -76,8 +77,8 @@ namespace TikTok_Downloader
         public MainForm()
         {
             InitializeComponent();
-            LoadDownloadFolderPath();
             settings = new AppSettings();
+            LoadSettingsatbeginning();
             settings.LoadSettings();
             this.settingsDialog = settingsDialog;
             string logFolderName = $"TTDownloader-Logs[{DateTime.Now:yyyy-MM-dd_HH-mm}]-Logs";
@@ -124,11 +125,36 @@ namespace TikTok_Downloader
         }
 
 
-        private void LoadDownloadFolderPath()
+        private void LoadSettingsatbeginning()
         {
-            AppSettings appSettings = new AppSettings();
-            appSettings.LoadSettings();
-            downloadFolderPath = appSettings.CurrentSettings.LastDownloadFolderPath;
+            settings.LoadSettings();
+
+            var currentSettings = settings.CurrentSettings;
+
+            if (currentSettings != null && !currentSettings.FirstRun)
+            {
+                DialogResult result = MessageBox.Show("It seems like this is the first time you're opening the application. Do you want to run the setup scripts now?", "First Time Setup", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    try
+                    {
+                        RunSetupScripts();
+
+                        currentSettings.FirstRun = true;
+                        settings.SaveSettings();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error running setup scripts: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("The Mass Download feature will not work if your system's default browser is Firefox until the setup scripts are run. If you use Firefox as your default browser, you will need to install the scripts manually.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+
+            downloadFolderPath = currentSettings.LastDownloadFolderPath;
             if (string.IsNullOrEmpty(downloadFolderPath))
             {
                 downloadFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TiktokDownloads");
@@ -821,15 +847,35 @@ namespace TikTok_Downloader
             }
         }
 
-        private void FirstRun(object sender, EventArgs e)
+        private void RunSetupScripts()
         {
+            string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string scriptsDirectory = Path.Combine(appDirectory, "scripts");
 
-            if (settings.CurrentSettings.FirstRun == "false")
+            Process process1 = Process.Start(new ProcessStartInfo
             {
-                settings.CurrentSettings.FirstRun = "true";
-                settings.SaveSettings();
+                FileName = Path.Combine(scriptsDirectory, "pwsh.bat"),
+                WorkingDirectory = scriptsDirectory
+            });
+
+            process1.WaitForExit();
+
+            if (process1.ExitCode == 0)
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = Path.Combine(scriptsDirectory, "playwright-ex.bat"),
+                    WorkingDirectory = scriptsDirectory
+                });
+
+                MessageBox.Show("Setup scripts executed successfully.", "Setup Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("Script1 failed to execute. Setup scripts cannot proceed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
