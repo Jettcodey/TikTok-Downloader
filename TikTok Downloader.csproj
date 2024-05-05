@@ -26,14 +26,14 @@
   <ItemGroup>
     <None Remove="scripts\playwright-ex.ps1" />
     <None Remove="scripts\playwright.ps1" />
-    <None Remove="scripts\pwsh.bat" />
+    <None Remove="scripts\pwsh.vbs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\icon.ico" />
     <Content Include="scripts\playwright-ex.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="scripts\pwsh.bat">
+    <Content Include="scripts\pwsh.vbs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
