@@ -90,8 +90,8 @@ If you select "Mass Download from Text File Links," you just need (if not alread
     - [x] Google Chrome
     - [x] Microsoft Edge
     - [x] Chromium
-    - [x] Brave <-- Not tested yet, but could work.
-    - [ ] Mozilla Firefox <-- Doesn't work for some reason, still investigating.
+    - [x] Brave
+    - [ ] Mozilla Firefox <-- Needs some testing, Release soon.
     - [ ] Opera GX <-- <-- Doesn't work for some reason, still investigating.
 - [ ] Make the GUI Better
     - [ ] Add more Options(Settings Menu)
