@@ -65,8 +65,9 @@ After the installation is finished, simply open the TikTok Downloader, and after
 ### How to use those options:
 
 #### Single Video/Image Download:
-If you select "Single Video/Image Download," you can simply copy and paste every TikTok browser link and press Download. The downloaded media is saved to the default storage location. 
-> TikTok browser links look like this: "https://www.tiktok.com/@tiktok/video/Numeric_ID", Video links from the TikTok App **Won´t Work**
+If you select "Single Video/Image Download," you can simply copy and paste every TikTok browser link and press Download. The downloaded media is saved to the default storage location.
+
+TikTok Browser links look like this: "https://www.tiktok.com/@user/video|photo/123456789", links directly from the TikTok App **Won´t Work!**(For Now)
 
 #### Mass Download by Username:
 If you select "Mass Download by Username," you need to type (or copy & paste) the username of the account (without the @) into the text field. After pressing download, your system's default browser will open, automatically navigating to the account's TikTok page. You'll then need to solve a simple puzzle slide at the beginning to verify that you are human and accept/deny cookies (which will be deleted after the download is finished). When the login window from TikTok shows up, just press "Continue as Guest." The browser will begin auto-scrolling the entire account page until it can't find any new posts. It will then filter and save any found links from the account's posts to a text file in the default storage location (`Username_combined_links.txt`). Once all links are saved to the text file, it will begin downloading all video/image posts from those saved links. The downloaded media is saved to the default storage location.
