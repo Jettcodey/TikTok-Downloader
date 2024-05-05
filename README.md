@@ -39,8 +39,8 @@ The default storage location (if not Changed in the Menu) is the user's desktop 
 To download all videos from a TikTok user, the Application opens the specified TikTok user in the browser. Then, loads all Video/Image links of the user by Auto scrolling through the browser. After that, those Links get saved in a separate text file named "{@username}_combined_links.txt" in the default storage location. Finally the Application works through the Saved links.
 
 The settings file is saved in the user's Documents folder at "Jettcodey\TikTok Downloader\appsettings.xml". The Settings Menu is still in development, so there aren't many options to choose from yet.
-### Important: 
-To make the TikTok User download work, you need to have a Chromium-based browser installed, because others like Firefox and Opera GX don't work for some reason, I'm still investigating.                                       
+<!--### Important: 
+To make the TikTok User download work, you need to have a Chromium-based browser or Firefox installed, because others like Opera GX don't work for some reason, I'm still investigating.-->                                       
 
 <p align="right"><a href="#readme-top">Back to top</a></p>
 
@@ -56,7 +56,7 @@ If the Installer fails to Install it, u need to Install [Microsoft .Net 8.0 Desk
 <!-- Usage -->
 ## Usage
 
-After the installation is finished, simply open the TikTok Downloader, and you will be able to select from the following options:
+After the installation is finished, simply open the TikTok Downloader, and after completing the First-Time Setup, you will be able to select from the following options:
 
 - Single Video/Image Download
 - Mass Download by Username
@@ -85,14 +85,14 @@ If you select "Mass Download from Text File Links," you just need (if not alread
 - [x] Download Videos & Images from Links in a Text File.
 - [x] Download All Videos from a User-Profile.
 - [x] Download All Images from a User-Profile Without Watermark.
-- [x] System Default Browser Support <--(only Chromium-based are Currently supported)
+- [x] System Default Browser Support
 - [ ] Multi-Webbrowser Support
     - [x] Google Chrome
     - [x] Microsoft Edge
     - [x] Chromium
     - [x] Brave
-    - [ ] Mozilla Firefox <-- Needs some testing, Release soon.
-    - [ ] Opera GX <-- <-- Doesn't work for some reason, still investigating.
+    - [x] Mozilla Firefox
+    - [ ] Opera GX <-- Doesn't work for some reason, still investigating.
 - [ ] Make the GUI Better
     - [ ] Add more Options(Settings Menu)
     - [ ] Make the GUI more appealing/better looking
