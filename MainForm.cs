@@ -821,6 +821,15 @@ namespace TikTok_Downloader
             }
         }
 
+        private void FirstRun(object sender, EventArgs e)
+        {
+
+            if (settings.CurrentSettings.FirstRun == "false")
+            {
+                settings.CurrentSettings.FirstRun = "true";
+                settings.SaveSettings();
+            }
+        }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
