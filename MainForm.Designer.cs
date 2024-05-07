@@ -22,20 +22,16 @@
             outputTextBox = new TextBox();
             progressBar = new ProgressBar();
             cmbChoice = new ComboBox();
-            txtUsername = new TextBox();
             menuStrip1 = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
             ChangeDownloadFolderToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
-            filePathLabel = new Label();
-            filePathTextBox = new TextBox();
+            settingsToolStripMenuItem = new ToolStripMenuItem();
             browseFileButton = new Button();
-            label1 = new Label();
-            label2 = new Label();
             withWatermarkCheckBox = new CheckBox();
             label3 = new Label();
-            label4 = new Label();
-            settingsToolStripMenuItem = new ToolStripMenuItem();
+            label2 = new Label();
+            label1 = new Label();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -47,6 +43,7 @@
             urlTextBox.PlaceholderText = "Enter TikTok Video/Image Link";
             urlTextBox.Size = new Size(281, 23);
             urlTextBox.TabIndex = 0;
+            urlTextBox.TextChanged += filePathTextBox_TextChanged;
             // 
             // downloadButton
             // 
@@ -88,14 +85,7 @@
             cmbChoice.Name = "cmbChoice";
             cmbChoice.Size = new Size(281, 23);
             cmbChoice.TabIndex = 4;
-            // 
-            // txtUsername
-            // 
-            txtUsername.Location = new Point(149, 107);
-            txtUsername.Name = "txtUsername";
-            txtUsername.PlaceholderText = "Enter TikTok Username";
-            txtUsername.Size = new Size(281, 23);
-            txtUsername.TabIndex = 5;
+            cmbChoice.SelectedIndexChanged += cmbChoice_SelectedIndexChanged;
             // 
             // menuStrip1
             // 
@@ -132,58 +122,23 @@
             aboutToolStripMenuItem.Text = "About";
             aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
-            // filePathLabel
+            // settingsToolStripMenuItem
             // 
-            filePathLabel.AutoSize = true;
-            filePathLabel.BackColor = Color.Transparent;
-            filePathLabel.ForeColor = SystemColors.Control;
-            filePathLabel.Location = new Point(12, 143);
-            filePathLabel.Name = "filePathLabel";
-            filePathLabel.Size = new Size(136, 15);
-            filePathLabel.TabIndex = 8;
-            filePathLabel.Text = "Download from Text file:";
-            // 
-            // filePathTextBox
-            // 
-            filePathTextBox.Location = new Point(149, 140);
-            filePathTextBox.Name = "filePathTextBox";
-            filePathTextBox.PlaceholderText = "Enter/Select Path to Text File";
-            filePathTextBox.Size = new Size(281, 23);
-            filePathTextBox.TabIndex = 9;
-            filePathTextBox.TextChanged += filePathTextBox_TextChanged;
+            settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            settingsToolStripMenuItem.Size = new Size(208, 22);
+            settingsToolStripMenuItem.Text = "Settings";
+            settingsToolStripMenuItem.Click += settingsToolStripMenuItem_Click;
             // 
             // browseFileButton
             // 
-            browseFileButton.Location = new Point(436, 140);
+            browseFileButton.Location = new Point(436, 73);
             browseFileButton.Name = "browseFileButton";
             browseFileButton.Size = new Size(88, 23);
             browseFileButton.TabIndex = 7;
             browseFileButton.Text = "Browse";
             browseFileButton.UseVisualStyleBackColor = true;
+            browseFileButton.Visible = false;
             browseFileButton.Click += browseFileButton_Click;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.BackColor = Color.Transparent;
-            label1.ForeColor = SystemColors.Control;
-            label1.Location = new Point(12, 39);
-            label1.Name = "label1";
-            label1.Size = new Size(109, 15);
-            label1.TabIndex = 6;
-            label1.Text = "Download Options:";
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.BackColor = Color.Transparent;
-            label2.ForeColor = SystemColors.Control;
-            label2.Location = new Point(12, 110);
-            label2.Name = "label2";
-            label2.Size = new Size(136, 15);
-            label2.TabIndex = 7;
-            label2.Text = "Download by Username:";
-            label2.Click += label2_Click;
             // 
             // withWatermarkCheckBox
             // 
@@ -192,9 +147,9 @@
             withWatermarkCheckBox.ForeColor = SystemColors.Control;
             withWatermarkCheckBox.Location = new Point(12, 178);
             withWatermarkCheckBox.Name = "withWatermarkCheckBox";
-            withWatermarkCheckBox.Size = new Size(112, 19);
+            withWatermarkCheckBox.Size = new Size(169, 19);
             withWatermarkCheckBox.TabIndex = 8;
-            withWatermarkCheckBox.Text = "With Watermark";
+            withWatermarkCheckBox.Text = "Download With Watermark";
             withWatermarkCheckBox.UseVisualStyleBackColor = false;
             // 
             // label3
@@ -207,25 +162,28 @@
             label3.Size = new Size(129, 15);
             label3.TabIndex = 9;
             label3.Text = "Download Single Links:";
-            label3.Click += label3_Click;
             // 
-            // label4
+            // label2
             // 
-            label4.AutoSize = true;
-            label4.BackColor = Color.Transparent;
-            label4.ForeColor = SystemColors.Control;
-            label4.Location = new Point(12, 228);
-            label4.Name = "label4";
-            label4.Size = new Size(133, 15);
-            label4.TabIndex = 10;
-            label4.Text = "Latest Download Status:";
+            label2.AutoSize = true;
+            label2.BackColor = Color.Transparent;
+            label2.ForeColor = SystemColors.Control;
+            label2.Location = new Point(12, 228);
+            label2.Name = "label2";
+            label2.Size = new Size(133, 15);
+            label2.TabIndex = 10;
+            label2.Text = "Latest Download Status:";
             // 
-            // settingsToolStripMenuItem
+            // label1
             // 
-            settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            settingsToolStripMenuItem.Size = new Size(208, 22);
-            settingsToolStripMenuItem.Text = "Settings";
-            settingsToolStripMenuItem.Click += settingsToolStripMenuItem_Click;
+            label1.AutoSize = true;
+            label1.BackColor = Color.Transparent;
+            label1.ForeColor = SystemColors.Control;
+            label1.Location = new Point(12, 39);
+            label1.Name = "label1";
+            label1.Size = new Size(109, 15);
+            label1.TabIndex = 6;
+            label1.Text = "Download Options:";
             // 
             // MainForm
             // 
@@ -236,15 +194,11 @@
             BackgroundImageLayout = ImageLayout.Stretch;
             ClientSize = new Size(532, 499);
             Controls.Add(menuStrip1);
-            Controls.Add(label4);
             Controls.Add(label3);
-            Controls.Add(withWatermarkCheckBox);
             Controls.Add(label2);
             Controls.Add(label1);
-            Controls.Add(filePathTextBox);
-            Controls.Add(filePathLabel);
+            Controls.Add(withWatermarkCheckBox);
             Controls.Add(browseFileButton);
-            Controls.Add(txtUsername);
             Controls.Add(cmbChoice);
             Controls.Add(progressBar);
             Controls.Add(outputTextBox);
@@ -271,16 +225,41 @@
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem ChangeDownloadFolderToolStripMenuItem;
         private ComboBox cmbChoice;
-        private TextBox txtUsername;
         private ToolStripMenuItem aboutToolStripMenuItem;
         private Button browseFileButton;
-        private Label filePathLabel;
-        private TextBox filePathTextBox;
-        private Label label1;
-        private Label label2;
-        private CheckBox withWatermarkCheckBox;
         private Label label3;
-        private Label label4;
+        private Label label2;
+        private Label label1;
+        private CheckBox withWatermarkCheckBox;
         private ToolStripMenuItem settingsToolStripMenuItem;
+
+        private void cmbChoice_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (cmbChoice.SelectedIndex)
+            {
+                case 0:
+                    urlTextBox.PlaceholderText = "Enter TikTok Video/Image Link";
+                    label3.Text = "Download Single Links:";
+                    browseFileButton.Visible = false;
+                    break;
+                case 1:
+                    urlTextBox.PlaceholderText = "Enter TikTok Username";
+                    label3.Text = "Download by Username:";
+                    browseFileButton.Visible = false;
+                    break;
+                case 2:
+                    urlTextBox.PlaceholderText = "Enter/Select Path to Text File";
+                    label3.Text = "Download from Text file:";
+                    browseFileButton.Visible = true;
+                    break;
+                default:
+                    urlTextBox.PlaceholderText = "Enter TikTok Video/Image Link";
+                    label3.Text = "Download Single Links:";
+                    browseFileButton.Visible = false;
+                    break;
+            }
+
+            urlTextBox.Text = "";
+        }
     }
 }

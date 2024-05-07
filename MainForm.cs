@@ -18,7 +18,7 @@ namespace TikTok_Downloader
         private bool logJsonEnabled;
         private readonly string jsonLogFilePath;
         private readonly object jsonLock = new object();
-        private bool useOldFileStructure;      
+        private bool useOldFileStructure;
         private readonly AppSettings settings;
         private SettingsDialog settingsDialog;
         private List<string> cachedVideoUrls = new List<string>();
@@ -197,7 +197,7 @@ namespace TikTok_Downloader
                 }
                 catch (Exception ex)
                 {
-                    outputTextBox.AppendText($"ERROR: An error occurred while logging JSON response: {ex.Message}\r\n");
+                    outputTextBox.AppendText($"Error: An error occurred while logging JSON response: {ex.Message}\r\n");
                     Console.WriteLine($"Error occurred while logging JSON response: {ex}");
                 }
             }
@@ -275,7 +275,7 @@ namespace TikTok_Downloader
             }
             else if (choice == "Mass Download from Text File Links")
             {
-                string filePath = filePathTextBox.Text.Trim();
+                string filePath = urlTextBox.Text.Trim();
                 LogMessage(logFilePath, $"Selected file path: {filePath}");
                 await DownloadFromTextFile(filePath);
             }
@@ -330,7 +330,7 @@ namespace TikTok_Downloader
             {
                 if (executablePath.ToLower().Contains("firefox"))
                 {
-                    return playwright.Firefox;  // Firefox does seem to work now.
+                    return playwright.Firefox;  // Firefox 124.0.0.8848 (Nighhtly) seems to work for now.
                 }
                 else if (executablePath.ToLower().Contains("webkit"))
                 {
@@ -345,7 +345,7 @@ namespace TikTok_Downloader
 
         private async Task MassDownloadByUsername()
         {
-            string username = txtUsername.Text.Trim();
+            string username = urlTextBox.Text.Trim();
             LogMessage(logFilePath, $"Username selected for mass download: {username}");
             string baseUrl = $"https://www.tiktok.com/@{username}";
 
@@ -473,6 +473,7 @@ namespace TikTok_Downloader
         {
             if (!File.Exists(filePath))
             {
+                MessageBox.Show($"Error: Text File not Found", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 LogError("Text file not found!");
                 return;
             }
@@ -575,7 +576,7 @@ namespace TikTok_Downloader
 
                     if (urlMedia == null)
                     {
-                        LogMessage(logFilePath, $"Skipping download link for video ID: {idVideo} due to missing media URL.");
+                        LogMessage(logFilePath, $"Skipping download link for MediaID: {idVideo} due to missing media URL.");
                         return null;
                     }
 
@@ -588,7 +589,7 @@ namespace TikTok_Downloader
                 }
                 catch (HttpRequestException ex) when ((int)ex.StatusCode == 404)
                 {
-                    LogMessage(logFilePath, $"Skipping download link for video ID: {idVideo} due to 404 error.");
+                    LogMessage(logFilePath, $"Skipping download link for MediaID: {idVideo} due to 404 error.");
                     return null;
                 }
                 catch (Exception ex)
@@ -892,7 +893,7 @@ namespace TikTok_Downloader
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    filePathTextBox.Text = openFileDialog.FileName;
+                    urlTextBox.Text = openFileDialog.FileName;
                     LogMessage(logFilePath, $"Selected file path: {openFileDialog.FileName}");
                 }
             }
@@ -915,6 +916,11 @@ namespace TikTok_Downloader
         {
             logJsonEnabled = value;
         }
+        private void outputTextBox_TextChanged(object sender, EventArgs e)
+        {
+            //outputTextBox.SelectionStart = outputTextBox.TextLength;
+            //outputTextBox.ScrollToCaret();
+        }
 
         private void withWatermarkRadioButton_CheckedChanged(object sender, EventArgs e)
         {
@@ -927,21 +933,6 @@ namespace TikTok_Downloader
         }
 
         private void withWatermarkRadioButton_CheckedChanged_1(object sender, EventArgs e)
-        {
-
-        }
-
-        private void outputTextBox_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label3_Click(object sender, EventArgs e)
         {
 
         }
