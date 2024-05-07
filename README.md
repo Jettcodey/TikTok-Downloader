@@ -34,7 +34,7 @@ C# and Microsoft Playwright
 
 Just a simple TikTok Downloader capable of downloading single videos/images, Mass Downloading from Links in a Text file or Mass downloading from a user profile.
 
-The default storage location (if not Changed in the Menu) is the user's desktop in a folder named "TikTokDownloads\{@Username}\Videos\ & \Images\ folders".
+The default storage location (if not Changed in the Menu) is the user's desktop in a folder named "TikTokDownloads\\{@Username}\Videos\ & \Images\ folders".
 
 To download all videos from a TikTok user, the Application opens the specified TikTok user in the browser. Then, loads all Video/Image links of the user by Auto scrolling through the browser. After that, those Links get saved in a separate text file named "{@username}_combined_links.txt" in the default storage location. Finally the Application works through the Saved links.
 
