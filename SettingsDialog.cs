@@ -78,7 +78,7 @@ namespace TikTok_Downloader
             // okButton
             // 
             okButton.BackColor = SystemColors.Control;
-            okButton.Location = new Point(30, 175);
+            okButton.Location = new Point(15, 175);
             okButton.Name = "okButton";
             okButton.Size = new Size(75, 23);
             okButton.TabIndex = 1;
@@ -89,7 +89,7 @@ namespace TikTok_Downloader
             // saveButton
             // 
             saveButton.BackColor = SystemColors.Control;
-            saveButton.Location = new Point(120, 175);
+            saveButton.Location = new Point(107, 175);
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(75, 23);
             saveButton.TabIndex = 2;
@@ -100,7 +100,7 @@ namespace TikTok_Downloader
             // exportButton
             // 
             exportButton.BackColor = SystemColors.Control;
-            exportButton.Location = new Point(210, 175);
+            exportButton.Location = new Point(202, 175);
             exportButton.Name = "exportButton";
             exportButton.Size = new Size(75, 23);
             exportButton.TabIndex = 3;
@@ -124,7 +124,7 @@ namespace TikTok_Downloader
             setting1CheckBox.AutoSize = true;
             setting1CheckBox.BackColor = Color.Transparent;
             setting1CheckBox.ForeColor = SystemColors.Control;
-            setting1CheckBox.Location = new Point(245, 112);
+            setting1CheckBox.Location = new Point(15, 95);
             setting1CheckBox.Name = "setting1CheckBox";
             setting1CheckBox.Size = new Size(146, 19);
             setting1CheckBox.TabIndex = 5;
@@ -163,7 +163,7 @@ namespace TikTok_Downloader
             setting4CheckBox.AutoSize = true;
             setting4CheckBox.BackColor = Color.Transparent;
             setting4CheckBox.ForeColor = SystemColors.Control;
-            setting4CheckBox.Location = new Point(245, 137);
+            setting4CheckBox.Location = new Point(15, 120);
             setting4CheckBox.Name = "setting4CheckBox";
             setting4CheckBox.Size = new Size(149, 19);
             setting4CheckBox.TabIndex = 7;
@@ -175,7 +175,7 @@ namespace TikTok_Downloader
             // 
             BackColor = SystemColors.ControlDarkDark;
             BackgroundImage = Properties.Resources.bg;
-            ClientSize = new Size(400, 250);
+            ClientSize = new Size(390, 250);
             Controls.Add(descriptionLabel);
             Controls.Add(okButton);
             Controls.Add(saveButton);

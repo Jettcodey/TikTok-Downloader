@@ -24,7 +24,7 @@ namespace TikTok_Downloader
         private Label versionLabel;
         private Label descriptionLabel;
         private Button okButton;
-        private Label label1;
+        private Label label2;
         private LinkLabel linkLabel;
 
         private void InitializeComponent()
@@ -35,7 +35,7 @@ namespace TikTok_Downloader
             descriptionLabel = new Label();
             okButton = new Button();
             linkLabel = new LinkLabel();
-            label1 = new Label();
+            label2 = new Label();
             SuspendLayout();
             // 
             // titleLabel
@@ -44,7 +44,7 @@ namespace TikTok_Downloader
             titleLabel.BackColor = Color.Transparent;
             titleLabel.Font = new Font("Arial", 12F, FontStyle.Bold);
             titleLabel.ForeColor = Color.Aquamarine;
-            titleLabel.Location = new Point(45, 27);
+            titleLabel.Location = new Point(40, 27);
             titleLabel.Name = "titleLabel";
             titleLabel.Size = new Size(157, 19);
             titleLabel.TabIndex = 0;
@@ -54,23 +54,23 @@ namespace TikTok_Downloader
             // 
             versionLabel.AutoSize = true;
             versionLabel.BackColor = Color.Transparent;
-            versionLabel.ForeColor = Color.Aquamarine;
-            versionLabel.Location = new Point(65, 65);
+            versionLabel.ForeColor = Color.Aqua;
+            versionLabel.Location = new Point(60, 65);
             versionLabel.Name = "versionLabel";
             versionLabel.Size = new Size(117, 15);
             versionLabel.TabIndex = 1;
-            versionLabel.Text = "Version: Release 1.2.3";
+            versionLabel.Text = "Version: Release 1.2.4";
             // 
             // descriptionLabel
             // 
             descriptionLabel.AutoSize = true;
             descriptionLabel.BackColor = Color.Transparent;
             descriptionLabel.ForeColor = Color.Aqua;
-            descriptionLabel.Location = new Point(45, 109);
+            descriptionLabel.Location = new Point(21, 128);
             descriptionLabel.Name = "descriptionLabel";
-            descriptionLabel.Size = new Size(149, 15);
+            descriptionLabel.Size = new Size(196, 15);
             descriptionLabel.TabIndex = 2;
-            descriptionLabel.Text = "Simple TikTok Downloader.";
+            descriptionLabel.Text = "Contact me on Discord: @Jettcodey";
             // 
             // okButton
             // 
@@ -88,7 +88,7 @@ namespace TikTok_Downloader
             linkLabel.AutoSize = true;
             linkLabel.BackColor = Color.Transparent;
             linkLabel.LinkColor = Color.Aquamarine;
-            linkLabel.Location = new Point(20, 155);
+            linkLabel.Location = new Point(20, 145);
             linkLabel.Name = "linkLabel";
             linkLabel.Size = new Size(199, 15);
             linkLabel.TabIndex = 5;
@@ -97,23 +97,23 @@ namespace TikTok_Downloader
             linkLabel.VisitedLinkColor = Color.Aquamarine;
             linkLabel.LinkClicked += LinkLabel_LinkClicked;
             // 
-            // label1
+            // label2
             // 
-            label1.AutoSize = true;
-            label1.BackColor = Color.Transparent;
-            label1.ForeColor = Color.Aqua;
-            label1.Location = new Point(60, 140);
-            label1.Name = "label1";
-            label1.Size = new Size(117, 15);
-            label1.TabIndex = 6;
-            label1.Text = "Made by @Jettcodey";
+            label2.AutoSize = true;
+            label2.BackColor = Color.Transparent;
+            label2.ForeColor = Color.Aqua;
+            label2.Location = new Point(65, 80);
+            label2.Name = "label2";
+            label2.Size = new Size(107, 15);
+            label2.TabIndex = 7;
+            label2.Text = "TikTok Downloader";
             // 
             // AboutWindow
             // 
             BackColor = SystemColors.ControlDarkDark;
             BackgroundImage = Properties.Resources.bg;
             ClientSize = new Size(240, 217);
-            Controls.Add(label1);
+            Controls.Add(label2);
             Controls.Add(linkLabel);
             Controls.Add(titleLabel);
             Controls.Add(versionLabel);

@@ -6,6 +6,7 @@ using System.Management;
 using System.Net;
 using System.Reflection;
 using System.Text.Json;
+using System.Windows.Forms;
 
 namespace TikTok_Downloader
 {
@@ -151,6 +152,8 @@ namespace TikTok_Downloader
                 else
                 {
                     MessageBox.Show("The Mass Download feature will not work if your system's default browser is Firefox until the setup scripts are run. If you use Firefox as your default browser, you will need to install the scripts manually.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    currentSettings.FirstRun = true;
+                    settings.SaveSettings();
                 }
             }
 
@@ -345,9 +348,22 @@ namespace TikTok_Downloader
 
         private async Task MassDownloadByUsername()
         {
-            string username = urlTextBox.Text.Trim();
+            string input = urlTextBox.Text.Trim();
+            string username = null;
+            string baseUrl = null;
+
+            if (input.StartsWith("https://www.tiktok.com/@"))
+            {
+                Uri uri = new Uri(input);
+                username = uri.Segments.Last().Trim('/');
+                baseUrl = input;
+            }
+            else
+            {
+                username = input;
+                baseUrl = $"https://www.tiktok.com/@{username}";
+            }
             LogMessage(logFilePath, $"Username selected for mass download: {username}");
-            string baseUrl = $"https://www.tiktok.com/@{username}";
 
             // Get system default browser executable path
             string browserExecutablePath = await browserUtility.GetSystemDefaultBrowser();
@@ -399,7 +415,7 @@ namespace TikTok_Downloader
                 LogMessage(logFilePath, $"Combined {combinedUrls.Count()} URLs");
 
                 // Filter links by username
-                var filteredUrls = combinedUrls.Where(url => url.Contains($"/@{username}/"));
+                var filteredUrls = combinedUrls.Where(url => url.Contains($"/{username}/"));
                 LogMessage(logFilePath, $"Filtered {filteredUrls.Count()} URLs by username");
 
                 // Save all video and image post links to a single text file
@@ -918,8 +934,44 @@ namespace TikTok_Downloader
         }
         private void outputTextBox_TextChanged(object sender, EventArgs e)
         {
-            //outputTextBox.SelectionStart = outputTextBox.TextLength;
-            //outputTextBox.ScrollToCaret();
+
+        }
+
+        private async void LinkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            string url = "https://github.com/Jettcodey/TikTok-Downloader/issues";
+
+            string browserPath = await browserUtility.GetSystemDefaultBrowser();
+
+            try
+            {
+                Process.Start(new ProcessStartInfo(browserPath, url));
+            }
+            catch (Exception ex)
+            {
+                using (var errorDialog = new Form())
+                {
+                    errorDialog.Text = "Error Opening Link";
+                    errorDialog.Size = new Size(400, 200);
+
+                    var errorMessageTextBox = new TextBox();
+                    errorMessageTextBox.Multiline = true;
+                    errorMessageTextBox.ReadOnly = true;
+                    errorMessageTextBox.ScrollBars = ScrollBars.Vertical;
+                    errorMessageTextBox.Dock = DockStyle.Fill;
+                    errorMessageTextBox.Text = $"An error occurred:\n\n{ex.Message}";
+
+                    errorDialog.Controls.Add(errorMessageTextBox);
+
+                    var okButton = new Button();
+                    okButton.Text = "OK";
+                    okButton.Dock = DockStyle.Bottom;
+                    okButton.Click += (s, ev) => errorDialog.Close();
+                    errorDialog.Controls.Add(okButton);
+
+                    errorDialog.ShowDialog();
+                }
+            }
         }
 
         private void withWatermarkRadioButton_CheckedChanged(object sender, EventArgs e)

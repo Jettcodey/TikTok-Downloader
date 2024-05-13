@@ -1,4 +1,6 @@
-﻿namespace TikTok_Downloader
+﻿using System.Windows.Forms;
+
+namespace TikTok_Downloader
 {
     partial class MainForm
     {
@@ -32,6 +34,7 @@
             label3 = new Label();
             label2 = new Label();
             label1 = new Label();
+            linkLabel1 = new LinkLabel();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -41,14 +44,14 @@
             urlTextBox.Location = new Point(149, 73);
             urlTextBox.Name = "urlTextBox";
             urlTextBox.PlaceholderText = "Enter TikTok Video/Image Link";
-            urlTextBox.Size = new Size(281, 23);
+            urlTextBox.Size = new Size(275, 23);
             urlTextBox.TabIndex = 0;
             urlTextBox.TextChanged += filePathTextBox_TextChanged;
             // 
             // downloadButton
             // 
             downloadButton.BackColor = SystemColors.Control;
-            downloadButton.Location = new Point(436, 174);
+            downloadButton.Location = new Point(434, 36);
             downloadButton.Name = "downloadButton";
             downloadButton.Size = new Size(88, 23);
             downloadButton.TabIndex = 1;
@@ -61,19 +64,19 @@
             outputTextBox.BackColor = SystemColors.WindowText;
             outputTextBox.Cursor = Cursors.IBeam;
             outputTextBox.ForeColor = Color.FromArgb(0, 192, 0);
-            outputTextBox.Location = new Point(12, 246);
+            outputTextBox.Location = new Point(12, 185);
             outputTextBox.Multiline = true;
             outputTextBox.Name = "outputTextBox";
             outputTextBox.ScrollBars = ScrollBars.Vertical;
-            outputTextBox.Size = new Size(512, 234);
+            outputTextBox.Size = new Size(510, 234);
             outputTextBox.TabIndex = 2;
             outputTextBox.TextChanged += outputTextBox_TextChanged;
             // 
             // progressBar
             // 
-            progressBar.Location = new Point(12, 203);
+            progressBar.Location = new Point(12, 133);
             progressBar.Name = "progressBar";
-            progressBar.Size = new Size(512, 22);
+            progressBar.Size = new Size(510, 22);
             progressBar.TabIndex = 3;
             progressBar.Click += progressBar_Click;
             // 
@@ -83,7 +86,7 @@
             cmbChoice.Items.AddRange(new object[] { "Single Video/Image Download", "Mass Download by Username", "Mass Download from Text File Links" });
             cmbChoice.Location = new Point(149, 36);
             cmbChoice.Name = "cmbChoice";
-            cmbChoice.Size = new Size(281, 23);
+            cmbChoice.Size = new Size(275, 23);
             cmbChoice.TabIndex = 4;
             cmbChoice.SelectedIndexChanged += cmbChoice_SelectedIndexChanged;
             // 
@@ -93,7 +96,7 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(532, 24);
+            menuStrip1.Size = new Size(534, 24);
             menuStrip1.TabIndex = 6;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -131,7 +134,7 @@
             // 
             // browseFileButton
             // 
-            browseFileButton.Location = new Point(436, 73);
+            browseFileButton.Location = new Point(434, 73);
             browseFileButton.Name = "browseFileButton";
             browseFileButton.Size = new Size(88, 23);
             browseFileButton.TabIndex = 7;
@@ -145,11 +148,13 @@
             withWatermarkCheckBox.AutoSize = true;
             withWatermarkCheckBox.BackColor = Color.Transparent;
             withWatermarkCheckBox.ForeColor = SystemColors.Control;
-            withWatermarkCheckBox.Location = new Point(12, 178);
+            withWatermarkCheckBox.ImageAlign = ContentAlignment.MiddleLeft;
+            withWatermarkCheckBox.Location = new Point(12, 106);
             withWatermarkCheckBox.Name = "withWatermarkCheckBox";
-            withWatermarkCheckBox.Size = new Size(169, 19);
+            withWatermarkCheckBox.Size = new Size(154, 19);
             withWatermarkCheckBox.TabIndex = 8;
-            withWatermarkCheckBox.Text = "Download With Watermark";
+            withWatermarkCheckBox.Text = "Download Watermarked";
+            withWatermarkCheckBox.TextAlign = ContentAlignment.TopLeft;
             withWatermarkCheckBox.UseVisualStyleBackColor = false;
             // 
             // label3
@@ -168,7 +173,7 @@
             label2.AutoSize = true;
             label2.BackColor = Color.Transparent;
             label2.ForeColor = SystemColors.Control;
-            label2.Location = new Point(12, 228);
+            label2.Location = new Point(12, 165);
             label2.Name = "label2";
             label2.Size = new Size(133, 15);
             label2.TabIndex = 10;
@@ -185,6 +190,22 @@
             label1.TabIndex = 6;
             label1.Text = "Download Options:";
             // 
+            // linkLabel1
+            // 
+            linkLabel1.ActiveLinkColor = Color.Teal;
+            linkLabel1.AutoSize = true;
+            linkLabel1.BackColor = Color.Transparent;
+            linkLabel1.Font = new Font("Segoe UI Emoji", 9F, FontStyle.Italic, GraphicsUnit.Point, 0);
+            linkLabel1.LinkColor = Color.Aquamarine;
+            linkLabel1.Location = new Point(425, 106);
+            linkLabel1.Name = "linkLabel1";
+            linkLabel1.Size = new Size(97, 16);
+            linkLabel1.TabIndex = 11;
+            linkLabel1.TabStop = true;
+            linkLabel1.Text = "Report Bug/Issue";
+            linkLabel1.VisitedLinkColor = Color.Aquamarine;
+            linkLabel1.LinkClicked += LinkLabel1_LinkClicked;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -192,7 +213,8 @@
             BackColor = SystemColors.ControlDarkDark;
             BackgroundImage = Properties.Resources.bg;
             BackgroundImageLayout = ImageLayout.Stretch;
-            ClientSize = new Size(532, 499);
+            ClientSize = new Size(534, 431);
+            Controls.Add(linkLabel1);
             Controls.Add(menuStrip1);
             Controls.Add(label3);
             Controls.Add(label2);
@@ -243,7 +265,7 @@
                     browseFileButton.Visible = false;
                     break;
                 case 1:
-                    urlTextBox.PlaceholderText = "Enter TikTok Username";
+                    urlTextBox.PlaceholderText = "Enter TikTok link/Username";
                     label3.Text = "Download by Username:";
                     browseFileButton.Visible = false;
                     break;
@@ -261,5 +283,7 @@
 
             urlTextBox.Text = "";
         }
+
+        private LinkLabel linkLabel1;
     }
 }
