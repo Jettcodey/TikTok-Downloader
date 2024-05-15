@@ -12,6 +12,7 @@
     <li><a href="#installation">Installation</a></li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#report-a-bug">Report a Bug</a></li>
   </ol>
 </details>
 
@@ -100,8 +101,14 @@ If you select "Mass Download from Text File Links," you just need (if not alread
     - [ ] Add more Options(Settings Menu)
     - [x] Make the GUI more appealing/better looking
 
+<p align="right"><a href="#readme-top">Back to top</a></p>
 
+
+<!-- Report a bug -->
+## Report a bug
 
 See the [open issues](https://github.com/Jettcodey/TikTok-Downloader/issues) for a full list of proposed features (and known issues).
+
+### Always report bugs and issues in English! If you report in any other language, your issue will be ignored and closed.
 
 <p align="right"><a href="#readme-top">Back to top</a></p>
