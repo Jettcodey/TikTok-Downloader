@@ -333,7 +333,7 @@ namespace TikTok_Downloader
             {
                 if (executablePath.ToLower().Contains("firefox"))
                 {
-                    return playwright.Firefox;  // Firefox 124.0.0.8848 (Nighhtly) seems to work for now.
+                    return playwright.Firefox;  // Firefox 124.0.0.8848 (Nightly) seems to work for now.
                 }
                 else if (executablePath.ToLower().Contains("webkit"))
                 {
@@ -351,6 +351,11 @@ namespace TikTok_Downloader
             string input = urlTextBox.Text.Trim();
             string username = null;
             string baseUrl = null;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                MessageBox.Show("Please enter a valid URL", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             if (input.StartsWith("https://www.tiktok.com/@"))
             {
@@ -972,21 +977,6 @@ namespace TikTok_Downloader
                     errorDialog.ShowDialog();
                 }
             }
-        }
-
-        private void withWatermarkRadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void urlLabel_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void withWatermarkRadioButton_CheckedChanged_1(object sender, EventArgs e)
-        {
-
         }
 
         private void progressBar_Click(object sender, EventArgs e)
