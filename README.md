@@ -90,6 +90,7 @@ If you select "Mass Download from Text File Links," you just need (if not alread
 - [x] Download All Videos from a User-Profile.
 - [x] Download All Images from a User-Profile Without Watermark.
 - [x] System Default Browser Support
+- [ ] Add Mobile Links Support
 - [ ] Multi-Webbrowser Support
     - [x] Google Chrome
     - [x] Microsoft Edge
