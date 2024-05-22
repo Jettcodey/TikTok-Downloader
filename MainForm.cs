@@ -579,19 +579,29 @@ namespace TikTok_Downloader
             {
                 try
                 {
-                    var response = await client.GetAsync(apiUrl);
+                    // Use a HttpRequestMessage with the 'OPTIONS' method because of TikTok's Api Update <-- Hotfix at 22.05.2024 04:13am UTC+2
+                    var request = new HttpRequestMessage(HttpMethod.Options, apiUrl);
+                    var response = await client.SendAsync(request);
+
                     response.EnsureSuccessStatusCode();
+
                     var json = await response.Content.ReadAsStringAsync();
                     LogJson($"API_Response_For_'{idVideo}'", json, logJsonEnabled);
-                    var data = JsonSerializer.Deserialize<ApiData>(json);
 
+                    if (string.IsNullOrWhiteSpace(json))
+                    {
+                        LogError($"Error: Received empty JSON response for MediaID: {idVideo}");
+                        return null;
+                    }
+
+                    var data = JsonSerializer.Deserialize<ApiData>(json);
                     if (data?.aweme_list == null || data.aweme_list.Count == 0)
                     {
+                        LogError($"Error: No aweme_list found in JSON response for MediaID: {idVideo}");
                         return null;
                     }
 
                     var video = data.aweme_list.FirstOrDefault();
-
                     var urlMedia = withWatermark ? video?.video?.download_addr?.url_list.FirstOrDefault() : video?.video?.play_addr?.url_list.FirstOrDefault();
                     var imageUrls = video?.image_post_info?.images?.Select(img => img.display_image.url_list.FirstOrDefault()).ToList();
 
@@ -608,18 +618,24 @@ namespace TikTok_Downloader
                         Id = idVideo
                     };
                 }
-                catch (HttpRequestException ex) when ((int)ex.StatusCode == 404)
+                catch (HttpRequestException ex)
                 {
-                    LogMessage(logFilePath, $"Skipping download link for MediaID: {idVideo} due to 404 error.");
+                    LogError($"HTTP error while getting video: {ex.Message}");
+                    return null;
+                }
+                catch (JsonException ex)
+                {
+                    LogError($"JSON error while getting video: {ex.Message}");
                     return null;
                 }
                 catch (Exception ex)
                 {
-                    LogError($"Error getting video: {ex.Message}");
+                    LogError($"Unexpected error while getting video: {ex.Message}");
                     return null;
                 }
             }
         }
+
 
 
         private async Task<string> GetIdVideo(string url)
