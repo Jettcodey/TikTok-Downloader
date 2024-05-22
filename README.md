@@ -1,4 +1,6 @@
 # TikTok Downloader
+# ⚠ THE APPLICATION ISN'T WORKING RIGHT NOW DUE TO RECENT TIKTOK API UPDATES ⚠
+
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
