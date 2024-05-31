@@ -179,7 +179,7 @@ namespace TikTok_Downloader
             LogMessage(logFilePath, $"Downloaded file: {fileName}, from URL: {url}");
         }
 
-        
+
         private void LogJson(string fileName, string jsonContent, bool logJsonEnabled)
         {
             if (!logJsonEnabled)
@@ -419,9 +419,21 @@ namespace TikTok_Downloader
                 var combinedUrls = videoUrls.Concat(imagePostUrls).Distinct();
                 LogMessage(logFilePath, $"Combined {combinedUrls.Count()} URLs");
 
-                // Filter links by username
-                var filteredUrls = combinedUrls.Where(url => url.Contains($"/{username}/"));
-                LogMessage(logFilePath, $"Filtered {filteredUrls.Count()} URLs by username");
+                // Filter links by username using the first pattern
+                var filteredUrls = combinedUrls.Where(url => url.Contains($"/@{username}/")).ToList();
+                LogMessage(logFilePath, $"Filtered {filteredUrls.Count()} URLs by username (@{username})");
+
+                // If no URLs were found, fallback to the second pattern
+                if (!filteredUrls.Any())
+                {
+                    filteredUrls = combinedUrls.Where(url => url.Contains($"/{username}/")).ToList();
+                    LogMessage(logFilePath, $"Filtered {filteredUrls.Count()} URLs by username ({username})");
+                }
+                else
+                {
+                    LogMessage(logFilePath, $"Filtered {filteredUrls.Count()} URLs by username (@{username})");
+                }
+
 
                 // Save all video and image post links to a single text file
                 string combinedLinksFilePath = Path.Combine(downloadFolderPath, $"{username}_combined_links.txt");
