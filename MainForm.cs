@@ -532,7 +532,7 @@ namespace TikTok_Downloader
 
                         if (data == null)
                         {
-                            LogError($"Error: Media from URL {trimmedUrl} was deleted!");
+                            LogError($"Error: Media from URL {trimmedUrl} not found!");
                             progressBar.Value++;
                             continue;
                         }
@@ -566,7 +566,7 @@ namespace TikTok_Downloader
 
                 if (data == null)
                 {
-                    LogError($"Error: Media from URL {trimmedUrl} was deleted!");
+                    LogError($"Error: Media from URL {trimmedUrl} not found!");
                     return;
                 }
 
