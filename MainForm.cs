@@ -434,7 +434,6 @@ namespace TikTok_Downloader
                     LogMessage(logFilePath, $"Filtered {filteredUrls.Count()} URLs by username (@{username})");
                 }
 
-
                 // Save all video and image post links to a single text file
                 string combinedLinksFilePath = Path.Combine(downloadFolderPath, $"{username}_combined_links.txt");
                 await File.WriteAllLinesAsync(combinedLinksFilePath, filteredUrls);
@@ -484,7 +483,7 @@ namespace TikTok_Downloader
                     {
                         LogMessage(logFilePath, $"Downloading {trimmedUrl}...");
 
-                        var data = await GetVideo(trimmedUrl, withWatermarkCheckBox.Checked);
+                        var data = await GetMedia(trimmedUrl, withWatermarkCheckBox.Checked);
 
                         if (data == null)
                         {
@@ -529,7 +528,7 @@ namespace TikTok_Downloader
                     {
                         LogMessage(logFilePath, $"Downloading {trimmedUrl} ...");
 
-                        var data = await GetVideo(trimmedUrl, withWatermarkCheckBox.Checked);
+                        var data = await GetMedia(trimmedUrl, withWatermarkCheckBox.Checked);
 
                         if (data == null)
                         {
@@ -563,7 +562,7 @@ namespace TikTok_Downloader
                 var trimmedUrl = url.Trim();
                 LogMessage(logFilePath, $"Downloading {trimmedUrl}...");
 
-                var data = await GetVideo(trimmedUrl, withWatermarkCheckBox.Checked);
+                var data = await GetMedia(trimmedUrl, withWatermarkCheckBox.Checked);
 
                 if (data == null)
                 {
@@ -582,10 +581,10 @@ namespace TikTok_Downloader
             }
         }
 
-        private async Task<VideoData?> GetVideo(string url, bool withWatermark)
+        private async Task<VideoData?> GetMedia(string url, bool withWatermark)
         {
-            var idVideo = await GetIdVideo(url);
-            var apiUrl = $"https://api22-normal-c-alisg.tiktokv.com/aweme/v1/feed/?aweme_id={idVideo}&iid=7318518857994389254&device_id=7318517321748022790&channel=googleplay&app_name=musical_ly&version_code=300904&device_platform=android&device_type=ASUS_Z01QD&version=9";
+            var MediaID = await GetMediaID(url);
+            var apiUrl = $"https://api22-normal-c-alisg.tiktokv.com/aweme/v1/feed/?aweme_id={MediaID}&iid=7318518857994389254&device_id=7318517321748022790&channel=googleplay&app_name=musical_ly&version_code=300904&device_platform=android&device_type=ASUS_Z01QD&version=9";
 
             using (var client = new HttpClient())
             {
@@ -598,18 +597,18 @@ namespace TikTok_Downloader
                     response.EnsureSuccessStatusCode();
 
                     var json = await response.Content.ReadAsStringAsync();
-                    LogJson($"API_Response_For_'{idVideo}'", json, logJsonEnabled);
+                    LogJson($"API_Response_For_'{MediaID}'", json, logJsonEnabled);
 
                     if (string.IsNullOrWhiteSpace(json))
                     {
-                        LogError($"Error: Received empty JSON response for MediaID: {idVideo}");
+                        LogError($"Error: Received empty JSON response for MediaID: {MediaID}");
                         return null;
                     }
 
                     var data = JsonSerializer.Deserialize<ApiData>(json);
                     if (data?.aweme_list == null || data.aweme_list.Count == 0)
                     {
-                        LogError($"Error: No aweme_list found in JSON response for MediaID: {idVideo}");
+                        LogError($"Error: No aweme_list found in JSON response for MediaID: {MediaID}");
                         return null;
                     }
 
@@ -619,7 +618,7 @@ namespace TikTok_Downloader
 
                     if (urlMedia == null)
                     {
-                        LogMessage(logFilePath, $"Skipping download link for MediaID: {idVideo} due to missing media URL.");
+                        LogMessage(logFilePath, $"Skipping download link for MediaID: {MediaID} due to missing media URL.");
                         return null;
                     }
 
@@ -627,7 +626,7 @@ namespace TikTok_Downloader
                     {
                         Url = urlMedia,
                         Images = imageUrls ?? new List<string>(),
-                        Id = idVideo
+                        Id = MediaID
                     };
                 }
                 catch (HttpRequestException ex)
@@ -650,7 +649,7 @@ namespace TikTok_Downloader
 
 
 
-        private async Task<string> GetIdVideo(string url)
+        private async Task<string> GetMediaID(string url)
         {
             try
             {
@@ -687,9 +686,9 @@ namespace TikTok_Downloader
                     return string.Empty;
                 }
 
-                var idVideo = url.Substring(startIndex, endIndex - startIndex);
+                var MediaID = url.Substring(startIndex, endIndex - startIndex);
 
-                return idVideo;
+                return MediaID;
             }
             catch (Exception ex)
             {
