@@ -125,7 +125,6 @@ namespace TikTok_Downloader
             outputTextBox.ReadOnly = true;
         }
 
-
         private void LoadSettingsatbeginning()
         {
             settings.LoadSettings();
@@ -165,7 +164,7 @@ namespace TikTok_Downloader
         }
 
 
-        private void LogMessage(string logFilePath, string message)
+        private static void LogMessage(string logFilePath, string message)
         {
             lock (logFilePath)
             {
@@ -178,7 +177,6 @@ namespace TikTok_Downloader
         {
             LogMessage(logFilePath, $"Downloaded file: {fileName}, from URL: {url}");
         }
-
 
         private void LogJson(string fileName, string jsonContent, bool logJsonEnabled)
         {
@@ -458,7 +456,6 @@ namespace TikTok_Downloader
             }
         }
 
-
         private async Task DownloadFromCombinedLinksFile(string filePath)
         {
             if (!File.Exists(filePath))
@@ -499,7 +496,6 @@ namespace TikTok_Downloader
                 }
             }
         }
-
 
         private async Task DownloadFromTextFile(string filePath)
         {
@@ -545,7 +541,6 @@ namespace TikTok_Downloader
             }
         }
 
-
         private async Task SingleVideoDownload()
         {
             outputTextBox.Clear();
@@ -581,6 +576,76 @@ namespace TikTok_Downloader
             }
         }
 
+        private async Task<string> GetMediaID(string url)
+        {
+            try
+            {
+                if (url.Contains("/t/"))
+                {
+                    using (var client = new HttpClient())
+                    {
+                        var response = await client.GetAsync(url);
+                        url = response.RequestMessage?.RequestUri.Segments.LastOrDefault()?.TrimEnd('/') ?? string.Empty;
+                    }
+                }
+                else
+                {
+                    url = await GetRedirectUrl(url);
+                }
+
+                var matching = url.Contains("/video/");
+                var matchingPhoto = url.Contains("/photo/");
+                var startIndex = url.IndexOf("/video/") + 7;
+                var endIndex = url.IndexOf("/video/") + 26;
+
+                if (matchingPhoto)
+                {
+                    startIndex = url.IndexOf("/photo/") + 7;
+                    endIndex = url.IndexOf("/photo/") + 26;
+                }
+                else if (!matching)
+                {
+                    outputTextBox.AppendText($"Error: URL not found - {url}\r\n");
+                    LogMessage(logFilePath, $"Error: URL not found - {url}");
+                    return string.Empty;
+                }
+
+                if (endIndex > url.Length || startIndex < 0 || endIndex < startIndex)
+                {
+                    outputTextBox.AppendText($"Error: Invalid URL format - {url}\r\n");
+                    LogMessage(logFilePath, $"Error: Invalid URL format - {url}");
+                    return string.Empty;
+                }
+
+                var MediaID = url.Substring(startIndex, endIndex - startIndex);
+
+                return MediaID;
+            }
+            catch (Exception ex)
+            {
+                outputTextBox.AppendText($"Error occurred while extracting MediaID: {ex.Message} - {url}\r\n");
+                LogMessage(logFilePath, $"Error occurred while extracting MediaID: {ex.Message} - {url}");
+                return string.Empty;
+            }
+        }
+
+        private async Task<string> GetRedirectUrl(string url)
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                    return response.RequestMessage?.RequestUri?.AbsoluteUri ?? url;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogMessage(logFilePath, $"Error in Getting the RedirectURL: {ex.Message}");
+                throw;
+            }
+        }
+
         private async Task<VideoData?> GetMedia(string url, bool withWatermark)
         {
             var MediaID = await GetMediaID(url);
@@ -590,7 +655,7 @@ namespace TikTok_Downloader
             {
                 try
                 {
-                    // Use a HttpRequestMessage with the 'OPTIONS' method because of TikTok's Api Update <-- Hotfix at 22.05.2024 04:13am UTC+2
+                    var finalUrl = await GetRedirectUrl(url);
                     var request = new HttpRequestMessage(HttpMethod.Options, apiUrl);
                     var response = await client.SendAsync(request);
 
@@ -647,63 +712,11 @@ namespace TikTok_Downloader
             }
         }
 
-
-
-        private async Task<string> GetMediaID(string url)
-        {
-            try
-            {
-                if (url.Contains("/t/"))
-                {
-                    using (var client = new HttpClient())
-                    {
-                        var response = await client.GetAsync(url);
-                        return response.RequestMessage?.RequestUri.Segments.LastOrDefault()?.TrimEnd('/') ?? string.Empty;
-                    }
-                }
-
-                var matching = url.Contains("/video/");
-                var matchingPhoto = url.Contains("/photo/");
-                var startIndex = url.IndexOf("/video/") + 7;
-                var endIndex = url.IndexOf("/video/") + 26;
-
-                if (matchingPhoto)
-                {
-                    startIndex = url.IndexOf("/photo/") + 7;
-                    endIndex = url.IndexOf("/photo/") + 26;
-                }
-                else if (!matching)
-                {
-                    outputTextBox.AppendText($"Error: URL not found - {url}\r\n");
-                    LogMessage(logFilePath, $"Error: URL not found - {url}");
-                    return string.Empty;
-                }
-
-                if (endIndex > url.Length || startIndex < 0 || endIndex < startIndex)
-                {
-                    outputTextBox.AppendText($"Error: Invalid URL format - {url}\r\n");
-                    LogMessage(logFilePath, $"Error: Invalid URL format - {url}");
-                    return string.Empty;
-                }
-
-                var MediaID = url.Substring(startIndex, endIndex - startIndex);
-
-                return MediaID;
-            }
-            catch (Exception ex)
-            {
-                outputTextBox.AppendText($"Error occurred while extracting MediaID: {ex.Message} - {url}\r\n");
-                LogMessage(logFilePath, $"Error occurred while extracting MediaID: {ex.Message} - {url}");
-                return string.Empty;
-            }
-        }
-
-
         private async Task DownloadMedia(VideoData data, string url, bool useOldFileStructure)
         {
             try
             {
-                string username = ExtractUsernameFromUrl(url);
+                string username = await ExtractUsernameFromUrl(url);
 
                 string userFolderPath = Path.Combine(downloadFolderPath, username);
                 if (!Directory.Exists(userFolderPath))
@@ -853,13 +866,12 @@ namespace TikTok_Downloader
             }
         }
 
-
-
-        private string ExtractUsernameFromUrl(string url)
+        private async Task<string> ExtractUsernameFromUrl(string url)
         {
             try
             {
-                var segments = url.Split('/');
+                var finalUrl = await GetRedirectUrl(url);
+                var segments = finalUrl.Split('/');
 
                 var usernameSegment = segments.FirstOrDefault(s => s.StartsWith("@"));
 
@@ -924,7 +936,6 @@ namespace TikTok_Downloader
                 MessageBox.Show("Script1 failed to execute. Setup scripts cannot proceed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
