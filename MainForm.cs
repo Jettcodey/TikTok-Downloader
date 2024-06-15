@@ -684,6 +684,7 @@ namespace TikTok_Downloader
                     if (urlMedia == null)
                     {
                         LogMessage(logFilePath, $"Skipping download link for MediaID: {MediaID} due to missing media URL.");
+                        outputTextBox.AppendText($"Error: No media URL found for MediaID: {MediaID}\r\n");
                         return null;
                     }
 
