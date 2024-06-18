@@ -214,6 +214,8 @@ namespace TikTok_Downloader
             public string Url { get; set; } = string.Empty;
             public List<string> Images { get; set; } = new List<string>();
             public string Id { get; set; } = string.Empty;
+            public List<string> AvatarUrls { get; set; }
+            public List<string> GifAvatarUrls { get; set; }
         }
 
         class ApiData
@@ -226,6 +228,7 @@ namespace TikTok_Downloader
             public string aweme_id { get; set; } = string.Empty;
             public ImagePostInfo image_post_info { get; set; } = new ImagePostInfo();
             public Video video { get; set; } = new Video();
+            public Author author { get; set; } = new Author();
         }
 
         class ImagePostInfo
@@ -248,6 +251,15 @@ namespace TikTok_Downloader
             public DownloadAddr download_addr { get; set; } = new DownloadAddr();
             public PlayAddr play_addr { get; set; } = new PlayAddr();
 
+        }
+        class Author
+        {
+            public Avatar avatar_medium { get; set; } = new Avatar();
+            public Avatar video_icon { get; set; } = new Avatar();
+        }
+        class Avatar
+        {
+            public List<string> url_list { get; set; } = new List<string>();
         }
 
         public class DownloadAddr
@@ -680,6 +692,8 @@ namespace TikTok_Downloader
                     var video = data.aweme_list.FirstOrDefault();
                     var urlMedia = withWatermark ? video?.video?.download_addr?.url_list.FirstOrDefault() : video?.video?.play_addr?.url_list.FirstOrDefault();
                     var imageUrls = video?.image_post_info?.images?.Select(img => img.display_image.url_list.FirstOrDefault()).ToList();
+                    var avatarUrls = video?.author?.avatar_medium?.url_list ?? new List<string>();
+                    var gifAvatarUrls = video?.author?.video_icon?.url_list ?? new List<string>();
 
                     if (urlMedia == null)
                     {
@@ -692,7 +706,9 @@ namespace TikTok_Downloader
                     {
                         Url = urlMedia,
                         Images = imageUrls ?? new List<string>(),
-                        Id = MediaID
+                        Id = MediaID,
+                        AvatarUrls = avatarUrls,
+                        GifAvatarUrls = gifAvatarUrls
                     };
                 }
                 catch (HttpRequestException ex)
@@ -830,6 +846,11 @@ namespace TikTok_Downloader
                     LogDownload(fileName, data.Url);
                 }
 
+                if (downloadAvatarsCheckBox.Checked)
+                {
+                    await DownloadAvatars(data, username, useOldFileStructure);
+                }
+
             }
             catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
@@ -866,6 +887,96 @@ namespace TikTok_Downloader
                 LogMessage(logFilePath, $"Error: An unexpected error occurred: {ex.Message}");
             }
         }
+
+        private async Task DownloadAvatars(VideoData data, string username, bool useOldFileStructure)
+        {
+            try
+            {
+                string userFolderPath = Path.Combine(downloadFolderPath, username);
+                string avatarsFolderPath = Path.Combine(userFolderPath, "Avatars");
+                avatarsFolderPath = useOldFileStructure ? Path.Combine(userFolderPath, "Avatars", $"Avatars_{username}") : avatarsFolderPath;
+
+                if (Directory.Exists(avatarsFolderPath) && Directory.GetFiles(avatarsFolderPath).Length > 0)
+                {
+                    outputTextBox.AppendText($"Avatars for user '{username}' already exist. Skipping avatar download.\r\n");
+                    return;
+                }
+
+                if (!Directory.Exists(avatarsFolderPath))
+                {
+                    Directory.CreateDirectory(avatarsFolderPath);
+                }
+
+                if (data.AvatarUrls != null && data.AvatarUrls.Count > 0)
+                {
+                    foreach (var avatarUrl in data.AvatarUrls)
+                    {
+                        string fileName = $"Avatar_{data.AvatarUrls.IndexOf(avatarUrl)}.jpeg";
+                        string filePath = Path.Combine(avatarsFolderPath, fileName);
+
+                        if (File.Exists(filePath))
+                        {
+                            outputTextBox.AppendText($"Avatar: '{fileName}' already exists. Skipping\r\n");
+                            continue;
+                        }
+
+                        using (var client = new HttpClient())
+                        {
+                            using (var stream = await client.GetStreamAsync(avatarUrl))
+                            using (var fileStream = File.Create(filePath))
+                            {
+                                await stream.CopyToAsync(fileStream);
+                            }
+                        }
+
+                        outputTextBox.AppendText($"Downloaded Avatar: '{fileName}' Successfully...\r\n");
+                        LogDownload(fileName, avatarUrl);
+                    }
+                }
+                else
+                {
+                    outputTextBox.AppendText("No avatar images to download.\r\n");
+                }
+
+                if (data.GifAvatarUrls != null && data.GifAvatarUrls.Count > 0)
+                {
+                    foreach (var gifAvatarUrl in data.GifAvatarUrls)
+                    {
+                        string fileName = $"GifAvatar_{data.GifAvatarUrls.IndexOf(gifAvatarUrl)}.gif";
+                        string filePath = Path.Combine(avatarsFolderPath, fileName);
+
+                        if (File.Exists(filePath))
+                        {
+                            outputTextBox.AppendText($"GIF Avatar: '{fileName}' already exists. Skipping\r\n");
+                            continue;
+                        }
+
+                        using (var client = new HttpClient())
+                        {
+                            using (var stream = await client.GetStreamAsync(gifAvatarUrl))
+                            using (var fileStream = File.Create(filePath))
+                            {
+                                await stream.CopyToAsync(fileStream);
+                            }
+                        }
+
+                        outputTextBox.AppendText($"Downloaded GIF Avatar: '{fileName}' Successfully...\r\n");
+                        LogDownload(fileName, gifAvatarUrl);
+                    }
+                }
+                else
+                {
+                    outputTextBox.AppendText("No GIF avatars to download.\r\n");
+                }
+            }
+            catch (Exception ex)
+            {
+                outputTextBox.AppendText($"Error: An error occurred while downloading avatars: {ex.Message}\r\n");
+                LogMessage(logFilePath, $"Error: An error occurred while downloading avatars: {ex.Message}");
+            }
+        }
+
+
 
         private async Task<string> ExtractUsernameFromUrl(string url)
         {
@@ -1029,6 +1140,11 @@ namespace TikTok_Downloader
         }
 
         private void filePathTextBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void downloadAvatarsCheckBox_CheckedChanged(object sender, EventArgs e)
         {
 
         }

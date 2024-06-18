@@ -31,6 +31,7 @@ namespace TikTok_Downloader
             settingsToolStripMenuItem = new ToolStripMenuItem();
             browseFileButton = new Button();
             withWatermarkCheckBox = new CheckBox();
+            downloadAvatarsCheckBox = new CheckBox();
             label3 = new Label();
             label2 = new Label();
             label1 = new Label();
@@ -157,6 +158,21 @@ namespace TikTok_Downloader
             withWatermarkCheckBox.TextAlign = ContentAlignment.TopLeft;
             withWatermarkCheckBox.UseVisualStyleBackColor = false;
             // 
+            // downloadAvatarsCheckBox
+            // 
+            downloadAvatarsCheckBox.AutoSize = true;
+            downloadAvatarsCheckBox.BackColor = Color.Transparent;
+            downloadAvatarsCheckBox.ForeColor = SystemColors.Control;
+            downloadAvatarsCheckBox.ImageAlign = ContentAlignment.MiddleLeft;
+            downloadAvatarsCheckBox.Location = new Point(172, 106);
+            downloadAvatarsCheckBox.Name = "downloadAvatarsCheckBox";
+            downloadAvatarsCheckBox.Size = new Size(122, 19);
+            downloadAvatarsCheckBox.TabIndex = 9;
+            downloadAvatarsCheckBox.Text = "Download Avatars";
+            downloadAvatarsCheckBox.TextAlign = ContentAlignment.TopLeft;
+            downloadAvatarsCheckBox.UseVisualStyleBackColor = false;
+            downloadAvatarsCheckBox.CheckedChanged += downloadAvatarsCheckBox_CheckedChanged;
+            // 
             // label3
             // 
             label3.AutoSize = true;
@@ -220,6 +236,7 @@ namespace TikTok_Downloader
             Controls.Add(label2);
             Controls.Add(label1);
             Controls.Add(withWatermarkCheckBox);
+            Controls.Add(downloadAvatarsCheckBox);
             Controls.Add(browseFileButton);
             Controls.Add(cmbChoice);
             Controls.Add(progressBar);
@@ -253,6 +270,7 @@ namespace TikTok_Downloader
         private Label label2;
         private Label label1;
         private CheckBox withWatermarkCheckBox;
+        private CheckBox downloadAvatarsCheckBox;
         private ToolStripMenuItem settingsToolStripMenuItem;
 
         private void cmbChoice_SelectedIndexChanged(object sender, EventArgs e)
