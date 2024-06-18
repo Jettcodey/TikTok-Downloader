@@ -848,7 +848,7 @@ namespace TikTok_Downloader
 
                 if (downloadAvatarsCheckBox.Checked)
                 {
-                    await DownloadAvatars(data, username, useOldFileStructure);
+                    await DownloadAvatars(data, url, username, useOldFileStructure);
                 }
 
             }
@@ -888,7 +888,7 @@ namespace TikTok_Downloader
             }
         }
 
-        private async Task DownloadAvatars(VideoData data, string username, bool useOldFileStructure)
+        private async Task DownloadAvatars(VideoData data, string url,string username, bool useOldFileStructure)
         {
             try
             {
