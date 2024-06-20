@@ -12,19 +12,20 @@ namespace TikTok_Downloader
 {
     public partial class MainForm : Form
     {
-        private readonly string logFolderPath;
-        private readonly string logFilePath;
-        string downloadFolderPath;
-        private readonly BrowserUtility browserUtility;
+        private string logFolderPath;
+        private string logFilePath;
+        private string downloadFolderPath;
+        private BrowserUtility browserUtility;
+        private bool EnableDownloadLogs;
         private bool logJsonEnabled;
-        private readonly string jsonLogFilePath;
-        private readonly object jsonLock = new object();
+        private string jsonLogFilePath;
+        private object jsonLock = new object();
         private bool useOldFileStructure;
         private readonly AppSettings settings;
         private SettingsDialog settingsDialog;
         private List<string> cachedVideoUrls = new List<string>();
 
-
+        private bool isLoggingInitialized = false;
 
         private Task LogSystemInformation(string logFilePath)
         {
@@ -32,7 +33,7 @@ namespace TikTok_Downloader
             {
                 string systemInfo = "";
 
-                systemInfo += $"Region and Language: {CultureInfo.CurrentCulture.DisplayName}\n";
+                systemInfo += $"\nRegion and Language: {CultureInfo.CurrentCulture.DisplayName}\n";
 
                 using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Processor"))
                 {
@@ -80,35 +81,9 @@ namespace TikTok_Downloader
             InitializeComponent();
             settings = new AppSettings();
             LoadSettingsatbeginning();
+            InitializeLoggingFolder();
             settings.LoadSettings();
-            this.settingsDialog = settingsDialog;
-            string logFolderName = $"TTDownloader-Logs[{DateTime.Now:yyyy-MM-dd_HH-mm}]-Logs";
-            string logFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), logFolderName);
-
-
-            try
-            {
-                Directory.CreateDirectory(logFolderPath);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error creating log directory: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Environment.Exit(1);
-            }
-
-            logFilePath = Path.Combine(logFolderPath, $"TikTokDownloaderLog_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
-            jsonLogFilePath = Path.Combine(logFolderPath, $"JSON_Log_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.json");
-
-            try
-            {
-                Directory.CreateDirectory(logFolderPath);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error creating log directory: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Environment.Exit(1);
-            }
-
+            settingsDialog = new SettingsDialog(this);
             Directory.CreateDirectory(downloadFolderPath);
 
             Task.Run(async () =>
@@ -123,6 +98,29 @@ namespace TikTok_Downloader
             cmbChoice.SelectedItem = "Single Video/Image Download";
 
             outputTextBox.ReadOnly = true;
+        }
+
+        private void InitializeLoggingFolder()
+        {
+            if (!isLoggingInitialized && (EnableDownloadLogs || logJsonEnabled))
+            {
+                string logFolderName = $"TTDownloader-Logs[{DateTime.Now:yyyy-MM-dd_HH-mm}]-Logs";
+                logFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), logFolderName);
+
+                try
+                {
+                    Directory.CreateDirectory(logFolderPath);
+                    logFilePath = Path.Combine(logFolderPath, $"TikTokDownloaderLog_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt");
+                    jsonLogFilePath = Path.Combine(logFolderPath, $"JSON_Log_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.json");
+
+                    isLoggingInitialized = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error creating log directory: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Environment.Exit(1);
+                }
+            }
         }
 
         private void LoadSettingsatbeginning()
@@ -161,11 +159,20 @@ namespace TikTok_Downloader
             {
                 downloadFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TiktokDownloads");
             }
+
+            EnableDownloadLogs = currentSettings.EnableDownloadLogs;
+            logJsonEnabled = currentSettings.EnableJsonLogs;
+            useOldFileStructure = currentSettings.UseOldFileStructure;
         }
 
 
-        private static void LogMessage(string logFilePath, string message)
+        private void LogMessage(string logFilePath, string message)
         {
+            if (!EnableDownloadLogs)
+            {
+                return;
+            }
+
             lock (logFilePath)
             {
                 string redactedMessage = message.Replace(Environment.UserName, "[RedactedUsername]");
@@ -173,41 +180,48 @@ namespace TikTok_Downloader
             }
         }
 
+
+
         private void LogDownload(string fileName, string url)
         {
-            LogMessage(logFilePath, $"Downloaded file: {fileName}, from URL: {url}");
+            if (EnableDownloadLogs)
+            {
+                LogMessage(logFilePath, $"Downloaded file: {fileName}, from URL: {url}");
+            }
         }
 
-        private void LogJson(string fileName, string jsonContent, bool logJsonEnabled)
+        private void LogJson(string fileName, string jsonContent)
         {
-            if (!logJsonEnabled)
+            if (logJsonEnabled)
             {
-                return;
-            }
-
-            lock (jsonLock)
-            {
-                try
+                lock (jsonLock)
                 {
-                    using (StreamWriter writer = File.AppendText(jsonLogFilePath))
+                    try
                     {
-                        writer.WriteLine($"[{DateTime.Now}] File: {fileName}");
-                        writer.WriteLine(jsonContent);
-                        writer.WriteLine();
+                        using (StreamWriter writer = File.AppendText(jsonLogFilePath))
+                        {
+                            writer.WriteLine($"[{DateTime.Now}] File: {fileName}");
+                            writer.WriteLine(jsonContent);
+                            writer.WriteLine();
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    outputTextBox.AppendText($"Error: An error occurred while logging JSON response: {ex.Message}\r\n");
-                    Console.WriteLine($"Error occurred while logging JSON response: {ex}");
+                    catch (Exception ex)
+                    {
+                        outputTextBox.AppendText($"Error: An error occurred while logging the JSON response: {ex.Message}\r\n");
+                        Console.WriteLine($"Error occurred while logging the JSON response: {ex}");
+                    }
                 }
             }
         }
 
         private void LogError(string errorMessage)
         {
-            LogMessage(logFilePath, $"ERROR: {errorMessage}");
+            if (EnableDownloadLogs)
+            {
+                LogMessage(logFilePath, $"ERROR: {errorMessage}");
+            }
         }
+
 
         class VideoData
         {
@@ -452,7 +466,7 @@ namespace TikTok_Downloader
                 // Close the page and context
                 await page.CloseAsync();
                 await context.CloseAsync();
-                LogMessage(logFilePath, "Page and context closed successfully");
+                LogMessage(logFilePath, "Browser Page and context closed successfully");
 
                 // Download all Videos and Images from the combined links file
                 await DownloadFromCombinedLinksFile(combinedLinksFilePath);
@@ -496,7 +510,7 @@ namespace TikTok_Downloader
 
                         if (data == null)
                         {
-                            LogError($"Error: Media from URL {trimmedUrl} was deleted!");
+                            LogError($"Error: Media from URL {trimmedUrl} wasn´t found!");
                             progressBar.Value++;
                             continue;
                         }
@@ -514,7 +528,7 @@ namespace TikTok_Downloader
             if (!File.Exists(filePath))
             {
                 MessageBox.Show($"Error: Text File not Found", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                LogError("Text file not found!");
+                LogError("Text file not found or None was Selected!");
                 return;
             }
 
@@ -540,7 +554,7 @@ namespace TikTok_Downloader
 
                         if (data == null)
                         {
-                            LogError($"Error: Media from URL {trimmedUrl} not found!");
+                            LogError($"Error: Media at URL {trimmedUrl} not found!");
                             progressBar.Value++;
                             continue;
                         }
@@ -674,7 +688,8 @@ namespace TikTok_Downloader
                     response.EnsureSuccessStatusCode();
 
                     var json = await response.Content.ReadAsStringAsync();
-                    LogJson($"API_Response_For_'{MediaID}'", json, logJsonEnabled);
+                    LogJson($"API_Response_For_'{MediaID}'", json);
+
 
                     if (string.IsNullOrWhiteSpace(json))
                     {
@@ -733,6 +748,7 @@ namespace TikTok_Downloader
         {
             try
             {
+
                 string username = await ExtractUsernameFromUrl(url);
 
                 string userFolderPath = Path.Combine(downloadFolderPath, username);
@@ -786,7 +802,7 @@ namespace TikTok_Downloader
                             }
                         }
 
-                        outputTextBox.AppendText($"Downloaded Image:'{fileName}' Successfully...\r\n");
+                        outputTextBox.AppendText($"Downloading Images from User: {username}\r\nDownloaded Image:'{fileName}' Successfully...\r\n");
                         LogDownload(fileName, imageUrl);
                     }
                 }
@@ -842,13 +858,14 @@ namespace TikTok_Downloader
                         }
                     }
 
-                    outputTextBox.AppendText($"Downloaded Video: '{fileName}' Successfully...\r\n");
+                    outputTextBox.AppendText($"Downloading Video from User: {username}\r\nDownloaded Video: '{fileName}' Successfully...\r\n");
                     LogDownload(fileName, data.Url);
                 }
 
                 if (downloadAvatarsCheckBox.Checked)
                 {
                     await DownloadAvatars(data, url, username, useOldFileStructure);
+                    LogMessage(logFilePath, "Download Avatars Checkbox is Active.");
                 }
 
             }
@@ -888,7 +905,7 @@ namespace TikTok_Downloader
             }
         }
 
-        private async Task DownloadAvatars(VideoData data, string url,string username, bool useOldFileStructure)
+        private async Task DownloadAvatars(VideoData data, string url, string username, bool useOldFileStructure)
         {
             try
             {
@@ -898,7 +915,7 @@ namespace TikTok_Downloader
 
                 if (Directory.Exists(avatarsFolderPath) && Directory.GetFiles(avatarsFolderPath).Length > 0)
                 {
-                    outputTextBox.AppendText($"Avatars for user '{username}' already exist. Skipping avatar download.\r\n");
+                    //outputTextBox.AppendText($"Avatars for user '{username}' already exist. Skipping avatar download.\r\n");
                     return;
                 }
 
@@ -929,7 +946,7 @@ namespace TikTok_Downloader
                             }
                         }
 
-                        outputTextBox.AppendText($"Downloaded Avatar: '{fileName}' Successfully...\r\n");
+                        outputTextBox.AppendText($"Downloaded Avatar From '{username}' Successfully...\r\n");
                         LogDownload(fileName, avatarUrl);
                     }
                 }
@@ -947,7 +964,7 @@ namespace TikTok_Downloader
 
                         if (File.Exists(filePath))
                         {
-                            outputTextBox.AppendText($"GIF Avatar: '{fileName}' already exists. Skipping\r\n");
+                            //outputTextBox.AppendText($"GIF Avatar: '{fileName}' already exists. Skipping\r\n");
                             continue;
                         }
 
@@ -960,13 +977,14 @@ namespace TikTok_Downloader
                             }
                         }
 
-                        outputTextBox.AppendText($"Downloaded GIF Avatar: '{fileName}' Successfully...\r\n");
+                        outputTextBox.AppendText($"Downloaded GIF Avatar from '{username}' Successfully...\r\n");
                         LogDownload(fileName, gifAvatarUrl);
                     }
                 }
                 else
                 {
                     outputTextBox.AppendText("No GIF avatars to download.\r\n");
+                    LogDownload("No GIF avatars to download", url);
                 }
             }
             catch (Exception ex)
@@ -975,8 +993,6 @@ namespace TikTok_Downloader
                 LogMessage(logFilePath, $"Error: An error occurred while downloading avatars: {ex.Message}");
             }
         }
-
-
 
         private async Task<string> ExtractUsernameFromUrl(string url)
         {
@@ -998,7 +1014,7 @@ namespace TikTok_Downloader
             catch (Exception ex)
             {
                 LogError($"Error extracting username from URL: {ex.Message}");
-                return "default_username";
+                return "Username not Found!";
             }
         }
 
@@ -1086,7 +1102,15 @@ namespace TikTok_Downloader
         public void LogJsonCheckBox(bool value)
         {
             logJsonEnabled = value;
+            InitializeLoggingFolder();
         }
+
+        public void EnableDownloadLogsCheckBox(bool value)
+        {
+            EnableDownloadLogs = value;
+            InitializeLoggingFolder();
+        }
+
         private void outputTextBox_TextChanged(object sender, EventArgs e)
         {
 

@@ -22,6 +22,7 @@ namespace TikTok_Downloader
         private CheckBox setting2CheckBox;
         private CheckBox setting3CheckBox;
         private CheckBox setting4CheckBox;
+        private CheckBox setting5CheckBox;
         private AppSettings.Settings settings = new AppSettings.Settings();
 
         private MainForm mainForm;
@@ -48,6 +49,14 @@ namespace TikTok_Downloader
             }
         }
 
+        private void Setting5CheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+            {
+                mainForm.EnableDownloadLogsCheckBox(checkBox.Checked);
+            }
+        }
+
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsDialog));
@@ -60,6 +69,7 @@ namespace TikTok_Downloader
             setting2CheckBox = new CheckBox();
             setting3CheckBox = new CheckBox();
             setting4CheckBox = new CheckBox();
+            setting5CheckBox = new CheckBox();
             SuspendLayout();
             // 
             // descriptionLabel
@@ -137,7 +147,7 @@ namespace TikTok_Downloader
             setting2CheckBox.AutoSize = true;
             setting2CheckBox.BackColor = Color.Transparent;
             setting2CheckBox.ForeColor = SystemColors.Control;
-            setting2CheckBox.Location = new Point(15, 70);
+            setting2CheckBox.Location = new Point(162, 70);
             setting2CheckBox.Name = "setting2CheckBox";
             setting2CheckBox.Size = new Size(115, 19);
             setting2CheckBox.TabIndex = 6;
@@ -171,6 +181,19 @@ namespace TikTok_Downloader
             setting4CheckBox.UseVisualStyleBackColor = false;
             setting4CheckBox.Visible = false;
             // 
+            // setting5CheckBox
+            // 
+            setting5CheckBox.AutoSize = true;
+            setting5CheckBox.BackColor = Color.Transparent;
+            setting5CheckBox.ForeColor = SystemColors.Control;
+            setting5CheckBox.Location = new Point(15, 70);
+            setting5CheckBox.Name = "setting5CheckBox";
+            setting5CheckBox.Size = new Size(146, 19);
+            setting5CheckBox.TabIndex = 7;
+            setting5CheckBox.Text = "Enable Download Logs";
+            setting5CheckBox.UseVisualStyleBackColor = false;
+            setting5CheckBox.CheckedChanged += Setting5CheckBox_CheckedChanged;
+            // 
             // SettingsDialog
             // 
             BackColor = SystemColors.ControlDarkDark;
@@ -185,6 +208,7 @@ namespace TikTok_Downloader
             Controls.Add(setting2CheckBox);
             Controls.Add(setting3CheckBox);
             Controls.Add(setting4CheckBox);
+            Controls.Add(setting5CheckBox);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
@@ -213,6 +237,7 @@ namespace TikTok_Downloader
                 settings.DownloadVideosOnly = setting1CheckBox.Checked;
                 settings.DownloadImagesOnly = setting4CheckBox.Checked;
                 settings.EnableJsonLogs = setting2CheckBox.Checked;
+                settings.EnableDownloadLogs = setting5CheckBox.Checked;
                 settings.UseOldFileStructure = setting3CheckBox.Checked;
 
                 using (StreamWriter writer = new StreamWriter(SettingsFilePath))
@@ -241,6 +266,7 @@ namespace TikTok_Downloader
                     setting1CheckBox.Checked = settings.DownloadVideosOnly;
                     setting4CheckBox.Checked = settings.DownloadImagesOnly;
                     setting2CheckBox.Checked = settings.EnableJsonLogs;
+                    setting5CheckBox.Checked = settings.EnableDownloadLogs;
                     setting3CheckBox.Checked = settings.UseOldFileStructure;
                 }
                 else
@@ -280,6 +306,7 @@ namespace TikTok_Downloader
                             setting1CheckBox.Checked = settings.DownloadVideosOnly;
                             setting4CheckBox.Checked = settings.DownloadImagesOnly;
                             setting2CheckBox.Checked = settings.EnableJsonLogs;
+                            setting5CheckBox.Checked = settings.EnableDownloadLogs;
                             setting3CheckBox.Checked = settings.UseOldFileStructure;
                         }
                     }
@@ -310,6 +337,7 @@ namespace TikTok_Downloader
                             DownloadVideosOnly = setting1CheckBox.Checked,
                             DownloadImagesOnly = setting4CheckBox.Checked,
                             EnableJsonLogs = setting2CheckBox.Checked,
+                            EnableDownloadLogs = setting5CheckBox.Checked,
                             UseOldFileStructure = setting3CheckBox.Checked
                         };
 
