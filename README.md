@@ -33,15 +33,16 @@ C# and Microsoft Playwright
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-### For educational purposes only!
 
 Just a simple TikTok Downloader capable of downloading single videos/images, Mass Downloading from Links in a Text file or Mass downloading from a user profile.
 
-The default storage location (if not Changed in the Menu) is the user's desktop in a folder named "TikTokDownloads\\{@Username}\Videos\ & \Images\ folders".
+The default storage location (if not Changed in the Menu) is the user's desktop in a folder named `TikTokDownloads\\{@Username}\Videos\ & \Images\ & \Avatars\ folders`.
 
 To download all videos from a TikTok user, the Application opens the specified TikTok user in the browser. Then, loads all Video/Image links of the user by Auto scrolling through the browser. After that, those Links get saved in a separate text file named "{@username}_combined_links.txt" in the default storage location. Finally the Application works through the Saved links.
 
-The settings file is saved in the user's Documents folder at "Jettcodey\TikTok Downloader\appsettings.xml". The Settings Menu is still in development, so there aren't many options to choose from yet.
+The settings file is saved in the user's Documents folder at `Jettcodey\TikTok Downloader\appsettings.xml`. The Settings Menu is still in development, so there aren't many options to choose from yet.
+
+If you have any Question about the Application DM me on Discord: `jettcodey`
 <!--### Important: 
 To make the TikTok User download work, you need to have a Chromium-based browser or Firefox installed, because others like Opera GX don't work for some reason, I'm still investigating.-->                                       
 
@@ -68,19 +69,19 @@ After the installation is finished, simply open the TikTok Downloader, and after
 ### How to use those options:
 
 #### Single Video/Image Download:
-If you select "Single Video/Image Download," you can simply copy & paste every TikTok link and press Download. The downloaded media is saved to the default storage location.
+If you select `Single Video/Image Download`, you can simply copy & paste every TikTok link and press Download. The downloaded media is saved to the default storage location.
 
-TikTok links look like this: "https://www.tiktok.com/@user/video|photo/123456789" or "https://vm.tiktok.com/a1b2c3d4".
+TikTok links look like this: `https://www.tiktok.com/@user/video|photo/123456789` or `https://vm.tiktok.com/a1b2c3d4`.
 
 #### Mass Download by Username:
-If you select "Mass Download by Username," you can simply copy & paste every TikTok Profile link the or the username of the account (without the @) into the text field. After pressing download, your system's default browser will open, automatically navigating to the account's TikTok page. You'll then need to solve a simple puzzle slide at the beginning to verify that you are human and accept/deny cookies (which will be deleted after the download is finished). When the login window from TikTok shows up, just press "Continue as Guest." The browser will begin auto-scrolling the entire account page until it can't find any new posts. It will then filter and save any found links from the account's posts to a text file in the default storage location (`@Username_combined_links.txt`). Once all links are saved to the text file, it will begin downloading all video/image posts from those saved links. The downloaded media is saved to the default storage location.
+If you select `Mass Download by Username`, you can simply copy & paste every TikTok Profile link the or the username of the account into the text field. After pressing download, your system's default browser will open, automatically navigating to the account's TikTok page. You'll then need to solve a simple puzzle slide at the beginning to verify that you are human and accept/deny cookies (which will be deleted after the download is finished). When the login window from TikTok shows up, just press "Continue as Guest." The browser will begin auto-scrolling the entire account page until it can't find any new posts. It will then filter and save any found links from the account's posts to a text file in the default storage location (`@Username_combined_links.txt`). Once all links are saved to the text file, it will begin downloading all video/image posts from those saved links. The downloaded media is saved to the default storage location.
 
-TikTok Profile links look like this: "https://www.tiktok.com/@user", Profile links directly from the TikTok App **Won´t Work!**(For Now)
+TikTok Profile links look like this: `https://www.tiktok.com/@user`, Profile links directly from the TikTok App **Won´t Work!**(For Now)
 
 #### Mass Download from Text File Links:
-If you select "Mass Download from Text File Links," you just need (if not already done) to create a `.txt` file anywhere on your PC in which you put all TikTok browser links. Every link needs to be on its own line. After that, simply select the "Browse" button and navigate to your text file with the links in it. Once that's done, you can press Download. The downloaded media is saved to the default storage location.
+If you select `Mass Download from Text File Links`, you just need (if not already done) to create a `.txt` file anywhere on your PC in which you put all TikTok browser links. Every link needs to be on its own line. After that, simply select the "Browse" button and navigate to your text file with the links in it. Once that's done, you can press Download. The downloaded media is saved to the default storage location.
 
-TikTok links look like this: "https://www.tiktok.com/@user/video|photo/123456789" or "https://vm.tiktok.com/a1b2c3d4".
+TikTok links look like this: `https://www.tiktok.com/@user/video|photo/123456789` or `https://vm.tiktok.com/a1b2c3d4`.
 
 <p align="right"><a href="#readme-top">Back to top</a></p>
 
@@ -95,15 +96,15 @@ TikTok links look like this: "https://www.tiktok.com/@user/video|photo/123456789
 - [x] Download All Images from a User-Profile Without Watermark.
 - [x] System Default Browser Support
 - [x] Add Mobile Links Support
-- [ ] Multi-Webbrowser Support
+- [x] Multi-Webbrowser Support
     - [x] Google Chrome
     - [x] Microsoft Edge
     - [x] Chromium
     - [x] Brave
     - [x] Mozilla Firefox
-    - [ ] Opera GX <-- Doesn't work for some reason, still investigating.
-- [ ] Make the GUI Better
-    - [ ] Add more Options(Settings Menu)
+    - [ ] Opera GX <-- Doesn't work, not investigating further for now.
+- [x] Make the GUI Better
+    - [x] Add more Options(Settings Menu)
     - [x] Make the GUI more appealing/better looking
 
 <p align="right"><a href="#readme-top">Back to top</a></p>
