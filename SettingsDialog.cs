@@ -57,6 +57,22 @@ namespace TikTok_Downloader
             }
         }
 
+        private void Setting1CheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+            {
+                mainForm.DownloadVideosOnlyCheckBox(checkBox.Checked);
+            }
+        }
+
+        private void Setting4CheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+            {
+                mainForm.DownloadImagesOnlyCheckBox(checkBox.Checked);
+            }
+        }
+
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsDialog));
@@ -141,13 +157,14 @@ namespace TikTok_Downloader
             setting1CheckBox.Text = "Download Videos Only";
             setting1CheckBox.UseVisualStyleBackColor = false;
             setting1CheckBox.Visible = false;
+            setting1CheckBox.CheckedChanged += Setting1CheckBox_CheckedChanged;
             // 
             // setting2CheckBox
             // 
             setting2CheckBox.AutoSize = true;
             setting2CheckBox.BackColor = Color.Transparent;
             setting2CheckBox.ForeColor = SystemColors.Control;
-            setting2CheckBox.Location = new Point(162, 70);
+            setting2CheckBox.Location = new Point(167, 70);
             setting2CheckBox.Name = "setting2CheckBox";
             setting2CheckBox.Size = new Size(115, 19);
             setting2CheckBox.TabIndex = 6;
@@ -180,6 +197,7 @@ namespace TikTok_Downloader
             setting4CheckBox.Text = "Download Images Only";
             setting4CheckBox.UseVisualStyleBackColor = false;
             setting4CheckBox.Visible = false;
+            setting4CheckBox.CheckedChanged += Setting4CheckBox_CheckedChanged;
             // 
             // setting5CheckBox
             // 

@@ -4,18 +4,6 @@ namespace TikTok_Downloader
 {
     partial class MainForm
     {
-        private System.ComponentModel.IContainer components = null;
-
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
@@ -93,18 +81,20 @@ namespace TikTok_Downloader
             // 
             // menuStrip1
             // 
-            menuStrip1.BackColor = SystemColors.Menu;
+            menuStrip1.BackColor = Color.FromArgb(32, 32, 32);
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(534, 24);
             menuStrip1.TabIndex = 6;
             menuStrip1.Text = "menuStrip1";
+            menuStrip1.Renderer = new RendererEx();
             // 
             // fileToolStripMenuItem
             // 
+            fileToolStripMenuItem.BackColor = Color.FromArgb(32, 32, 32);
             fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { ChangeDownloadFolderToolStripMenuItem, aboutToolStripMenuItem, settingsToolStripMenuItem });
-            fileToolStripMenuItem.ForeColor = SystemColors.MenuText;
+            fileToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(61, 20);
             fileToolStripMenuItem.Text = "Options";
@@ -112,7 +102,8 @@ namespace TikTok_Downloader
             // 
             // ChangeDownloadFolderToolStripMenuItem
             // 
-            ChangeDownloadFolderToolStripMenuItem.BackColor = Color.Transparent;
+            ChangeDownloadFolderToolStripMenuItem.BackColor = Color.FromArgb(32, 32, 32);
+            ChangeDownloadFolderToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
             ChangeDownloadFolderToolStripMenuItem.Name = "ChangeDownloadFolderToolStripMenuItem";
             ChangeDownloadFolderToolStripMenuItem.Size = new Size(208, 22);
             ChangeDownloadFolderToolStripMenuItem.Text = "Change Download Folder";
@@ -120,7 +111,8 @@ namespace TikTok_Downloader
             // 
             // aboutToolStripMenuItem
             // 
-            aboutToolStripMenuItem.BackColor = Color.Transparent;
+            aboutToolStripMenuItem.BackColor = Color.FromArgb(32, 32, 32);
+            aboutToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             aboutToolStripMenuItem.Size = new Size(208, 22);
             aboutToolStripMenuItem.Text = "About";
@@ -128,6 +120,8 @@ namespace TikTok_Downloader
             // 
             // settingsToolStripMenuItem
             // 
+            settingsToolStripMenuItem.BackColor = Color.FromArgb(32, 32, 32);
+            settingsToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
             settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             settingsToolStripMenuItem.Size = new Size(208, 22);
             settingsToolStripMenuItem.Text = "Settings";
@@ -272,6 +266,38 @@ namespace TikTok_Downloader
         private CheckBox withWatermarkCheckBox;
         private CheckBox downloadAvatarsCheckBox;
         private ToolStripMenuItem settingsToolStripMenuItem;
+
+        public class RendererEx : ToolStripProfessionalRenderer
+        {
+            protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
+            {
+                Rectangle rc = new Rectangle(Point.Empty, e.Item.Size);
+
+                if (e.Item.Selected || e.Item.Pressed)
+                {
+                    // Highlight color
+                    using (SolidBrush highlightBrush = new SolidBrush(Color.FromArgb(64, 64, 64)))
+                    {
+                        e.Graphics.FillRectangle(highlightBrush, rc);
+                    }
+                }
+                else
+                {
+                    // Normal background color
+                    using (SolidBrush backBrush = new SolidBrush(Color.FromArgb(32, 32, 32)))
+                    {
+                        e.Graphics.FillRectangle(backBrush, rc);
+                    }
+                }
+            }
+
+            protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
+            {
+                // Text color
+                e.Item.ForeColor = Color.White;
+                base.OnRenderItemText(e);
+            }
+        }
 
         private void cmbChoice_SelectedIndexChanged(object sender, EventArgs e)
         {

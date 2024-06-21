@@ -6,6 +6,8 @@ using System.Management;
 using System.Net;
 using System.Reflection;
 using System.Text.Json;
+using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace TikTok_Downloader
@@ -21,6 +23,8 @@ namespace TikTok_Downloader
         private string jsonLogFilePath;
         private object jsonLock = new object();
         private bool useOldFileStructure;
+        private bool DownloadVideosOnly;
+        private bool DownloadImagesOnly;
         private readonly AppSettings settings;
         private SettingsDialog settingsDialog;
         private List<string> cachedVideoUrls = new List<string>();
@@ -1109,6 +1113,16 @@ namespace TikTok_Downloader
         {
             EnableDownloadLogs = value;
             InitializeLoggingFolder();
+        }
+
+        public void DownloadVideosOnlyCheckBox(bool value)
+        {
+            DownloadVideosOnly = value;
+        }
+
+        public void DownloadImagesOnlyCheckBox(bool value)
+        {
+            DownloadImagesOnly = value;
         }
 
         private void outputTextBox_TextChanged(object sender, EventArgs e)
