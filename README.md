@@ -1,3 +1,11 @@
+<!--
+##########################################
+#           TikTok Downloader            #
+#           Made by Jettcodey            #
+#                © 2024                  #
+#           DO NOT REMOVE THIS           #
+##########################################
+-->
 # TikTok Downloader
 <!-- # ⚠ THE APPLICATION ISN'T WORKING RIGHT NOW DUE TO RECENT TIKTOK API UPDATES ⚠ -->
 

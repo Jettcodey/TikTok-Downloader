@@ -1,3 +1,11 @@
+/*
+##########################################
+#           TikTok Downloader            #
+#           Made by Jettcodey            #
+#                © 2024                  #
+#           DO NOT REMOVE THIS           #
+##########################################
+*/
 using Microsoft.Playwright;
 using Microsoft.Win32;
 using System.Diagnostics;

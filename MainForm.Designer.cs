@@ -1,4 +1,12 @@
-﻿using System.Windows.Forms;
+﻿/*
+##########################################
+#           TikTok Downloader            #
+#           Made by Jettcodey            #
+#                © 2024                  #
+#           DO NOT REMOVE THIS           #
+##########################################
+*/
+using System.Windows.Forms;
 
 namespace TikTok_Downloader
 {
@@ -24,6 +32,7 @@ namespace TikTok_Downloader
             label2 = new Label();
             label1 = new Label();
             linkLabel1 = new LinkLabel();
+            noWatermarkCheckBox = new CheckBox();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -88,13 +97,12 @@ namespace TikTok_Downloader
             menuStrip1.Size = new Size(534, 24);
             menuStrip1.TabIndex = 6;
             menuStrip1.Text = "menuStrip1";
-            menuStrip1.Renderer = new RendererEx();
             // 
             // fileToolStripMenuItem
             // 
             fileToolStripMenuItem.BackColor = Color.FromArgb(32, 32, 32);
             fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { ChangeDownloadFolderToolStripMenuItem, aboutToolStripMenuItem, settingsToolStripMenuItem });
-            fileToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
+            fileToolStripMenuItem.ForeColor = Color.White;
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(61, 20);
             fileToolStripMenuItem.Text = "Options";
@@ -146,11 +154,25 @@ namespace TikTok_Downloader
             withWatermarkCheckBox.ImageAlign = ContentAlignment.MiddleLeft;
             withWatermarkCheckBox.Location = new Point(12, 106);
             withWatermarkCheckBox.Name = "withWatermarkCheckBox";
-            withWatermarkCheckBox.Size = new Size(154, 19);
+            withWatermarkCheckBox.Size = new Size(112, 19);
             withWatermarkCheckBox.TabIndex = 8;
-            withWatermarkCheckBox.Text = "Download Watermarked";
+            withWatermarkCheckBox.Text = "With Watermark";
             withWatermarkCheckBox.TextAlign = ContentAlignment.TopLeft;
             withWatermarkCheckBox.UseVisualStyleBackColor = false;
+            //
+            // noWatermarkCheckBox
+            // 
+            noWatermarkCheckBox.AutoSize = true;
+            noWatermarkCheckBox.BackColor = Color.Transparent;
+            noWatermarkCheckBox.ForeColor = SystemColors.Control;
+            noWatermarkCheckBox.ImageAlign = ContentAlignment.MiddleLeft;
+            noWatermarkCheckBox.Location = new Point(130, 106);
+            noWatermarkCheckBox.Name = "noWatermarkCheckBox";
+            noWatermarkCheckBox.Size = new Size(103, 19);
+            noWatermarkCheckBox.TabIndex = 9;
+            noWatermarkCheckBox.Text = "No Watermark";
+            noWatermarkCheckBox.TextAlign = ContentAlignment.TopLeft;
+            noWatermarkCheckBox.UseVisualStyleBackColor = false;
             // 
             // downloadAvatarsCheckBox
             // 
@@ -158,10 +180,10 @@ namespace TikTok_Downloader
             downloadAvatarsCheckBox.BackColor = Color.Transparent;
             downloadAvatarsCheckBox.ForeColor = SystemColors.Control;
             downloadAvatarsCheckBox.ImageAlign = ContentAlignment.MiddleLeft;
-            downloadAvatarsCheckBox.Location = new Point(172, 106);
+            downloadAvatarsCheckBox.Location = new Point(239, 106);
             downloadAvatarsCheckBox.Name = "downloadAvatarsCheckBox";
             downloadAvatarsCheckBox.Size = new Size(122, 19);
-            downloadAvatarsCheckBox.TabIndex = 9;
+            downloadAvatarsCheckBox.TabIndex = 10;
             downloadAvatarsCheckBox.Text = "Download Avatars";
             downloadAvatarsCheckBox.TextAlign = ContentAlignment.TopLeft;
             downloadAvatarsCheckBox.UseVisualStyleBackColor = false;
@@ -175,7 +197,6 @@ namespace TikTok_Downloader
             label3.Location = new Point(12, 76);
             label3.Name = "label3";
             label3.Size = new Size(129, 15);
-            label3.TabIndex = 9;
             label3.Text = "Download Single Links:";
             // 
             // label2
@@ -186,7 +207,6 @@ namespace TikTok_Downloader
             label2.Location = new Point(12, 165);
             label2.Name = "label2";
             label2.Size = new Size(133, 15);
-            label2.TabIndex = 10;
             label2.Text = "Latest Download Status:";
             // 
             // label1
@@ -197,7 +217,6 @@ namespace TikTok_Downloader
             label1.Location = new Point(12, 39);
             label1.Name = "label1";
             label1.Size = new Size(109, 15);
-            label1.TabIndex = 6;
             label1.Text = "Download Options:";
             // 
             // linkLabel1
@@ -224,6 +243,7 @@ namespace TikTok_Downloader
             BackgroundImage = Properties.Resources.bg;
             BackgroundImageLayout = ImageLayout.Stretch;
             ClientSize = new Size(534, 431);
+            Controls.Add(noWatermarkCheckBox);
             Controls.Add(linkLabel1);
             Controls.Add(menuStrip1);
             Controls.Add(label3);
@@ -329,5 +349,6 @@ namespace TikTok_Downloader
         }
 
         private LinkLabel linkLabel1;
+        private CheckBox noWatermarkCheckBox;
     }
 }

@@ -1,3 +1,11 @@
+/*
+##########################################
+#           TikTok Downloader            #
+#           Made by Jettcodey            #
+#                © 2024                  #
+#           DO NOT REMOVE THIS           #
+##########################################
+*/
 using System.Diagnostics;
 using static TikTok_Downloader.MainForm;
 

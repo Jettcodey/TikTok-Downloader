@@ -1,3 +1,11 @@
+/*
+##########################################
+#           TikTok Downloader            #
+#           Made by Jettcodey            #
+#                © 2024                  #
+#           DO NOT REMOVE THIS           #
+##########################################
+*/
 using System.Xml.Serialization;
 
 namespace TikTok_Downloader
