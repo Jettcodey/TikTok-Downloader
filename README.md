@@ -22,6 +22,7 @@
     <li><a href="#installation">Installation</a></li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contribute">Contribute</a></li>
     <li><a href="#report-a-bug">Report a Bug</a></li>
   </ol>
 </details>
@@ -117,6 +118,13 @@ TikTok links look like this: `https://www.tiktok.com/@user/video|photo/123456789
 
 <p align="right"><a href="#readme-top">Back to top</a></p>
 
+
+<!-- Contribute -->
+## Contribute
+
+Contributions are always welcome.
+
+<p align="right"><a href="#readme-top">Back to top</a></p>
 
 <!-- Report a bug -->
 ## Report a bug
