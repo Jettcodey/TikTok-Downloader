@@ -7,14 +7,14 @@
 ##########################################
 */
 using System.Xml.Serialization;
+using Microsoft.Win32;
 using static TikTok_Downloader.AppSettings;
-
+using static TikTok_Downloader.MainForm;
 
 namespace TikTok_Downloader
 {
     public partial class SettingsDialog : Form
     {
-
         private string SettingsFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Jettcodey", "TikTok Downloader", "appsettings.xml");
         public bool UseOldFileStructure
         {
@@ -31,8 +31,9 @@ namespace TikTok_Downloader
         private CheckBox setting3CheckBox;
         private CheckBox setting4CheckBox;
         private CheckBox setting5CheckBox;
+        private ComboBox browserComboBox;
         private AppSettings.Settings settings = new AppSettings.Settings();
-
+        private Label BrowserSelect;
         private MainForm mainForm;
         public SettingsDialog(MainForm mainForm)
         {
@@ -94,6 +95,8 @@ namespace TikTok_Downloader
             setting3CheckBox = new CheckBox();
             setting4CheckBox = new CheckBox();
             setting5CheckBox = new CheckBox();
+            browserComboBox = new ComboBox();
+            BrowserSelect = new Label();
             SuspendLayout();
             // 
             // descriptionLabel
@@ -198,7 +201,7 @@ namespace TikTok_Downloader
             setting4CheckBox.AutoSize = true;
             setting4CheckBox.BackColor = Color.Transparent;
             setting4CheckBox.ForeColor = SystemColors.Control;
-            setting4CheckBox.Location = new Point(15, 120);
+            setting4CheckBox.Location = new Point(166, 95);
             setting4CheckBox.Name = "setting4CheckBox";
             setting4CheckBox.Size = new Size(149, 19);
             setting4CheckBox.TabIndex = 7;
@@ -220,11 +223,34 @@ namespace TikTok_Downloader
             setting5CheckBox.UseVisualStyleBackColor = false;
             setting5CheckBox.CheckedChanged += Setting5CheckBox_CheckedChanged;
             // 
+            // browserComboBox
+            // 
+            browserComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            browserComboBox.FormattingEnabled = true;
+            browserComboBox.Items.AddRange(new object[] { "System Default", "Google Chrome", "Mozilla Firefox", "Microsoft Edge", "Chromium", "Brave Browser", "Opera GX (Not Working!)" });
+            browserComboBox.Location = new Point(12, 134);
+            browserComboBox.Name = "browserComboBox";
+            browserComboBox.Size = new Size(300, 23);
+            browserComboBox.TabIndex = 8;
+            browserComboBox.SelectedIndexChanged += BrowserComboBox_SelectedIndexChanged;
+            // 
+            // BrowserSelect
+            // 
+            BrowserSelect.AutoSize = true;
+            BrowserSelect.BackColor = Color.Transparent;
+            BrowserSelect.ForeColor = SystemColors.Control;
+            BrowserSelect.Location = new Point(11, 117);
+            BrowserSelect.Name = "BrowserSelect";
+            BrowserSelect.Size = new Size(143, 15);
+            BrowserSelect.TabIndex = 9;
+            BrowserSelect.Text = "Select a Custom Browser: ";
+            // 
             // SettingsDialog
             // 
             BackColor = SystemColors.ControlDarkDark;
             BackgroundImage = Properties.Resources.bg;
-            ClientSize = new Size(390, 250);
+            ClientSize = new Size(400, 250);
+            Controls.Add(BrowserSelect);
             Controls.Add(descriptionLabel);
             Controls.Add(okButton);
             Controls.Add(saveButton);
@@ -235,6 +261,7 @@ namespace TikTok_Downloader
             Controls.Add(setting3CheckBox);
             Controls.Add(setting4CheckBox);
             Controls.Add(setting5CheckBox);
+            Controls.Add(browserComboBox);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
@@ -266,6 +293,9 @@ namespace TikTok_Downloader
                 settings.EnableDownloadLogs = setting5CheckBox.Checked;
                 settings.UseOldFileStructure = setting3CheckBox.Checked;
 
+                string selectedBrowser = browserComboBox.SelectedItem.ToString();
+                settings.CustomBrowserPath = GetBrowserPath(selectedBrowser);
+
                 using (StreamWriter writer = new StreamWriter(SettingsFilePath))
                 {
                     XmlSerializer serializer = new XmlSerializer(typeof(AppSettings.Settings));
@@ -294,6 +324,19 @@ namespace TikTok_Downloader
                     setting2CheckBox.Checked = settings.EnableJsonLogs;
                     setting5CheckBox.Checked = settings.EnableDownloadLogs;
                     setting3CheckBox.Checked = settings.UseOldFileStructure;
+
+                    string selectedBrowser = settings.CustomBrowserPath;
+                    if (!string.IsNullOrWhiteSpace(selectedBrowser))
+                    {
+                        foreach (var item in browserComboBox.Items)
+                        {
+                            if (selectedBrowser.Contains(item.ToString()))
+                            {
+                                browserComboBox.SelectedItem = item;
+                                break;
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -305,7 +348,6 @@ namespace TikTok_Downloader
                 MessageBox.Show("Error loading existing settings: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
 
         private void LoadButton_Click(object sender, EventArgs e)
         {
@@ -334,6 +376,7 @@ namespace TikTok_Downloader
                             setting2CheckBox.Checked = settings.EnableJsonLogs;
                             setting5CheckBox.Checked = settings.EnableDownloadLogs;
                             setting3CheckBox.Checked = settings.UseOldFileStructure;
+                            browserComboBox.SelectedItem = GetBrowserNameFromPath(settings.CustomBrowserPath);
                         }
                     }
                     catch (Exception ex)
@@ -343,7 +386,6 @@ namespace TikTok_Downloader
                 }
             }
         }
-
 
         private void ExportButton_Click(object sender, EventArgs e)
         {
@@ -381,6 +423,92 @@ namespace TikTok_Downloader
                     }
                 }
             }
+        }
+
+        private string GetBrowserPath(string browserName)
+        {
+            string browserPath = string.Empty;
+            try
+            {
+                if (string.Equals(browserName, "System Default", StringComparison.OrdinalIgnoreCase))
+                {
+                    var browserUtility = new BrowserUtility(mainForm, mainForm.AppSettings);
+                    browserPath = Task.Run(() => browserUtility.GetSystemDefaultBrowser()).Result;
+                }
+                else if (string.Equals(browserName, "Mozilla Firefox", StringComparison.OrdinalIgnoreCase))
+                {
+                    browserPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"ms-playwright\firefox-1447\firefox\firefox.exe");
+                }
+                else if (string.Equals(browserName, "Chromium", StringComparison.OrdinalIgnoreCase))
+                {
+                    browserPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Chromium\Application\chrome.exe");
+                }
+                else
+                {
+                    string registryKeyPath = string.Empty;
+                    switch (browserName)
+                    {
+                        case "Google Chrome":
+                            registryKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe";
+                            break;
+                        case "Microsoft Edge":
+                            registryKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe";
+                            break;
+                        case "Brave Browser":
+                            registryKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\brave.exe";
+                            break;
+                        case "Opera GX":
+                            registryKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\opera.exe";
+                            break;
+                        default:
+                            throw new Exception("Unsupported browser selected.");
+                    }
+
+                    using (RegistryKey key = Registry.LocalMachine.OpenSubKey(registryKeyPath))
+                    {
+                        if (key != null)
+                        {
+                            browserPath = key.GetValue("") as string;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error getting browser path: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return browserPath;
+        }
+
+        private void BrowserComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (browserComboBox.SelectedItem != null)
+            {
+                string browserName = browserComboBox.SelectedItem.ToString();
+                settings.CustomBrowserPath = GetBrowserPath(browserName);
+
+                mainForm.AppSettings.CurrentSettings.CustomBrowserPath = settings.CustomBrowserPath;
+                mainForm.AppSettings.SaveSettings();
+
+            }
+        }
+
+        private string GetBrowserNameFromPath(string browserPath)
+        {
+            if (browserPath.Contains("chrome.exe"))
+            {
+                if (browserPath.Contains("Chromium"))
+                {
+                    return "Chromium";
+                }
+                return "Google Chrome";
+            }
+            if (browserPath.Contains("firefox.exe")) return "Mozilla Firefox";
+            if (browserPath.Contains("msedge.exe")) return "Microsoft Edge";
+            if (browserPath.Contains("brave.exe")) return "Brave Browser";
+            if (browserPath.Contains("opera.exe")) return "Opera GX";
+            return "System Default";
         }
     }
 }

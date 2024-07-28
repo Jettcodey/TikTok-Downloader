@@ -67,7 +67,7 @@ namespace TikTok_Downloader
             versionLabel.Name = "versionLabel";
             versionLabel.Size = new Size(117, 15);
             versionLabel.TabIndex = 1;
-            versionLabel.Text = "Version: Release 1.2.7";
+            versionLabel.Text = "Version: Release 1.2.8";
             // 
             // descriptionLabel
             // 
@@ -146,7 +146,7 @@ namespace TikTok_Downloader
         {
             string url = linkLabel.Text;
 
-            string browserPath = await browserUtility.GetSystemDefaultBrowser();
+            string browserPath = await browserUtility.GetBrowserExecutablePath();
 
             try
             {

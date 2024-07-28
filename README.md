@@ -82,7 +82,7 @@ If you select `Single Video/Image Download`, you can simply copy & paste every T
 TikTok links look like this: `https://www.tiktok.com/@user/video|photo/123456789` or `https://vm.tiktok.com/a1b2c3d4`.
 
 #### Mass Download by Username:
-If you select `Mass Download by Username`, you can simply copy & paste every TikTok Profile link the or the username of the account into the text field. After pressing download, your system's default browser will open, automatically navigating to the account's TikTok page. You'll then need to solve a simple puzzle slide at the beginning to verify that you are human and accept/deny cookies (which will be deleted after the download is finished). When the login window from TikTok shows up, just press "Continue as Guest." The browser will begin auto-scrolling the entire account page until it can't find any new posts. It will then filter and save any found links from the account's posts to a text file in the default storage location (`@Username_combined_links.txt`). Once all links are saved to the text file, it will begin downloading all video/image posts from those saved links. The downloaded media is saved to the default storage location.
+If you select `Mass Download by Username`, you can simply copy & paste every TikTok Profile link the or the username of the account into the text field. After pressing download, your system's default browser will open(you can Select a diffrent one in the Settings), automatically navigating to the account's TikTok page. You'll then need to solve a simple puzzle slide at the beginning to verify that you are human and accept/deny cookies (which will be deleted after the download is finished). When the login window from TikTok shows up, just press "Continue as Guest." The browser will begin auto-scrolling the entire account page until it can't find any new posts. It will then filter and save any found links from the account's posts to a text file in the default storage location (`@Username_combined_links.txt`). Once all links are saved to the text file, it will begin downloading all video/image posts from those saved links. The downloaded media is saved to the default storage location.
 
 TikTok Profile links look like this: `https://www.tiktok.com/@user`, Profile links directly from the TikTok App **Won´t Work!**(For Now)
 
@@ -110,7 +110,7 @@ TikTok links look like this: `https://www.tiktok.com/@user/video|photo/123456789
     - [x] Chromium
     - [x] Brave
     - [x] Mozilla Firefox
-    - [ ] Opera GX <-- Doesn't work, not investigating further for now.
+    - [ ] Opera GX <-- Doesn't work, back to investigating.
 - [x] Make the GUI Better
     - [x] Add more Options(Settings Menu)
     - [x] Make the GUI more appealing/better looking

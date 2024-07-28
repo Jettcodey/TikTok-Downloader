@@ -38,6 +38,7 @@ namespace TikTok_Downloader
         private List<string> cachedVideoUrls = new List<string>();
 
         private bool isLoggingInitialized = false;
+        public AppSettings AppSettings => settings;
 
         private Task LogSystemInformation(string logFilePath)
         {
@@ -105,7 +106,7 @@ namespace TikTok_Downloader
 
             LogMessage(logFilePath, $"Initial download folder: {downloadFolderPath}");
 
-            browserUtility = new BrowserUtility(this);
+            browserUtility = new BrowserUtility(this, settings);
 
             cmbChoice.SelectedItem = "Single Video/Image Download";
 
@@ -323,10 +324,12 @@ namespace TikTok_Downloader
         internal class BrowserUtility
         {
             private readonly MainForm mainForm;
+            private readonly AppSettings appSettings;
 
-            public BrowserUtility(MainForm mainForm)
+            public BrowserUtility(MainForm mainForm, AppSettings appSettings)
             {
                 this.mainForm = mainForm;
+                this.appSettings = appSettings;
             }
 
             public async Task<string> GetSystemDefaultBrowser()
@@ -340,11 +343,11 @@ namespace TikTok_Downloader
                     var stringDefault = regDefault.GetValue("ProgId");
 
                     regKey = Registry.ClassesRoot.OpenSubKey(stringDefault + "\\shell\\open\\command", false);
-                    executablePath = regKey.GetValue(null).ToString().ToLower().Replace("" + (char)34, "");
+                    executablePath = regKey.GetValue(null).ToString().ToLower().Replace("\"", "");
 
                     if (!executablePath.EndsWith("exe"))
                         executablePath = executablePath.Substring(0, executablePath.LastIndexOf(".exe") + 4);
-
+                    
                     if (executablePath.Contains("firefox"))
                     {
                         var playwright = await Playwright.CreateAsync();
@@ -353,27 +356,43 @@ namespace TikTok_Downloader
                 }
                 catch (Exception ex)
                 {
-                    executablePath = string.Format("ERROR: An exception of type: {0} occurred in method: {1} in the following module: {2}", ex.GetType(), ex.TargetSite, nameof(BrowserUtility));
+                    executablePath = $"ERROR: An exception of type: {ex.GetType()} occurred in method: {ex.TargetSite} in the following module: {nameof(BrowserUtility)}";
                     mainForm.LogError(executablePath);
                 }
                 finally
                 {
-                    if (regKey != null)
-                        regKey.Close();
+                    regKey?.Close();
                 }
 
                 return executablePath;
+            }
+
+            public async Task<string> GetBrowserExecutablePath()
+            {
+                if (!string.IsNullOrWhiteSpace(appSettings.CurrentSettings.CustomBrowserPath))
+                {
+                    if (File.Exists(appSettings.CurrentSettings.CustomBrowserPath))
+                    {
+                        return appSettings.CurrentSettings.CustomBrowserPath;
+                    }
+                    else
+                    {
+                        mainForm.LogError($"Custom browser path does not exist: {appSettings.CurrentSettings.CustomBrowserPath}");
+                    }
+
+                }
+                return await GetSystemDefaultBrowser();
             }
 
             public IBrowserType GetBrowserTypeForExecutable(string executablePath, IPlaywright playwright)
             {
                 if (executablePath.ToLower().Contains("firefox"))
                 {
-                    return playwright.Firefox;  // Firefox 124.0.0.8848 (Nightly) seems to work for now.
+                    return playwright.Firefox;
                 }
                 else if (executablePath.ToLower().Contains("webkit"))
                 {
-                    return playwright.Webkit;   // Webkit doesn´t seem to work with my current playwright configuration for now.
+                    return playwright.Webkit;
                 }
                 else
                 {
@@ -407,8 +426,8 @@ namespace TikTok_Downloader
             LogMessage(logFilePath, $"Username selected for mass download: {username}");
 
             // Get system default browser executable path
-            string browserExecutablePath = await browserUtility.GetSystemDefaultBrowser();
-            LogMessage(logFilePath, $"System default browser executable path: {browserExecutablePath}");
+            string browserExecutablePath = await browserUtility.GetBrowserExecutablePath();
+            LogMessage(logFilePath, $"Browser executable path: {browserExecutablePath}");
 
             // Launch Playwright with the appropriate browser type
             using var playwright = await Playwright.CreateAsync();

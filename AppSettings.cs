@@ -7,11 +7,20 @@
 ##########################################
 */
 using System.Xml.Serialization;
+using static TikTok_Downloader.MainForm;
+
 
 namespace TikTok_Downloader
 {
     public class AppSettings
     {
+        private readonly BrowserUtility browserUtility;
+
+        internal AppSettings(BrowserUtility browserUtility)
+        {
+            this.browserUtility = browserUtility;
+        }
+
         public class Settings
         {
             public bool DownloadVideosOnly { get; set; }
@@ -21,6 +30,7 @@ namespace TikTok_Downloader
             public bool UseOldFileStructure { get; set; }
             public string LastDownloadFolderPath { get; set; }
             public bool FirstRun { get; set; }
+            public string CustomBrowserPath { get; set; }
         }
 
         private string directoryPath;
@@ -70,6 +80,7 @@ namespace TikTok_Downloader
                     UseOldFileStructure = false,
                     LastDownloadFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TiktokDownloads"),
                     FirstRun = false,
+                    CustomBrowserPath = "",
                 };
                 SaveSettings();
             }
