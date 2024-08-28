@@ -41,7 +41,7 @@ C# and Microsoft Playwright
 ![Playwright](https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/e36d2e7e-689f-4927-aadb-42b8a7d1de2d)-->
 
 
-<p align="right"><a href="#TikTok Downloader">Back to top</a></p>
+<p align="right"><a href="#tiktok-downloader">Back to top</a></p>
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -58,7 +58,7 @@ If you have any Question about the Application DM me on Discord: `jettcodey`
 <!--### Important: 
 To make the TikTok User download work, you need to have a Chromium-based browser or Firefox installed, because others like Opera GX don't work for some reason, I'm still investigating.-->                                       
 
-<p align="right"><a href="#TikTok Downloader">Back to top</a></p>
+<p align="right"><a href="#tiktok-downloader">Back to top</a></p>
 
 <!-- Installation -->
 ## Installation
@@ -67,7 +67,7 @@ To install TikTok Downloader, Download the Latest Setup file from [Releases](htt
 
 If the Installer fails to Install it, u need to Install [Microsoft .Net 8.0 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) manually.
 
-<p align="right"><a href="#readme-top">Back to top</a></p>
+<p align="right"><a href="#tiktok-downloader">Back to top</a></p>
 
 <!-- Usage -->
 ## Usage
@@ -99,7 +99,7 @@ If you select `Mass Download from Text File Links`, you just need (if not alread
 
 TikTok links look like this: `https://www.tiktok.com/@user/video|photo/123456789` or `https://vm.tiktok.com/a1b2c3d4`.
 
-<p align="right"><a href="#readme-top">Back to top</a></p>
+<p align="right"><a href="#tiktok-downloader">Back to top</a></p>
 
 <!-- ROADMAP -->
 ## Roadmap
@@ -123,7 +123,7 @@ TikTok links look like this: `https://www.tiktok.com/@user/video|photo/123456789
     - [x] Add more Options(Settings Menu)
     - [x] Make the GUI more appealing/better looking
 
-<p align="right"><a href="#readme-top">Back to top</a></p>
+<p align="right"><a href="#tiktok-downloader">Back to top</a></p>
 
 
 <!-- Contribute -->
@@ -131,13 +131,13 @@ TikTok links look like this: `https://www.tiktok.com/@user/video|photo/123456789
 
 Contributions are always welcome.
 
-<p align="right"><a href="#readme-top">Back to top</a></p>
+<p align="right"><a href="#tiktok-downloader">Back to top</a></p>
 
 <!-- Report a bug -->
-## Report a bug
+## Report a bug/Request a Feature
 
 See the [open issues](https://github.com/Jettcodey/TikTok-Downloader/issues) for a full list of proposed features (and known issues).
 
 ### Always report bugs and issues in English! If you report in any other language, your issue will be ignored and closed.
 
-<p align="right"><a href="#readme-top">Back to top</a></p>
+<p align="right"><a href="#tiktok-downloader">Back to top</a></p>
