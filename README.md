@@ -41,7 +41,7 @@ C# and Microsoft Playwright
 ![Playwright](https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/e36d2e7e-689f-4927-aadb-42b8a7d1de2d)-->
 
 
-<p align="right"><a href="#readme-top">Back to top</a></p>
+<p align="right"><a href="#TikTok Downloader">Back to top</a></p>
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -58,7 +58,7 @@ If you have any Question about the Application DM me on Discord: `jettcodey`
 <!--### Important: 
 To make the TikTok User download work, you need to have a Chromium-based browser or Firefox installed, because others like Opera GX don't work for some reason, I'm still investigating.-->                                       
 
-<p align="right"><a href="#readme-top">Back to top</a></p>
+<p align="right"><a href="#TikTok Downloader">Back to top</a></p>
 
 <!-- Installation -->
 ## Installation
