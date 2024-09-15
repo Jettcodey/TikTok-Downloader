@@ -40,6 +40,7 @@ namespace TikTok_Downloader
             InitializeComponent();
             this.mainForm = mainForm;
             LoadExistingSettings();
+            browserComboBox.SelectedItem = "System Default";
         }
 
         private void Setting3CheckBox_CheckedChanged(object sender, EventArgs e)

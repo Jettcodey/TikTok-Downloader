@@ -725,6 +725,7 @@ namespace TikTok_Downloader
                     if (string.IsNullOrWhiteSpace(json))
                     {
                         LogError($"Error: Received empty JSON response for MediaID: {MediaID}");
+                        outputTextBox.AppendText($"Error: Received empty JSON response for MediaID: {MediaID}. Try again later.");
                         return null;
                     }
 
@@ -732,10 +733,19 @@ namespace TikTok_Downloader
                     if (data?.aweme_list == null || data.aweme_list.Count == 0)
                     {
                         LogError($"Error: No aweme_list found in JSON response for MediaID: {MediaID}");
+                        outputTextBox.AppendText($"Error: No aweme_list found in JSON response for MediaID: {MediaID}. Try again later.");
                         return null;
                     }
 
                     var video = data.aweme_list.FirstOrDefault();
+
+                    if (video?.aweme_id != MediaID)
+                    {
+                        LogError($"Error: MediaID mismatch in JSON response for MediaID: {MediaID}");
+                        outputTextBox.AppendText($"Error: MediaID mismatch in JSON response for MediaID: {MediaID}\r\n");
+                        return null;
+                    }
+
                     var urlMedia = withWatermark ? video?.video?.download_addr?.url_list.FirstOrDefault() : video?.video?.play_addr?.url_list.FirstOrDefault();
                     var imageUrls = video?.image_post_info?.images?.Select(img => img.display_image.url_list.FirstOrDefault()).ToList();
                     var avatarUrls = video?.author?.avatar_medium?.url_list ?? new List<string>();

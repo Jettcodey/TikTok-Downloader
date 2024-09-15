@@ -267,7 +267,7 @@ namespace TikTok_Downloader
             MainMenuStrip = menuStrip1;
             MaximizeBox = false;
             Name = "MainForm";
-            Text = "TikTok Downloader v1.2.8";
+            Text = "TikTok Downloader v1.2.9";
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ResumeLayout(false);
