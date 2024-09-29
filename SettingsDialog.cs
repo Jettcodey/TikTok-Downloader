@@ -469,7 +469,7 @@ namespace TikTok_Downloader
                     {
                         if (key != null)
                         {
-                            browserPath = key.GetValue("") as string;
+                            browserPath = key.GetValue("") as string ?? string.Empty;
                         }
                     }
                 }

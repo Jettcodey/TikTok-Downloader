@@ -21,6 +21,7 @@ namespace TikTok_Downloader
             progressBar = new ProgressBar();
             cmbChoice = new ComboBox();
             menuStrip1 = new MenuStrip();
+            menuStrip1.Renderer = new MyRenderer();
             fileToolStripMenuItem = new ToolStripMenuItem();
             ChangeDownloadFolderToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
@@ -91,6 +92,7 @@ namespace TikTok_Downloader
             // menuStrip1
             // 
             menuStrip1.BackColor = Color.FromArgb(32, 32, 32);
+            menuStrip1.Renderer = new MyRenderer();
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
@@ -267,7 +269,7 @@ namespace TikTok_Downloader
             MainMenuStrip = menuStrip1;
             MaximizeBox = false;
             Name = "MainForm";
-            Text = "TikTok Downloader v1.2.9";
+            Text = "TikTok Downloader v1.3.0";
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ResumeLayout(false);
@@ -287,39 +289,35 @@ namespace TikTok_Downloader
         private Label label3;
         private Label label2;
         private Label label1;
+        private LinkLabel linkLabel1;
+        private CheckBox noWatermarkCheckBox;
         private CheckBox withWatermarkCheckBox;
         private CheckBox downloadAvatarsCheckBox;
         private ToolStripMenuItem settingsToolStripMenuItem;
 
-        public class RendererEx : ToolStripProfessionalRenderer
+        private class MyRenderer : ToolStripProfessionalRenderer
         {
+
             protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
             {
-                Rectangle rc = new Rectangle(Point.Empty, e.Item.Size);
 
-                if (e.Item.Selected || e.Item.Pressed)
+                if (e.Item.Selected)
                 {
-                    // Highlight color
-                    using (SolidBrush highlightBrush = new SolidBrush(Color.FromArgb(64, 64, 64)))
-                    {
-                        e.Graphics.FillRectangle(highlightBrush, rc);
-                    }
+                    Rectangle menuRectangle = new Rectangle(Point.Empty, e.Item.Size);
+
+                    e.Graphics.FillRectangle(new SolidBrush(ColorTranslator.FromHtml("#343434")), menuRectangle);
+
+                }
+                else if (e.Item.Pressed)
+                {
+                    Rectangle menuRectangle = new Rectangle(Point.Empty, e.Item.Size);
+
+                    e.Graphics.FillRectangle(new SolidBrush(ColorTranslator.FromHtml("#202020")), menuRectangle);
                 }
                 else
                 {
-                    // Normal background color
-                    using (SolidBrush backBrush = new SolidBrush(Color.FromArgb(32, 32, 32)))
-                    {
-                        e.Graphics.FillRectangle(backBrush, rc);
-                    }
+                    base.OnRenderMenuItemBackground(e);
                 }
-            }
-
-            protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
-            {
-                // Text color
-                e.Item.ForeColor = Color.White;
-                base.OnRenderItemText(e);
             }
         }
 
@@ -352,7 +350,5 @@ namespace TikTok_Downloader
             urlTextBox.Text = "";
         }
 
-        private LinkLabel linkLabel1;
-        private CheckBox noWatermarkCheckBox;
     }
 }
