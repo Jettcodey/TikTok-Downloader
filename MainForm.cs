@@ -706,7 +706,7 @@ namespace TikTok_Downloader
         private async Task<VideoData?> GetMedia(string url, bool withWatermark)
         {
             var MediaID = await GetMediaID(url);
-            var apiUrl = $"https://api22-normal-c-alisg.tiktokv.com/aweme/v1/feed/?aweme_id={MediaID}&iid=7318518857994389254&device_id=7318517321748022790&channel=googleplay&app_name=musical_ly&version_code=300904&device_platform=android&device_type=ASUS_Z01QD&version=9";
+            var apiUrl = $"https://api22-normal-c-alisg.tiktokv.com/aweme/v1/feed/?aweme_id={MediaID}&iid=7238789370386695942&device_id=7238787983025079814&resolution=1920*1080&channel=googleplay&app_name=musical_ly&version_code=300904&device_platform=android&device_type=Pixel+7&version=13";
 
             using (var client = new HttpClient())
             {
@@ -715,6 +715,14 @@ namespace TikTok_Downloader
                     var finalUrl = await GetRedirectUrl(url);
                     var request = new HttpRequestMessage(HttpMethod.Options, apiUrl);
                     var response = await client.SendAsync(request);
+
+                    if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    {
+                        LogMessage(logFilePath, "Received a Http 429 error (TooManyRequests), retrying after 5 Second delay...");
+                        //outputTextBox.AppendText($"Small Cooldown, Continue after 5 Seconds.\r\n");
+                        await Task.Delay(5000);
+                        return await GetMedia(url, withWatermark);
+                    }
 
                     response.EnsureSuccessStatusCode();
 
@@ -909,6 +917,14 @@ namespace TikTok_Downloader
                     LogMessage(logFilePath, "Download Avatars Checkbox is Active.");
                 }
 
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                outputTextBox.AppendText($"Error: The video download failed with a 429 error: {url}\r\n");
+                outputTextBox.AppendText("Retry continue download in 5 seconds...\r\n");
+                LogMessage(logFilePath, $"Error: The video download failed with a 429 error: {ex.Message}");
+                await Task.Delay(5000);
+                await DownloadMedia(data, url, settingsDialog.UseOldFileStructure);
             }
             catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
