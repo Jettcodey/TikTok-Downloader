@@ -160,6 +160,7 @@ namespace TikTok_Downloader
             withWatermarkCheckBox.Text = "With Watermark";
             withWatermarkCheckBox.TextAlign = ContentAlignment.TopLeft;
             withWatermarkCheckBox.UseVisualStyleBackColor = false;
+            withWatermarkCheckBox.Visible = true;
             withWatermarkCheckBox.CheckedChanged += withWatermarkCheckBox_CheckedChanged;
             // 
             // noWatermarkCheckBox
@@ -190,6 +191,7 @@ namespace TikTok_Downloader
             downloadAvatarsCheckBox.Text = "Download Avatars";
             downloadAvatarsCheckBox.TextAlign = ContentAlignment.TopLeft;
             downloadAvatarsCheckBox.UseVisualStyleBackColor = false;
+            downloadAvatarsCheckBox.Visible = true;
             downloadAvatarsCheckBox.CheckedChanged += downloadAvatarsCheckBox_CheckedChanged;
             // 
             // label3
@@ -329,31 +331,43 @@ namespace TikTok_Downloader
                     urlTextBox.PlaceholderText = "Enter TikTok Video/Image Link";
                     label3.Text = "Download Single Links:";
                     browseFileButton.Visible = false;
+                    withWatermarkCheckBox.Visible = true;
+                    downloadAvatarsCheckBox.Visible = true;
                     break;
                 case 1:
                     urlTextBox.PlaceholderText = "Enter TikTok link/Username";
                     label3.Text = "Download by Username:";
                     browseFileButton.Visible = false;
+                    withWatermarkCheckBox.Visible = true;
+                    downloadAvatarsCheckBox.Visible = true;
                     break;
                 case 2:
                     urlTextBox.PlaceholderText = "Enter/Select Path to Text File";
                     label3.Text = "Download from Text file:";
                     browseFileButton.Visible = true;
+                    withWatermarkCheckBox.Visible = true;
+                    downloadAvatarsCheckBox.Visible = true;
                     break;
                 case 3:
                     urlTextBox.PlaceholderText = "HD Download Single Video";
                     label3.Text = "HD Download Video:";
                     browseFileButton.Visible = false;
+                    withWatermarkCheckBox.Visible = false;
+                    downloadAvatarsCheckBox.Visible = false;
                     break;
                 case 4:
                     urlTextBox.PlaceholderText = "Enter/Select Path to Text File";
                     label3.Text = "HD Download Text file:";
                     browseFileButton.Visible = true;
+                    withWatermarkCheckBox.Visible = false;
+                    downloadAvatarsCheckBox.Visible = false;
                     break;
                 default:
                     urlTextBox.PlaceholderText = "Enter TikTok Video/Image Link";
                     label3.Text = "Download Single Links:";
                     browseFileButton.Visible = false;
+                    withWatermarkCheckBox.Visible = true;
+                    downloadAvatarsCheckBox.Visible = true;
                     break;
             }
 
