@@ -706,7 +706,7 @@ namespace TikTok_Downloader
         private async Task<VideoData?> GetMedia(string url, bool withWatermark)
         {
             var MediaID = await GetMediaID(url);
-            var apiUrl = $"https://api22-normal-c-alisg.tiktokv.com/aweme/v1/feed/?aweme_id={MediaID}&iid=7238789370386695942&device_id=7238787983025079814&resolution=1920*1080&channel=googleplay&app_name=musical_ly&version_code=300904&device_platform=android&device_type=Pixel+7&version=13";
+            var apiUrl = $"https://api22-normal-c-alisg.tiktokv.com/aweme/v1/feed/?aweme_id={MediaID}&iid=7238789370386695942&device_id=7238787983025079814&resolution=1080*2400&channel=googleplay&app_name=musical_ly&version_code=350103&device_platform=android&device_type=Pixel+7&os_version=13";
 
             using (var client = new HttpClient())
             {
