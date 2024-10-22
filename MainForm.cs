@@ -17,6 +17,9 @@ using System.Text.Json;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
+using JsonNet = Newtonsoft.Json;
+using System.Security.Policy;
 
 namespace TikTok_Downloader
 {
@@ -319,6 +322,24 @@ namespace TikTok_Downloader
                 LogMessage(logFilePath, $"Selected file path: {filePath}");
                 await DownloadFromTextFile(filePath);
             }
+            else if (choice == "HD Download Single Video")
+            {
+                string tiktokUrl = urlTextBox.Text.Trim();
+                if (!string.IsNullOrEmpty(tiktokUrl))
+                {
+                    await HDVideoDownload(tiktokUrl);
+                }
+                else
+                {
+                    outputTextBox.AppendText("Please enter a TikTok video URL for HD download.\r\n");
+                }
+            }
+            else if (choice == "HD Download´From Text File Links")
+            {
+                string filePath = urlTextBox.Text.Trim();
+                LogMessage(logFilePath, $"Selected file path: {filePath}");
+                await HDVideoDownloadFromTextFile(filePath);
+            }
         }
 
         internal class BrowserUtility
@@ -598,6 +619,42 @@ namespace TikTok_Downloader
             }
         }
 
+        private async Task HDVideoDownloadFromTextFile(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                MessageBox.Show("Error: The provided file path does not exist.", "File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            var urls = await File.ReadAllLinesAsync(filePath);
+            LogMessage(logFilePath, $"Read {urls.Length} URLs from file: {filePath}");
+
+            progressBar.Minimum = 0;
+            progressBar.Maximum = urls.Length;
+            progressBar.Value = 0;
+
+            using (var settingsDialog = new SettingsDialog(this))
+            {
+                bool useOldFileStructure = settingsDialog.UseOldFileStructure;
+
+                foreach (var url in urls)
+                {
+                    string trimmedUrl = url.Trim();
+                    if (!string.IsNullOrEmpty(trimmedUrl))
+                    {
+                        LogMessage(logFilePath, $"Downloading HD Video {trimmedUrl} ...");
+
+                        await HDVideoDownload(trimmedUrl);
+
+                        progressBar.Value++;
+
+                        await Task.Delay(1000);
+                    }
+                }
+            }
+        }
+
         private async Task SingleVideoDownload()
         {
             outputTextBox.Clear();
@@ -630,6 +687,68 @@ namespace TikTok_Downloader
             catch (Exception ex)
             {
                 LogError($"An error occurred: {ex.Message}");
+            }
+        }
+
+        private async Task HDVideoDownload(string tiktokUrl)    // Third-party API endpoint!
+        {
+            string apiEndpoint = "https://www.tikwm.com/api/";
+
+            using (HttpClient client = new HttpClient())
+            {
+                var urlWithParams = $"{apiEndpoint}?url={tiktokUrl}&hd=1"; // Always set hd=1 for HD download
+
+                HttpResponseMessage response = await client.GetAsync(urlWithParams);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    // JsonNet alias for Newtonsoft.Json
+                    dynamic responseData = JsonNet.JsonConvert.DeserializeObject(responseBody);
+
+                    if (responseData.code == 0)
+                    {
+                        // Extract username and video ID from the TikTok URL
+                        string username = Regex.Match(tiktokUrl, @"@(\w+)").Groups[1].Value;
+                        string videoId = Regex.Match(tiktokUrl, @"/video/(\d+)").Groups[1].Value;
+
+                        string userFolder = Path.Combine(downloadFolderPath, username);
+                        if (!Directory.Exists(userFolder))
+                        {
+                            Directory.CreateDirectory(userFolder);
+                        }
+
+                        string filename = $"{videoId}_HD.mp4";
+                        string fullPath = Path.Combine(userFolder, filename);
+                        LogMessage(logFilePath, $"HD Video File Saved to {fullPath}.");
+
+                        // Check if the video already exists
+                        if (!File.Exists(fullPath))
+                        {
+                            string videoUrl = responseData.data.hdplay; // Get HD video URL (www.tikwm.com/video/media/hdplay/{videoID}.mp4)
+                            //string WvideoUrl = responseData.data.watermark; // Get Watermarked video URL (www.tikwm.com/video/media/wmplay/{videoID}.mp4) Watermarked is not in HD
+
+                            // Download the video
+                            byte[] videoData = await client.GetByteArrayAsync(videoUrl);
+                            await File.WriteAllBytesAsync(fullPath, videoData);
+
+                            outputTextBox.AppendText($"Downloading HD Video from User: {username}\r\nDownloaded HD Video: '{filename}' Successfully...\r\n");
+                        }
+                        else
+                        {
+                            outputTextBox.AppendText($"Video: '{filename}' already exists. Skipping\r\n");
+                        }
+                    }
+                    else
+                    {
+                        outputTextBox.AppendText($"Error: {responseData.message}\r\n");
+                    }
+                }
+                else
+                {
+                    outputTextBox.AppendText("Error: Unable to download video in HD\r\n");
+                }
             }
         }
 
@@ -1239,5 +1358,6 @@ namespace TikTok_Downloader
         {
 
         }
+
     }
 }
