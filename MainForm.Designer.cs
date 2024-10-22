@@ -161,6 +161,7 @@ namespace TikTok_Downloader
             withWatermarkCheckBox.Text = "With Watermark";
             withWatermarkCheckBox.TextAlign = ContentAlignment.TopLeft;
             withWatermarkCheckBox.UseVisualStyleBackColor = false;
+            withWatermarkCheckBox.CheckedChanged += withWatermarkCheckBox_CheckedChanged;
             // 
             // downloadAvatarsCheckBox
             // 
