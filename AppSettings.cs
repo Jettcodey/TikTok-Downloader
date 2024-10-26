@@ -91,7 +91,7 @@ namespace TikTok_Downloader
                     using (var streamReader = new StreamReader(filePath))
                     {
                         var serializer = new XmlSerializer(typeof(Settings));
-                        CurrentSettings = (Settings)serializer.Deserialize(streamReader);
+                        CurrentSettings = serializer.Deserialize(streamReader) as Settings;
                     }
                 }
                 catch (Exception ex)

@@ -67,7 +67,7 @@ namespace TikTok_Downloader
             versionLabel.Name = "versionLabel";
             versionLabel.Size = new Size(117, 15);
             versionLabel.TabIndex = 1;
-            versionLabel.Text = "Version: Release 1.3.1";
+            versionLabel.Text = "Version: Release 1.3.0";
             // 
             // descriptionLabel
             // 
@@ -128,7 +128,7 @@ namespace TikTok_Downloader
             Controls.Add(descriptionLabel);
             Controls.Add(okButton);
             FormBorderStyle = FormBorderStyle.FixedSingle;
-            Icon = (Icon)resources.GetObject("$this.Icon");
+            Icon = resources.GetObject("$this.Icon") as Icon;
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "AboutWindow";
