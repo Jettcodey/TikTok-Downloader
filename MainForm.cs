@@ -810,7 +810,7 @@ namespace TikTok_Downloader
                     if (response.StatusCode == HttpStatusCode.TooManyRequests)
                     {
                         LogMessage(logFilePath, "Received a Http 429 error (TooManyRequests), retrying after 5 Second delay...");
-                        outputTextBox.AppendText($"Small Cooldown, Continue after 5 Seconds.\n");
+                        outputTextBox.AppendText($"Small Cooldown, Continue after 5 Seconds.\r\n");
                         await Task.Delay(5000);
                         return await GetMedia(url, withWatermark, noWatermark);
                     }
@@ -822,14 +822,14 @@ namespace TikTok_Downloader
 
                     if (string.IsNullOrWhiteSpace(json))
                     {
-                        outputTextBox.AppendText($"Error: Received empty JSON response for MediaID: {MediaID}\n");
+                        outputTextBox.AppendText($"Error: Received empty JSON response for MediaID: {MediaID}\r\n");
                         return null;
                     }
 
                     var data = JsonSerializer.Deserialize<ApiData>(json);
                     if (data?.aweme_list == null || data.aweme_list.Count == 0)
                     {
-                        outputTextBox.AppendText($"Error: No aweme_list found in JSON response for MediaID: {MediaID}\n");
+                        outputTextBox.AppendText($"Error: No aweme_list found in JSON response for MediaID: {MediaID}\r\n");
                         return null;
                     }
 
@@ -846,17 +846,17 @@ namespace TikTok_Downloader
                         if (noWatermark)
                         {
                             LogMessage(logFilePath, $"Skipping download link for MediaID: {MediaID} due to missing No Watermark URL.");
-                            outputTextBox.AppendText($"Error: No Watermark free URL found for MediaID: {MediaID}\n");
+                            outputTextBox.AppendText($"Error: No Watermark free URL found for MediaID: {MediaID}\r\n");
                         }
                         else if (withWatermark)
                         {
                             LogMessage(logFilePath, $"Skipping download link for MediaID: {MediaID} due to missing Watermark URL.");
-                            outputTextBox.AppendText($"Error: No Watermark URL found for MediaID: {MediaID}\n");
+                            outputTextBox.AppendText($"Error: No Watermark URL found for MediaID: {MediaID}\r\n");
                         }
                         else
                         {
                             LogMessage(logFilePath, $"Skipping download link for MediaID: {MediaID} due to missing media URL.");
-                            outputTextBox.AppendText($"Error: No media URL found for MediaID: {MediaID}\n");
+                            outputTextBox.AppendText($"Error: No media URL found for MediaID: {MediaID}\r\n");
                         }
 
                         return null;
@@ -937,7 +937,7 @@ namespace TikTok_Downloader
 
                             if (File.Exists(filePath))
                             {
-                                outputTextBox.AppendText($"Image: '{fileName}' already exists. Skipping\n");
+                                outputTextBox.AppendText($"Image: '{fileName}' already exists. Skipping\r\n");
                                 continue;
                             }
 
@@ -950,7 +950,7 @@ namespace TikTok_Downloader
                                 }
                             }
 
-                            outputTextBox.AppendText($"Downloading Images from User: {username}\r\nDownloaded Image:'{fileName}' Successfully...\n");
+                            outputTextBox.AppendText($"Downloading Images from User: {username}\r\nDownloaded Image:'{fileName}' Successfully...\r\n");
                             LogDownload(fileName, imageUrl);
                         }
                     }
@@ -978,7 +978,7 @@ namespace TikTok_Downloader
 
                         if (File.Exists(filePath))
                         {
-                            outputTextBox.AppendText($"Video: '{fileName}' already exists. Skipping\n");
+                            outputTextBox.AppendText($"Video: '{fileName}' already exists. Skipping\r\n");
                             return;
                         }
 
@@ -990,7 +990,7 @@ namespace TikTok_Downloader
                             {
                                 if (response.StatusCode == HttpStatusCode.NotFound)
                                 {
-                                    outputTextBox.AppendText($"Download failed because of an error in the Media file hosted on the Server. Link: {url}. Skipping...\n");
+                                    outputTextBox.AppendText($"Download failed because of an error in the Media file hosted on the Server. Link: {url}. Skipping...\r\n");
                                     return;
                                 }
                                 else
@@ -1006,66 +1006,66 @@ namespace TikTok_Downloader
                             }
                         }
 
-                        outputTextBox.AppendText($"Downloading Video from User: {username}\r\nDownloaded Video: '{fileName}' Successfully...\n");
+                        outputTextBox.AppendText($"Downloading Video from User: {username}\r\nDownloaded Video: '{fileName}' Successfully...\r\n");
                         LogDownload(fileName, data.Url);
                     }
 
                     if (downloadAvatarsCheckBox.Checked)
                     {
                         await DownloadAvatars(data, url, username, UseOldFileStructure);
-                        outputTextBox.AppendText($"Download Avatars Checkbox is Active.\n");
+                        LogError($"Download Avatars Checkbox is Active.\r\n");
                     }
 
                     return; // Download successful, exit the method
                 }
                 catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.TooManyRequests)
                 {
-                    outputTextBox.AppendText($"Error: The video download failed with a 429 error: {url}\n");
-                    outputTextBox.AppendText("Retrying in 5 seconds...\n");
+                    outputTextBox.AppendText($"Error: The video download failed with a 429 error: {url}\r\n");
+                    outputTextBox.AppendText("Retrying in 5 seconds...\r\n");
                     LogMessage(logFilePath, $"Error: The video download failed with a 429 error: {ex.Message}");
                     await Task.Delay(5000);
                 }
                 catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
                 {
-                    outputTextBox.AppendText($"Error: The video download failed with a 404 error: {url}\n");
+                    outputTextBox.AppendText($"Error: The video download failed with a 404 error: {url}\r\n");
                     LogMessage(logFilePath, $"Error: The video download failed with a 404 error: {ex.Message}");
                     break; // Do not retry on 404 error
                 }
                 catch (HttpRequestException ex)
                 {
-                    outputTextBox.AppendText($"Error: An error occurred while downloading Media: {ex.Message}\n");
-                    outputTextBox.AppendText("Retrying in 5 seconds...\n");
+                    outputTextBox.AppendText($"Error: An error occurred while downloading Media: {ex.Message}\r\n");
+                    outputTextBox.AppendText("Retrying in 5 seconds...\r\n");
                     LogMessage(logFilePath, $"Error: An error occurred while downloading Media: {ex.Message}");
                     await Task.Delay(5000);
                 }
                 catch (TargetInvocationException ex)
                 {
-                    outputTextBox.AppendText($"Error: TargetInvocationException occurred: {ex.InnerException?.Message}\n");
-                    outputTextBox.AppendText($"Inner Exception 1: {ex.InnerException?.InnerException?.Message}\n");
-                    outputTextBox.AppendText($"Inner Exception 2: {ex.InnerException?.InnerException?.InnerException?.Message}\n");
+                    outputTextBox.AppendText($"Error: TargetInvocationException occurred: {ex.InnerException?.Message}\\r\n");
+                    outputTextBox.AppendText($"Inner Exception 1: {ex.InnerException?.InnerException?.Message}\r\n");
+                    outputTextBox.AppendText($"Inner Exception 2: {ex.InnerException?.InnerException?.InnerException?.Message}\r\n");
                     LogMessage(logFilePath, $"Error: TargetInvocationException occurred: {ex.InnerException?.Message}");
                 }
                 catch (JsonException ex)
                 {
-                    outputTextBox.AppendText($"Error: An error occurred while processing JSON response: {ex.Message}\n");
+                    outputTextBox.AppendText($"Error: An error occurred while processing JSON response: {ex.Message}\r\n");
                     outputTextBox.AppendText("Retrying in 5 seconds...\n");
                     LogMessage(logFilePath, $"Error: An error occurred while processing JSON response: {ex.Message}");
                     await Task.Delay(5000);
                 }
                 catch (Exception ex)
                 {
-                    outputTextBox.AppendText($"Error: An unexpected error occurred: {ex.Message}\n");
+                    outputTextBox.AppendText($"Error: An unexpected error occurred: {ex.Message}\r\n");
                     LogMessage(logFilePath, $"Error: An unexpected error occurred: {ex.Message}");
                 }
 
                 if (attempt < maxRetries)
                 {
-                    outputTextBox.AppendText($"Retrying download (Attempt {attempt} of {maxRetries}) in 5 seconds...\n");
+                    outputTextBox.AppendText($"Retrying download (Attempt {attempt} of {maxRetries}) in 5 seconds...\r\n");
                     await Task.Delay(5000);
                 }
                 else
                 {
-                    outputTextBox.AppendText($"Error: Failed to download media from {url} after {maxRetries} attempts.\n");
+                    outputTextBox.AppendText($"Error: Failed to download media from {url} after {maxRetries} attempts.\r\n");
                 }
             }
         }
