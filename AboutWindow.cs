@@ -118,6 +118,8 @@ namespace TikTok_Downloader
             // 
             // AboutWindow
             // 
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
             BackColor = SystemColors.ControlDarkDark;
             BackgroundImage = Properties.Resources.bg;
             ClientSize = new Size(240, 217);
@@ -128,7 +130,7 @@ namespace TikTok_Downloader
             Controls.Add(descriptionLabel);
             Controls.Add(okButton);
             FormBorderStyle = FormBorderStyle.FixedSingle;
-            Icon = resources.GetObject("$this.Icon") as Icon;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "AboutWindow";

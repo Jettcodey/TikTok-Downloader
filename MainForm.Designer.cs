@@ -161,6 +161,7 @@ namespace TikTok_Downloader
             withWatermarkCheckBox.Text = "With Watermark";
             withWatermarkCheckBox.TextAlign = ContentAlignment.TopLeft;
             withWatermarkCheckBox.UseVisualStyleBackColor = false;
+            withWatermarkCheckBox.CheckedChanged += withWatermarkCheckBox_CheckedChanged;
             // 
             // downloadAvatarsCheckBox
             // 
@@ -243,8 +244,8 @@ namespace TikTok_Downloader
             // 
             // MainForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
             BackColor = SystemColors.ControlDarkDark;
             BackgroundImage = Properties.Resources.bg;
             BackgroundImageLayout = ImageLayout.Stretch;
@@ -281,6 +282,7 @@ namespace TikTok_Downloader
         private TextBox outputTextBox;
         private ProgressBar progressBar;
         private MenuStrip menuStrip1;
+        private MyRenderer myRenderer;
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem ChangeDownloadFolderToolStripMenuItem;
         private ComboBox cmbChoice;
