@@ -282,7 +282,6 @@ namespace TikTok_Downloader
         private TextBox outputTextBox;
         private ProgressBar progressBar;
         private MenuStrip menuStrip1;
-        private MyRenderer myRenderer;
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem ChangeDownloadFolderToolStripMenuItem;
         private ComboBox cmbChoice;

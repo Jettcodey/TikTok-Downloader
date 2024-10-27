@@ -40,7 +40,6 @@ namespace TikTok_Downloader
             InitializeComponent();
             this.mainForm = mainForm;
             LoadExistingSettings();
-            browserComboBox.SelectedItem = "System Default";
         }
 
         private void Setting3CheckBox_CheckedChanged(object sender, EventArgs e)
@@ -277,8 +276,18 @@ namespace TikTok_Downloader
 
         private void OkButton_Click(object sender, EventArgs e)
         {
-            SaveSettings();
-            this.Close();
+            string browserName = browserComboBox.SelectedItem?.ToString();
+            string browserPath = GetBrowserPath(browserName);
+
+            if (string.IsNullOrEmpty(browserPath))
+            {
+                MessageBox.Show("Please select a valid browser before proceeding.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+            {
+                SaveSettings();
+                this.Close();
+            }
         }
 
         private void SaveButton_Click(object sender, EventArgs e)
@@ -296,7 +305,7 @@ namespace TikTok_Downloader
                 settings.EnableDownloadLogs = setting5CheckBox.Checked;
                 settings.UseOldFileStructure = setting3CheckBox.Checked;
 
-                string selectedBrowser = browserComboBox.SelectedItem.ToString();
+                string selectedBrowser = browserComboBox.SelectedItem?.ToString();
                 settings.CustomBrowserPath = GetBrowserPath(selectedBrowser);
 
                 using (StreamWriter writer = new StreamWriter(SettingsFilePath))
@@ -328,18 +337,8 @@ namespace TikTok_Downloader
                     setting5CheckBox.Checked = settings.EnableDownloadLogs;
                     setting3CheckBox.Checked = settings.UseOldFileStructure;
 
-                    string selectedBrowser = settings.CustomBrowserPath;
-                    if (!string.IsNullOrWhiteSpace(selectedBrowser))
-                    {
-                        foreach (var item in browserComboBox.Items)
-                        {
-                            if (selectedBrowser.Contains(item.ToString()))
-                            {
-                                browserComboBox.SelectedItem = item;
-                                break;
-                            }
-                        }
-                    }
+                    string selectedBrowser = GetBrowserNameFromPath(settings.CustomBrowserPath);
+                    browserComboBox.SelectedItem = selectedBrowser;
                 }
                 else
                 {
@@ -430,7 +429,7 @@ namespace TikTok_Downloader
 
         private string GetBrowserPath(string browserName)
         {
-            string browserPath = string.Empty;
+            string browserPath = "";
             try
             {
                 if (string.Equals(browserName, "System Default", StringComparison.OrdinalIgnoreCase))
@@ -440,7 +439,12 @@ namespace TikTok_Downloader
                 }
                 else if (string.Equals(browserName, "Mozilla Firefox", StringComparison.OrdinalIgnoreCase))
                 {
-                    browserPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"ms-playwright\firefox-1447\firefox\firefox.exe");
+                    var firefoxDir = Directory.GetDirectories(
+                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ms-playwright"),
+                        "firefox-*"
+                    ).FirstOrDefault();
+
+                    browserPath = firefoxDir != null ? Path.Combine(firefoxDir, "firefox", "firefox.exe") : throw new Exception("Firefox executable not found.");
                 }
                 else if (string.Equals(browserName, "Chromium", StringComparison.OrdinalIgnoreCase))
                 {
@@ -467,13 +471,9 @@ namespace TikTok_Downloader
                             throw new Exception("Unsupported browser selected.");
                     }
 
-                    using (RegistryKey key = Registry.LocalMachine.OpenSubKey(registryKeyPath))
-                    {
-                        if (key != null)
-                        {
-                            browserPath = key.GetValue("") as string ?? string.Empty;
-                        }
-                    }
+                    browserPath = GetRegistryBrowserPath(Registry.LocalMachine, registryKeyPath)
+                                  ?? GetRegistryBrowserPath(Registry.CurrentUser, registryKeyPath)
+                                  ?? string.Empty;
                 }
             }
             catch (Exception ex)
@@ -482,6 +482,14 @@ namespace TikTok_Downloader
             }
 
             return browserPath;
+        }
+
+        private string? GetRegistryBrowserPath(RegistryKey rootKey, string subKeyPath)
+        {
+            using (RegistryKey key = rootKey.OpenSubKey(subKeyPath))
+            {
+                return key?.GetValue("") as string;
+            }
         }
 
         private void BrowserComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -493,7 +501,6 @@ namespace TikTok_Downloader
 
                 mainForm.AppSettings.CurrentSettings.CustomBrowserPath = settings.CustomBrowserPath;
                 mainForm.AppSettings.SaveSettings();
-
             }
         }
 
@@ -501,11 +508,7 @@ namespace TikTok_Downloader
         {
             if (browserPath.Contains("chrome.exe"))
             {
-                if (browserPath.Contains("Chromium"))
-                {
-                    return "Chromium";
-                }
-                return "Google Chrome";
+                return browserPath.Contains("Chromium") ? "Chromium" : "Google Chrome";
             }
             if (browserPath.Contains("firefox.exe")) return "Mozilla Firefox";
             if (browserPath.Contains("msedge.exe")) return "Microsoft Edge";
