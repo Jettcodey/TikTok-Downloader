@@ -12,8 +12,12 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Management;
 using System.Net;
+using System.IO;
+using System.Net.Http;
+using System.Collections.Generic;
 using System.Reflection;
-using System.Text.Json;
+using JsonNet = System.Text.Json;
+using JsonSoft = Newtonsoft.Json;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -111,6 +115,12 @@ namespace TikTok_Downloader
             cmbChoice.SelectedItem = "Single Video/Image Download";
 
             outputTextBox.ReadOnly = true;
+        }
+
+        public class VersionInfo
+        {
+            public string Version { get; set; }
+            public List<string> Files { get; set; }
         }
 
         private void InitializeLoggingFolder()
@@ -826,7 +836,7 @@ namespace TikTok_Downloader
                         return null;
                     }
 
-                    var data = JsonSerializer.Deserialize<ApiData>(json);
+                    var data = JsonNet.JsonSerializer.Deserialize<ApiData>(json);
                     if (data?.aweme_list == null || data.aweme_list.Count == 0)
                     {
                         outputTextBox.AppendText($"Error: No aweme_list found in JSON response for MediaID: {MediaID}\r\n");
@@ -876,7 +886,7 @@ namespace TikTok_Downloader
                     LogError($"HTTP error while getting video: {ex.Message}");
                     return null;
                 }
-                catch (JsonException ex)
+                catch (JsonNet.JsonException ex)
                 {
                     LogError($"JSON error while getting video: {ex.Message}");
                     return null;
@@ -1045,7 +1055,7 @@ namespace TikTok_Downloader
                     outputTextBox.AppendText($"Inner Exception 2: {ex.InnerException?.InnerException?.InnerException?.Message}\r\n");
                     LogMessage(logFilePath, $"Error: TargetInvocationException occurred: {ex.InnerException?.Message}");
                 }
-                catch (JsonException ex)
+                catch (JsonNet.JsonException ex)
                 {
                     outputTextBox.AppendText($"Error: An error occurred while processing JSON response: {ex.Message}\r\n");
                     outputTextBox.AppendText("Retrying in 5 seconds...\n");
@@ -1230,6 +1240,82 @@ namespace TikTok_Downloader
             }
         }
 
+        private void CheckForUpdates()
+        {
+            string url = "https://api.jettcodey.de/ttd/update/update.json";
+
+            using (HttpClient client = new HttpClient())
+            {
+                var response = client.GetStringAsync(url).Result;
+                var latestVersionInfo = JsonSoft.JsonConvert.DeserializeObject<VersionInfo>(response);
+
+                // Compare versions
+                Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                Version latestVersion = new Version(latestVersionInfo.Version);
+
+                if (latestVersion > currentVersion)
+                {
+                    string tempFolder = Path.Combine(Path.GetTempPath(), "update");
+                    Directory.CreateDirectory(tempFolder);
+                    DownloadFiles(latestVersionInfo.Files, tempFolder);
+
+                    DialogResult result = MessageBox.Show("New updates are available. Would you like to restart the application to apply updates?", "Update Available", MessageBoxButtons.YesNo);
+                    if (result == DialogResult.Yes)
+                    {
+                        CreateBatchFile(tempFolder); // Generate Update.bat
+                        Application.Exit();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("You are already using the latest version.");
+                }
+            }
+        }
+
+        private void CreateBatchFile(string tempFolder)
+        {
+            string appFolder = AppDomain.CurrentDomain.BaseDirectory;
+            string batchFilePath = Path.Combine(Path.GetTempPath(), "update.bat");
+
+            using (StreamWriter writer = new StreamWriter(batchFilePath))
+            {
+                writer.WriteLine("@echo off");
+                writer.WriteLine("timeout /t 2");
+
+                foreach (var file in Directory.GetFiles(tempFolder))
+                {
+                    string fileName = Path.GetFileName(file);
+                    string destinationPath = Path.Combine(appFolder, fileName);
+                    writer.WriteLine($"copy /y \"{file}\" \"{destinationPath}\"");
+                }
+
+                writer.WriteLine($"rmdir /s /q \"{tempFolder}\"");
+            }
+
+            // Start the Update.bat file
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = batchFilePath,
+                UseShellExecute = true,
+                Verb = "runas" // Admin rights required to replace files
+            });
+        }
+
+        private void DownloadFiles(List<string> fileUrls, string tempFolder)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                foreach (var fileUrl in fileUrls)
+                {
+                    string fileName = Path.GetFileName(fileUrl);
+                    string tempFilePath = Path.Combine(tempFolder, fileName);
+                    var fileBytes = client.GetByteArrayAsync(fileUrl).Result;
+                    File.WriteAllBytes(tempFilePath, fileBytes);
+                }
+            }
+        }
+
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AboutWindow aboutWindow = new AboutWindow(browserUtility);
@@ -1257,6 +1343,11 @@ namespace TikTok_Downloader
             {
                 settingsDialog.ShowDialog();
             }
+        }
+
+        private void checkForUpdateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CheckForUpdates();
         }
 
         public void SetUseOldFileStructure(bool value)

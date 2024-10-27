@@ -34,6 +34,7 @@ namespace TikTok_Downloader
             label1 = new Label();
             linkLabel1 = new LinkLabel();
             noWatermarkCheckBox = new CheckBox();
+            checkForUpdateToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -103,7 +104,7 @@ namespace TikTok_Downloader
             // fileToolStripMenuItem
             // 
             fileToolStripMenuItem.BackColor = Color.FromArgb(32, 32, 32);
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { ChangeDownloadFolderToolStripMenuItem, aboutToolStripMenuItem, settingsToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { ChangeDownloadFolderToolStripMenuItem, aboutToolStripMenuItem, settingsToolStripMenuItem, checkForUpdateToolStripMenuItem });
             fileToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(61, 20);
@@ -136,6 +137,31 @@ namespace TikTok_Downloader
             settingsToolStripMenuItem.Size = new Size(208, 22);
             settingsToolStripMenuItem.Text = "Settings";
             settingsToolStripMenuItem.Click += settingsToolStripMenuItem_Click;
+            // 
+            // noWatermarkCheckBox
+            // 
+            noWatermarkCheckBox.AutoSize = true;
+            noWatermarkCheckBox.BackColor = Color.Transparent;
+            noWatermarkCheckBox.ForeColor = SystemColors.Control;
+            noWatermarkCheckBox.ImageAlign = ContentAlignment.MiddleLeft;
+            noWatermarkCheckBox.Location = new Point(258, 106);
+            noWatermarkCheckBox.Name = "noWatermarkCheckBox";
+            noWatermarkCheckBox.Size = new Size(103, 19);
+            noWatermarkCheckBox.TabIndex = 9;
+            noWatermarkCheckBox.Text = "No Watermark";
+            noWatermarkCheckBox.TextAlign = ContentAlignment.TopLeft;
+            noWatermarkCheckBox.UseVisualStyleBackColor = false;
+            noWatermarkCheckBox.Visible = false;
+            // 
+            // checkForUpdateToolStripMenuItem
+            // 
+            checkForUpdateToolStripMenuItem.BackColor = Color.FromArgb(32, 32, 32);
+            checkForUpdateToolStripMenuItem.ForeColor = SystemColors.Control;
+            checkForUpdateToolStripMenuItem.Name = "checkForUpdateToolStripMenuItem";
+            checkForUpdateToolStripMenuItem.Size = new Size(208, 22);
+            checkForUpdateToolStripMenuItem.Text = "Check for Update";
+            checkForUpdateToolStripMenuItem.Click += checkForUpdateToolStripMenuItem_Click;
+            checkForUpdateToolStripMenuItem.Visible = true;
             // 
             // browseFileButton
             // 
@@ -227,21 +253,6 @@ namespace TikTok_Downloader
             linkLabel1.VisitedLinkColor = Color.Aquamarine;
             linkLabel1.LinkClicked += LinkLabel1_LinkClicked;
             // 
-            // noWatermarkCheckBox
-            // 
-            noWatermarkCheckBox.AutoSize = true;
-            noWatermarkCheckBox.BackColor = Color.Transparent;
-            noWatermarkCheckBox.ForeColor = SystemColors.Control;
-            noWatermarkCheckBox.ImageAlign = ContentAlignment.MiddleLeft;
-            noWatermarkCheckBox.Location = new Point(258, 106);
-            noWatermarkCheckBox.Name = "noWatermarkCheckBox";
-            noWatermarkCheckBox.Size = new Size(103, 19);
-            noWatermarkCheckBox.TabIndex = 9;
-            noWatermarkCheckBox.Text = "No Watermark";
-            noWatermarkCheckBox.TextAlign = ContentAlignment.TopLeft;
-            noWatermarkCheckBox.UseVisualStyleBackColor = false;
-            noWatermarkCheckBox.Visible = false;
-            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(96F, 96F);
@@ -270,7 +281,7 @@ namespace TikTok_Downloader
             MainMenuStrip = menuStrip1;
             MaximizeBox = false;
             Name = "MainForm";
-            Text = "TikTok Downloader v1.3.0";
+            Text = "TikTok Downloader v1.3.1";
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ResumeLayout(false);
@@ -351,5 +362,6 @@ namespace TikTok_Downloader
             urlTextBox.Text = "";
         }
 
+        private ToolStripMenuItem checkForUpdateToolStripMenuItem;
     }
 }
