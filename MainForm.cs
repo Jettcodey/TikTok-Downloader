@@ -807,6 +807,16 @@ namespace TikTok_Downloader
         private async Task<VideoData?> GetMedia(string url, bool withWatermark, bool noWatermark)
         {
             var MediaID = await GetMediaID(url);
+            var username = await ExtractUsernameFromUrl(url);
+            string userFolderPath = Path.Combine(downloadFolderPath, username);
+            string indexFilePath = Path.Combine(userFolderPath, $"{username}_index.txt");
+
+            if (File.Exists(indexFilePath) && File.ReadLines(indexFilePath).Contains(MediaID))
+            {
+                outputTextBox.AppendText($"Media {MediaID} already downloaded. Skipping...\r\n");
+                return null;
+            }
+
             var apiUrl = $"https://api22-normal-c-alisg.tiktokv.com/aweme/v1/feed/?aweme_id={MediaID}&iid=7238789370386695942&device_id=7238787983025079814&resolution=1080*2400&channel=googleplay&app_name=musical_ly&version_code=350103&device_platform=android&device_type=Pixel+7&os_version=13";
 
             using (var client = new HttpClient())
@@ -908,122 +918,79 @@ namespace TikTok_Downloader
                 try
                 {
                     string username = await ExtractUsernameFromUrl(url);
-
                     string userFolderPath = Path.Combine(downloadFolderPath, username);
-                    if (!Directory.Exists(userFolderPath))
+                    string indexFilePath = Path.Combine(userFolderPath, $"{username}_index.txt");
+
+                    // Create user folder if it doesn't exist
+                    Directory.CreateDirectory(userFolderPath);
+
+                    // Create folders for videos and images
+                    string videosFolderPath = UseOldFileStructure ? userFolderPath : Path.Combine(userFolderPath, "Videos");
+                    Directory.CreateDirectory(videosFolderPath);
+
+                    string imagesFolderPath = UseOldFileStructure ? userFolderPath : Path.Combine(userFolderPath, "Images");
+                    Directory.CreateDirectory(imagesFolderPath);
+
+                    // Download the video
+                    string videoFileName = $"{data.Id}{(noWatermark ? "_Save" : (withWatermark ? "_Watermark" : string.Empty))}.mp4";
+                    string videoFilePath = Path.Combine(videosFolderPath, videoFileName);
+
+                    if (File.Exists(videoFilePath))
                     {
-                        Directory.CreateDirectory(userFolderPath);
+                        outputTextBox.AppendText($"Video: '{videoFileName}' already exists. Skipping...\r\n");
                     }
-
-                    string videosFolderPath = Path.Combine(userFolderPath, "Videos");
-                    if (!Directory.Exists(videosFolderPath))
+                    else
                     {
-                        Directory.CreateDirectory(videosFolderPath);
-                    }
-
-                    string imagesFolderPath = Path.Combine(userFolderPath, "Images");
-                    if (!Directory.Exists(imagesFolderPath))
-                    {
-                        Directory.CreateDirectory(imagesFolderPath);
-                    }
-
-                    string folderName = UseOldFileStructure ? userFolderPath : videosFolderPath;
-
-                    string fileName;
-
-                    if (data.Images.Count > 0)
-                    {
-                        folderName = UseOldFileStructure ? Path.Combine(userFolderPath, "Images", $"{data.Id}_Images") : imagesFolderPath;
-
-                        if (!Directory.Exists(folderName))
+                        using (var client = new HttpClient())
                         {
-                            Directory.CreateDirectory(folderName);
+                            var response = await client.GetAsync(data.Url);
+                            response.EnsureSuccessStatusCode();
+
+                            using (var stream = await response.Content.ReadAsStreamAsync())
+                            using (var fileStream = File.Create(videoFilePath))
+                            {
+                                await stream.CopyToAsync(fileStream);
+                            }
                         }
 
-                        foreach (var imageUrl in data.Images)
-                        {
-                            fileName = $"{data.Id}_{data.Images.IndexOf(imageUrl)}.jpeg";
-                            string filePath = Path.Combine(folderName, fileName);
+                        outputTextBox.AppendText($"Downloaded Video: '{videoFileName}' successfully.\r\n");
+                        await File.AppendAllTextAsync(indexFilePath, $"{data.Id}\n"); // Log in index file
+                    }
 
-                            if (File.Exists(filePath))
+                    // Download images if available
+                    if (data.Images.Count > 0)
+                    {
+                        foreach (var imageUrl in data.Images) /*.Select((url, i) => (url, i)))*/
+                        {
+                            string imageFileName = $"{data.Id}_{data.Images.IndexOf(imageUrl)}.jpeg";
+                            /*string imageFileName = $"{data.Id}_{index}.jpeg";*/
+                            string imageFilePath = Path.Combine(imagesFolderPath, imageFileName);
+
+                            if (File.Exists(imageFilePath))
                             {
-                                outputTextBox.AppendText($"Image: '{fileName}' already exists. Skipping\r\n");
+                                outputTextBox.AppendText($"Image: '{imageFileName}' already exists. Skipping...\r\n");
                                 continue;
                             }
 
                             using (var client = new HttpClient())
                             {
                                 using (var stream = await client.GetStreamAsync(imageUrl))
-                                using (var fileStream = File.Create(filePath))
+                                using (var fileStream = File.Create(imageFilePath))
                                 {
                                     await stream.CopyToAsync(fileStream);
                                 }
                             }
 
-                            outputTextBox.AppendText($"Downloading Images from User: {username}\r\nDownloaded Image:'{fileName}' Successfully...\r\n");
-                            LogDownload(fileName, imageUrl);
+                            outputTextBox.AppendText($"Downloaded Image: '{imageFileName}' successfully.\r\n");
+                            await File.AppendAllTextAsync(indexFilePath, $"{data.Id}\n");
                         }
                     }
-                    else
-                    {
-                        folderName = UseOldFileStructure ? Path.Combine(userFolderPath, "Videos", $"{data.Id}_Video") : videosFolderPath;
 
-                        if (!Directory.Exists(folderName))
-                        {
-                            Directory.CreateDirectory(folderName);
-                        }
-
-                        fileName = $"{data.Id}";
-
-                        if (noWatermark)
-                        {
-                            fileName += "_Save.mp4";
-                        }
-                        if (withWatermark)
-                        {
-                            fileName += "_Watermark.mp4";
-                        }
-
-                        string filePath = Path.Combine(folderName, fileName);
-
-                        if (File.Exists(filePath))
-                        {
-                            outputTextBox.AppendText($"Video: '{fileName}' already exists. Skipping\r\n");
-                            return;
-                        }
-
-                        using (var client = new HttpClient())
-                        {
-                            var response = await client.GetAsync(data.Url);
-
-                            if (!response.IsSuccessStatusCode)
-                            {
-                                if (response.StatusCode == HttpStatusCode.NotFound)
-                                {
-                                    outputTextBox.AppendText($"Download failed because of an error in the Media file hosted on the Server. Link: {url}. Skipping...\r\n");
-                                    return;
-                                }
-                                else
-                                {
-                                    throw new HttpRequestException($"HTTP error: {response.StatusCode}");
-                                }
-                            }
-
-                            using (var stream = await response.Content.ReadAsStreamAsync())
-                            using (var fileStream = File.Create(filePath))
-                            {
-                                await stream.CopyToAsync(fileStream);
-                            }
-                        }
-
-                        outputTextBox.AppendText($"Downloading Video from User: {username}\r\nDownloaded Video: '{fileName}' Successfully...\r\n");
-                        LogDownload(fileName, data.Url);
-                    }
-
+                    // Optionally download avatars if the checkbox is checked
                     if (downloadAvatarsCheckBox.Checked)
                     {
                         await DownloadAvatars(data, url, username, UseOldFileStructure);
-                        LogError($"Download Avatars Checkbox is Active.\r\n");
+                        LogMessage(logFilePath, "Download Avatars Checkbox is Active.");
                     }
 
                     return; // Download successful, exit the method
