@@ -9,18 +9,15 @@
 # TikTok Downloader
 <!-- # ⚠ THE APPLICATION ISN'T WORKING RIGHT NOW DUE TO RECENT TIKTOK API UPDATES ⚠ -->
 
+<!-- # ⚠ The Update Server is currently down for Maintenance. I´m working hard to bring it back online. ⚠ -->
+
 <!-- > [!NOTE]
 > Some features of the application are not always working 100% right now due to changes in the TikTok API. -->
 
 <!-- TABLE OF CONTENTS -->
 <summary>Table of Contents</summary>
  <ol>
-   <li>
-     <a href="#-about-the-project">About The Project</a>
-     <ul>
-       <li><a href="#built-with">Built With</a></li>
-     </ul>
-   </li>
+   <li><a href="#-about-the-project">About The Project</a></li>
    <li><a href="#-features">Features</a></li>
    <li><a href="#%EF%B8%8F-installation">Installation</a></li>
    <li><a href="#-usage">Usage</a></li>
@@ -49,6 +46,7 @@ C# and Microsoft Playwright
 - **Mass Download Content** using Links from a Text file or by Username
 
 ### 💾 Storage Information
+- **Install Location**: TikTok Downloader will be Installed at `C:\Program Files\Jettcodey\TikTok Downloader\TikTok Downloader`
 - **Default Location**: Downloads are saved in a folder on your desktop named `TikTokDownloads\{@Username}\`, organized into **Videos**, **Images**, and **Avatars**.
 - **Settings File**: Configuration is stored in the user's Documents folder at `Jettcodey\TikTok Downloader\appsettings.xml`.
 
@@ -123,15 +121,15 @@ After installing TikTok Downloader, open the application and complete the First-
 - The downloader will then retrieve all video/image posts from the saved links.
 
 #### 3. Mass Download from Text File Links
-- Create a `.txt` file with each TikTok link on a new line. 
+- Create a `.txt` file with each TikTok link* on a new line. 
 - Select the **"Browse"** button to locate and choose your text file. 
 - Click **Download** to start the process.
 
 #### 4. HD Download Single Video
-- Similar to the Single Video/Image Download option, but this can Only download **videos** in HD quality.
+- Similar to the Single Video/Image Download option, but this can Only download **Videos** in HD quality.
 
 #### 5. HD Download from Text File Links
-- Similar to the Mass Download from Text File Links option, but this can Only download **videos** in HD quality.
+- Similar to the Mass Download from Text File Links option, but this can Only download **Videos** in HD quality.
 
 \* TikTok Links format: `https://www.tiktok.com/@user/video|photo/123456789` or `https://vm.tiktok.com/a1b2c3d4`.  
 **TikTok Profile Links format: `https://www.tiktok.com/@user`.
