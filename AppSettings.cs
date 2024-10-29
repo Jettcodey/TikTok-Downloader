@@ -27,7 +27,6 @@ namespace TikTok_Downloader
             public bool DownloadImagesOnly { get; set; }
             public bool EnableJsonLogs { get; set; }
             public bool EnableDownloadLogs { get; set; }
-            public bool UseOldFileStructure { get; set; }
             public string LastDownloadFolderPath { get; set; }
             public bool FirstRun { get; set; }
             public string CustomBrowserPath { get; set; }
@@ -77,7 +76,6 @@ namespace TikTok_Downloader
                     DownloadImagesOnly = false,
                     EnableJsonLogs = false,
                     EnableDownloadLogs = false,
-                    UseOldFileStructure = false,
                     LastDownloadFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TiktokDownloads"),
                     FirstRun = false,
                     CustomBrowserPath = "",
