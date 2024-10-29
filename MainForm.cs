@@ -16,11 +16,16 @@ using System.IO;
 using System.Net.Http;
 using System.Collections.Generic;
 using System.Reflection;
-using JsonNet = System.Text.Json;
 using JsonSoft = Newtonsoft.Json;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
+using System.Linq.Expressions;
+using System.Security.Policy;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+using System;
 
 namespace TikTok_Downloader
 {
@@ -34,7 +39,6 @@ namespace TikTok_Downloader
         private bool logJsonEnabled;
         private string jsonLogFilePath;
         private object jsonLock = new object();
-        private bool useOldFileStructure;
         private bool DownloadVideosOnly;
         private bool DownloadImagesOnly;
         private readonly AppSettings settings;
@@ -127,7 +131,7 @@ namespace TikTok_Downloader
         {
             if (!isLoggingInitialized && (EnableDownloadLogs || logJsonEnabled))
             {
-                string logFolderName = $"TTDownloader-Logs[{DateTime.Now:yyyy-MM-dd_HH-mm}]-Logs";
+                string logFolderName = $"TTDownloader-Logs[{DateTime.Now:yyyy-MM-dd_HH-mm}]";
                 logFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), logFolderName);
 
                 try
@@ -171,7 +175,7 @@ namespace TikTok_Downloader
                 }
                 else
                 {
-                    MessageBox.Show("The Mass Download feature will not work if your system's default browser is Firefox until the setup scripts are run. If you use Firefox as your default browser, you will need to install the scripts manually.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("The feature 'Mass Download by Username' will not work if you want to use Firefox until the setup scripts are run. If you want to use Firefox as your browser, you will need to execute the scripts manually.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     currentSettings.FirstRun = true;
                     settings.SaveSettings();
                 }
@@ -185,7 +189,6 @@ namespace TikTok_Downloader
 
             EnableDownloadLogs = currentSettings.EnableDownloadLogs;
             logJsonEnabled = currentSettings.EnableJsonLogs;
-            useOldFileStructure = currentSettings.UseOldFileStructure;
         }
 
 
@@ -328,6 +331,17 @@ namespace TikTok_Downloader
                 string filePath = urlTextBox.Text.Trim();
                 LogMessage(logFilePath, $"Selected file path: {filePath}");
                 await DownloadFromTextFile(filePath);
+            }
+            else if (choice == "HD Download Single Video")
+            {
+                string HDUrl = urlTextBox.Text.Trim();
+                await HDGetMediaID(HDUrl);
+            }
+            else if (choice == "HD Download´From Text File Links")
+            {
+                string filePath = urlTextBox.Text.Trim();
+                LogMessage(logFilePath, $"Selected file path: {filePath}");
+                await HDVideoDownloadFromTextFile(filePath);
             }
         }
 
@@ -557,7 +571,7 @@ namespace TikTok_Downloader
                             }
                             else
                             {
-                                await DownloadMedia(dataWithWatermark, trimmedUrl, settingsDialog.UseOldFileStructure, true, false);
+                                await DownloadMedia(dataWithWatermark, trimmedUrl, true, false);
                             }
                         }
 
@@ -571,7 +585,7 @@ namespace TikTok_Downloader
                             }
                             else
                             {
-                                await DownloadMedia(dataNoWatermark, trimmedUrl, settingsDialog.UseOldFileStructure, false, true);
+                                await DownloadMedia(dataNoWatermark, trimmedUrl, false, true);
                             }
                         }
                         else
@@ -584,7 +598,7 @@ namespace TikTok_Downloader
                             }
                             else
                             {
-                                await DownloadMedia(dataNoWatermark, trimmedUrl, settingsDialog.UseOldFileStructure, false, true);
+                                await DownloadMedia(dataNoWatermark, trimmedUrl, false, true);
                             }
                         }
                     }
@@ -598,7 +612,7 @@ namespace TikTok_Downloader
         {
             if (!File.Exists(filePath))
             {
-                MessageBox.Show($"Error: Text File not Found", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Text file not found or None was Selected!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 LogError("Text file not found or None was Selected!");
                 return;
             }
@@ -612,7 +626,6 @@ namespace TikTok_Downloader
 
             using (var settingsDialog = new SettingsDialog(this))
             {
-                bool useOldFileStructure = settingsDialog.UseOldFileStructure;
 
                 foreach (var url in urls)
                 {
@@ -631,7 +644,7 @@ namespace TikTok_Downloader
                             }
                             else
                             {
-                                await DownloadMedia(dataWithWatermark, trimmedUrl, useOldFileStructure, true, false);
+                                await DownloadMedia(dataWithWatermark, trimmedUrl, true, false);
                             }
                         }
 
@@ -645,7 +658,7 @@ namespace TikTok_Downloader
                             }
                             else
                             {
-                                await DownloadMedia(dataNoWatermark, trimmedUrl, useOldFileStructure, false, true);
+                                await DownloadMedia(dataNoWatermark, trimmedUrl, false, true);
                             }
                         }
                         else
@@ -658,7 +671,7 @@ namespace TikTok_Downloader
                             }
                             else
                             {
-                                await DownloadMedia(dataNoWatermark, trimmedUrl, useOldFileStructure, false, true);
+                                await DownloadMedia(dataNoWatermark, trimmedUrl, false, true);
                             }
                         }
                     }
@@ -696,7 +709,7 @@ namespace TikTok_Downloader
                         }
                         else
                         {
-                            await DownloadMedia(dataWithWatermark, trimmedUrl, settingsDialog.UseOldFileStructure, true, false);
+                            await DownloadMedia(dataWithWatermark, trimmedUrl, true, false);
                         }
                     }
 
@@ -710,7 +723,7 @@ namespace TikTok_Downloader
                         }
                         else
                         {
-                            await DownloadMedia(dataNoWatermark, trimmedUrl, settingsDialog.UseOldFileStructure, false, true);
+                            await DownloadMedia(dataNoWatermark, trimmedUrl, false, true);
                         }
                     }
                     else
@@ -723,7 +736,7 @@ namespace TikTok_Downloader
                         }
                         else
                         {
-                            await DownloadMedia(dataNoWatermark, trimmedUrl, settingsDialog.UseOldFileStructure, false, true);
+                            await DownloadMedia(dataNoWatermark, trimmedUrl, false, true);
                         }
                     }
                 }
@@ -734,7 +747,103 @@ namespace TikTok_Downloader
             }
         }
 
-        private async Task<string> GetMediaID(string url)
+        private async Task HDGetMediaID(string HDUrl)
+        {
+            outputTextBox.Clear();
+
+            try
+            {
+                var url = urlTextBox.Text.Trim();
+                if (string.IsNullOrWhiteSpace(url))
+                {
+                    MessageBox.Show("Please enter a valid URL", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var trimmedUrl = url.Trim();
+                LogMessage(logFilePath, $"Downloading {trimmedUrl}...");
+
+                var tiktokUrl = await GetMediaUrl(trimmedUrl);
+
+                if (string.IsNullOrEmpty(tiktokUrl))
+                {
+                    LogError($"Error: MediaID not found for URL {trimmedUrl}");
+                    return;
+                }
+                else
+                {
+                    await HDVideoDownload(tiktokUrl);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"An error occurred: {ex.Message}");
+            }
+        }
+
+        private async Task HDVideoDownloadFromTextFile(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                MessageBox.Show("Error: The provided file path does not exist.", "File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            var urls = await File.ReadAllLinesAsync(filePath);
+            LogMessage(logFilePath, $"Read {urls.Length} URLs from file: {filePath}");
+            progressBar.Minimum = 0;
+            progressBar.Maximum = urls.Length;
+            progressBar.Value = 0;
+            using (var settingsDialog = new SettingsDialog(this))
+            {
+                foreach (var url in urls)
+                {
+                    string HDUrl = url.Trim();
+                    if (!string.IsNullOrEmpty(HDUrl))
+                    {
+                        LogMessage(logFilePath, $"Downloading HD Video {HDUrl} ...");
+                        await HDGetMediaID(HDUrl);
+                        progressBar.Value++;
+                        await Task.Delay(1000);
+                    }
+                }
+            }
+        }
+
+        public async Task<string> GetMediaUrl(string url)
+        {
+            try
+            {
+                if (url.Contains("/photo/"))
+                {
+                    outputTextBox.AppendText($"Blocked URL: Image/Photo URLs are not allowed: {url}\r\n");
+                    return string.Empty;
+                }
+
+                if (url.Contains("/video/"))
+                {
+                    string redirectedUrl = await GetRedirectUrl(url);
+
+                    if (redirectedUrl.Contains("/photo/"))
+                    {
+                        outputTextBox.AppendText($"Blocked URL: Image/Photo URLs are not allowed after redirection: {redirectedUrl}\r\n");
+                        return string.Empty;
+                    }
+
+                    return redirectedUrl;
+                }
+
+                outputTextBox.AppendText($"Invalid URL: Not a Video URL! URL provided: {url}\r\n");
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                outputTextBox.AppendText($"Error occurred while extracting MediaID: {ex.Message} - {url}\r\n");
+                LogMessage(logFilePath, $"Error occurred while extracting MediaID: {ex.Message} - {url}");
+                return string.Empty;
+            }
+        }
+
+        public async Task<string> GetMediaID(string url)
         {
             try
             {
@@ -811,10 +920,47 @@ namespace TikTok_Downloader
             string userFolderPath = Path.Combine(downloadFolderPath, username);
             string indexFilePath = Path.Combine(userFolderPath, $"{username}_index.txt");
 
-            if (File.Exists(indexFilePath) && File.ReadLines(indexFilePath).Contains(MediaID))
+            if (File.Exists(indexFilePath))
             {
-                outputTextBox.AppendText($"Media {MediaID} already downloaded. Skipping...\r\n");
-                return null;
+                var downloadedIds = File.ReadLines(indexFilePath).ToList();
+
+                if (downloadAvatarsCheckBox.Checked)
+                {
+                    // Check for Avatar_{indexNumber} (Normal Avatars)
+                    var avatarIndexNumberPattern = $"{username}_\\d+";
+                    bool normalAvatarsExist = downloadedIds.Any(id => Regex.IsMatch(id, avatarIndexNumberPattern));
+                    if (normalAvatarsExist)
+                    {
+                        outputTextBox.AppendText($"Avatars for Media {username} already downloaded. Skipping...\r\n");
+                        return null;
+                    }
+
+                    // Check for GifAvatar_{indexNumber} (GIF Avatars)
+                    var gifAvatarIndexNumberPattern = $"{username}_GIF_\\d+";
+                    if (downloadedIds.Any(id => Regex.IsMatch(id, gifAvatarIndexNumberPattern)))
+                    {
+                        outputTextBox.AppendText($"GIF Avatars for Media {username} already downloaded. Skipping...\r\n");
+                        return null;
+                    }
+                }
+
+                if (!downloadAvatarsCheckBox.Checked)
+                {
+                    // Check for MediaID (Videos)
+                    if (downloadedIds.Contains(MediaID))
+                    {
+                        outputTextBox.AppendText($"Media {MediaID} already downloaded. Skipping...\r\n");
+                        return null;
+                    }
+
+                    // Check for MediaID_{indexNumber} (Images)
+                    var indexNumberPattern = $"{MediaID}_\\d+";
+                    if (downloadedIds.Any(id => Regex.IsMatch(id, indexNumberPattern)))
+                    {
+                        outputTextBox.AppendText($"Media {MediaID} already downloaded. Skipping...\r\n");
+                        return null;
+                    }
+                }
             }
 
             var apiUrl = $"https://api22-normal-c-alisg.tiktokv.com/aweme/v1/feed/?aweme_id={MediaID}&iid=7238789370386695942&device_id=7238787983025079814&resolution=1080*2400&channel=googleplay&app_name=musical_ly&version_code=350103&device_platform=android&device_type=Pixel+7&os_version=13";
@@ -846,7 +992,7 @@ namespace TikTok_Downloader
                         return null;
                     }
 
-                    var data = JsonNet.JsonSerializer.Deserialize<ApiData>(json);
+                    var data = JsonSoft.JsonConvert.DeserializeObject<ApiData>(json);
                     if (data?.aweme_list == null || data.aweme_list.Count == 0)
                     {
                         outputTextBox.AppendText($"Error: No aweme_list found in JSON response for MediaID: {MediaID}\r\n");
@@ -896,7 +1042,7 @@ namespace TikTok_Downloader
                     LogError($"HTTP error while getting video: {ex.Message}");
                     return null;
                 }
-                catch (JsonNet.JsonException ex)
+                catch (JsonSoft.JsonException ex)
                 {
                     LogError($"JSON error while getting video: {ex.Message}");
                     return null;
@@ -909,7 +1055,77 @@ namespace TikTok_Downloader
             }
         }
 
-        private async Task DownloadMedia(VideoData data, string url, bool UseOldFileStructure, bool withWatermark, bool noWatermark)
+        private async Task HDVideoDownload(string tiktokUrl) // Third-party API endpoint!
+        {
+            string apiEndpoint = "https://www.tikwm.com/api/";
+            using (HttpClient client = new HttpClient())
+            {
+                var urlWithParams = $"{apiEndpoint}?url={tiktokUrl}&hd=1"; // Set hd=1 for HD download
+                HttpResponseMessage response = await client.GetAsync(urlWithParams);
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    dynamic responseData = JsonSoft.JsonConvert.DeserializeObject(responseBody);
+                    if (responseData.code == 0)
+                    {
+                        // Extract username and video ID from the TikTok URL
+                        var videoURL = await GetMediaUrl(tiktokUrl);
+                        string username = Regex.Match(tiktokUrl, @"@(\w+)").Groups[1].Value;
+                        string videoId = Regex.Match(tiktokUrl, @"/video/(\d+)").Groups[1].Value;
+                        string userFolderPath = Path.Combine(downloadFolderPath, username);
+                        string indexFilePath = Path.Combine(userFolderPath, $"{username}_index.txt");
+
+                        if (!Directory.Exists(userFolderPath))
+                        {
+                            Directory.CreateDirectory(userFolderPath);
+                        }
+
+                        string videosFolderPath = Path.Combine(userFolderPath, "Videos");
+                        if (!Directory.Exists(videosFolderPath))
+                        {
+                            Directory.CreateDirectory(videosFolderPath);
+                        }
+
+                        string filename = $"{videoId}_HD.mp4";
+                        string fullPath = Path.Combine(videosFolderPath, filename);
+                        LogMessage(logFilePath, $"HD Video File Saved to {fullPath}.");
+
+                        bool videoAlreadyDownloaded = false;
+                        if (File.Exists(indexFilePath))
+                        {
+                            var downloadedIds = await File.ReadAllLinesAsync(indexFilePath);
+                            var HDVideoPattern = $"{videoId}_HD";
+                            if (downloadedIds.Any(id => Regex.IsMatch(id, HDVideoPattern)))
+                            {
+                                outputTextBox.AppendText($"Media {videoId} already downloaded. Skipping...\r\n");
+                                videoAlreadyDownloaded = true;
+                            }
+                        }
+
+                        if (!videoAlreadyDownloaded)
+                        {
+                            string videoUrl = responseData.data.hdplay; // Get HD video URL
+                            byte[] videoData = await client.GetByteArrayAsync(videoUrl);
+                            await File.WriteAllBytesAsync(fullPath, videoData);
+                            outputTextBox.AppendText($"Downloading HD Video from User: {username}\r\nDownloaded HD Video: '{filename}' Successfully...\r\n");
+
+                            await File.AppendAllTextAsync(indexFilePath, $"{videoId}_HD\n");
+                        }
+                        
+                    }
+                    else
+                    {
+                        outputTextBox.AppendText($"Error: {responseData.message}\r\n");
+                    }
+                }
+                else
+                {
+                    outputTextBox.AppendText("Error: Unable to download video in HD\r\n");
+                }
+            }
+        }
+
+        private async Task DownloadMedia(VideoData data, string url, bool withWatermark, bool noWatermark)
         {
             const int maxRetries = 5;
 
@@ -921,49 +1137,19 @@ namespace TikTok_Downloader
                     string userFolderPath = Path.Combine(downloadFolderPath, username);
                     string indexFilePath = Path.Combine(userFolderPath, $"{username}_index.txt");
 
-                    // Create user folder if it doesn't exist
                     Directory.CreateDirectory(userFolderPath);
 
-                    // Create folders for videos and images
-                    string videosFolderPath = UseOldFileStructure ? userFolderPath : Path.Combine(userFolderPath, "Videos");
+                    string videosFolderPath = Path.Combine(userFolderPath, "Videos");
                     Directory.CreateDirectory(videosFolderPath);
 
-                    string imagesFolderPath = UseOldFileStructure ? userFolderPath : Path.Combine(userFolderPath, "Images");
+                    string imagesFolderPath = Path.Combine(userFolderPath, "Images");
                     Directory.CreateDirectory(imagesFolderPath);
 
-                    // Download the video
-                    string videoFileName = $"{data.Id}{(noWatermark ? "_Save" : (withWatermark ? "_Watermark" : string.Empty))}.mp4";
-                    string videoFilePath = Path.Combine(videosFolderPath, videoFileName);
-
-                    if (File.Exists(videoFilePath))
-                    {
-                        outputTextBox.AppendText($"Video: '{videoFileName}' already exists. Skipping...\r\n");
-                    }
-                    else
-                    {
-                        using (var client = new HttpClient())
-                        {
-                            var response = await client.GetAsync(data.Url);
-                            response.EnsureSuccessStatusCode();
-
-                            using (var stream = await response.Content.ReadAsStreamAsync())
-                            using (var fileStream = File.Create(videoFilePath))
-                            {
-                                await stream.CopyToAsync(fileStream);
-                            }
-                        }
-
-                        outputTextBox.AppendText($"Downloaded Video: '{videoFileName}' successfully.\r\n");
-                        await File.AppendAllTextAsync(indexFilePath, $"{data.Id}\n"); // Log in index file
-                    }
-
-                    // Download images if available
                     if (data.Images.Count > 0)
                     {
-                        foreach (var imageUrl in data.Images) /*.Select((url, i) => (url, i)))*/
+                        foreach (var imageUrl in data.Images)
                         {
                             string imageFileName = $"{data.Id}_{data.Images.IndexOf(imageUrl)}.jpeg";
-                            /*string imageFileName = $"{data.Id}_{index}.jpeg";*/
                             string imageFilePath = Path.Combine(imagesFolderPath, imageFileName);
 
                             if (File.Exists(imageFilePath))
@@ -982,31 +1168,61 @@ namespace TikTok_Downloader
                             }
 
                             outputTextBox.AppendText($"Downloaded Image: '{imageFileName}' successfully.\r\n");
-                            await File.AppendAllTextAsync(indexFilePath, $"{data.Id}\n");
+                            await File.AppendAllTextAsync(indexFilePath, $"{data.Id}_{data.Images.IndexOf(imageUrl)}\n");
+                        }
+                    }
+                    // Download the video only if no images were found/downloaded (I know this is Stupid, but it works)
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(data.Url))
+                        {
+                            string videoFileName = $"{data.Id}{(noWatermark ? "_Save" : (withWatermark ? "_Watermark" : string.Empty))}.mp4";
+                            string videoFilePath = Path.Combine(videosFolderPath, videoFileName);
+
+                            if (File.Exists(videoFilePath))
+                            {
+                                outputTextBox.AppendText($"Video: '{videoFileName}' already exists. Skipping...\r\n");
+                            }
+                            else
+                            {
+                                using (var client = new HttpClient())
+                                {
+                                    var response = await client.GetAsync(data.Url);
+                                    response.EnsureSuccessStatusCode();
+
+                                    using (var stream = await response.Content.ReadAsStreamAsync())
+                                    using (var fileStream = File.Create(videoFilePath))
+                                    {
+                                        await stream.CopyToAsync(fileStream);
+                                    }
+                                }
+
+                                outputTextBox.AppendText($"Downloaded Video: '{videoFileName}' successfully.\r\n");
+                                await File.AppendAllTextAsync(indexFilePath, $"{data.Id}\n");
+                            }
                         }
                     }
 
-                    // Optionally download avatars if the checkbox is checked
                     if (downloadAvatarsCheckBox.Checked)
                     {
-                        await DownloadAvatars(data, url, username, UseOldFileStructure);
+                        await DownloadAvatars(data, url, username);
                         LogMessage(logFilePath, "Download Avatars Checkbox is Active.");
                     }
 
-                    return; // Download successful, exit the method
+                    return;
                 }
                 catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.TooManyRequests)
                 {
-                    outputTextBox.AppendText($"Error: The video download failed with a 429 error: {url}\r\n");
+                    outputTextBox.AppendText($"Error: The media download failed with a 429 error: {url}\r\n");
                     outputTextBox.AppendText("Retrying in 5 seconds...\r\n");
-                    LogMessage(logFilePath, $"Error: The video download failed with a 429 error: {ex.Message}");
+                    LogMessage(logFilePath, $"Error: The media download failed with a 429 error: {ex.Message}");
                     await Task.Delay(5000);
                 }
                 catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
                 {
-                    outputTextBox.AppendText($"Error: The video download failed with a 404 error: {url}\r\n");
-                    LogMessage(logFilePath, $"Error: The video download failed with a 404 error: {ex.Message}");
-                    break; // Do not retry on 404 error
+                    outputTextBox.AppendText($"Error: The media download failed with a 404 error: {url}\r\n");
+                    LogMessage(logFilePath, $"Error: The media download failed with a 404 error: {ex.Message}");
+                    break;
                 }
                 catch (HttpRequestException ex)
                 {
@@ -1017,12 +1233,12 @@ namespace TikTok_Downloader
                 }
                 catch (TargetInvocationException ex)
                 {
-                    outputTextBox.AppendText($"Error: TargetInvocationException occurred: {ex.InnerException?.Message}\\r\n");
+                    outputTextBox.AppendText($"Error: TargetInvocationException occurred: {ex.InnerException?.Message}\r\n");
                     outputTextBox.AppendText($"Inner Exception 1: {ex.InnerException?.InnerException?.Message}\r\n");
                     outputTextBox.AppendText($"Inner Exception 2: {ex.InnerException?.InnerException?.InnerException?.Message}\r\n");
                     LogMessage(logFilePath, $"Error: TargetInvocationException occurred: {ex.InnerException?.Message}");
                 }
-                catch (JsonNet.JsonException ex)
+                catch (JsonSoft.JsonException ex)
                 {
                     outputTextBox.AppendText($"Error: An error occurred while processing JSON response: {ex.Message}\r\n");
                     outputTextBox.AppendText("Retrying in 5 seconds...\n");
@@ -1047,17 +1263,17 @@ namespace TikTok_Downloader
             }
         }
 
-        private async Task DownloadAvatars(VideoData data, string url, string username, bool useOldFileStructure)
+        private async Task DownloadAvatars(VideoData data, string url, string username)
         {
             try
             {
                 string userFolderPath = Path.Combine(downloadFolderPath, username);
                 string avatarsFolderPath = Path.Combine(userFolderPath, "Avatars");
-                avatarsFolderPath = useOldFileStructure ? Path.Combine(userFolderPath, "Avatars", $"Avatars_{username}") : avatarsFolderPath;
+                string indexFilePath = Path.Combine(userFolderPath, $"{username}_index.txt");
 
                 if (Directory.Exists(avatarsFolderPath) && Directory.GetFiles(avatarsFolderPath).Length > 0)
                 {
-                    //outputTextBox.AppendText($"Avatars for user '{username}' already exist. Skipping avatar download.\r\n");
+                    LogError($"Error: Avatars folder already exists for user: {username}");
                     return;
                 }
 
@@ -1070,26 +1286,27 @@ namespace TikTok_Downloader
                 {
                     foreach (var avatarUrl in data.AvatarUrls)
                     {
-                        string fileName = $"Avatar_{data.AvatarUrls.IndexOf(avatarUrl)}.jpeg";
-                        string filePath = Path.Combine(avatarsFolderPath, fileName);
+                        string avatarFileName = $"{username}_{data.AvatarUrls.IndexOf(avatarUrl)}.jpeg";
+                        string avatarFilePath = Path.Combine(avatarsFolderPath, avatarFileName);
 
-                        if (File.Exists(filePath))
+                        if (File.Exists(avatarFilePath))
                         {
-                            outputTextBox.AppendText($"Avatar: '{fileName}' already exists. Skipping\r\n");
+                            outputTextBox.AppendText($"Avatar: '{avatarFileName}' already exists. Skipping\r\n");
                             continue;
                         }
 
                         using (var client = new HttpClient())
                         {
                             using (var stream = await client.GetStreamAsync(avatarUrl))
-                            using (var fileStream = File.Create(filePath))
+                            using (var fileStream = File.Create(avatarFilePath))
                             {
                                 await stream.CopyToAsync(fileStream);
                             }
                         }
 
-                        outputTextBox.AppendText($"Downloaded Avatar From '{username}' Successfully...\r\n");
-                        LogDownload(fileName, avatarUrl);
+                        outputTextBox.AppendText($"Downloaded Avatar From '{avatarFileName}' Successfully...\r\n");
+                        await File.AppendAllTextAsync(indexFilePath, $"{username}_{data.AvatarUrls.IndexOf(avatarUrl)}\r\n");
+                        LogDownload(avatarFileName, avatarUrl);
                     }
                 }
                 else
@@ -1101,26 +1318,27 @@ namespace TikTok_Downloader
                 {
                     foreach (var gifAvatarUrl in data.GifAvatarUrls)
                     {
-                        string fileName = $"GifAvatar_{data.GifAvatarUrls.IndexOf(gifAvatarUrl)}.gif";
-                        string filePath = Path.Combine(avatarsFolderPath, fileName);
+                        string gifAvatarfileName = $"{username}_GIF_{data.GifAvatarUrls.IndexOf(gifAvatarUrl)}.gif";
+                        string gifAvatarfilePath = Path.Combine(avatarsFolderPath, gifAvatarfileName);
 
-                        if (File.Exists(filePath))
+                        if (File.Exists(gifAvatarfilePath))
                         {
-                            //outputTextBox.AppendText($"GIF Avatar: '{fileName}' already exists. Skipping\r\n");
+                            LogError($"Error: Avatars folder already exists for user: {username}");
                             continue;
                         }
 
                         using (var client = new HttpClient())
                         {
                             using (var stream = await client.GetStreamAsync(gifAvatarUrl))
-                            using (var fileStream = File.Create(filePath))
+                            using (var fileStream = File.Create(gifAvatarfilePath))
                             {
                                 await stream.CopyToAsync(fileStream);
                             }
                         }
 
-                        outputTextBox.AppendText($"Downloaded GIF Avatar from '{username}' Successfully...\r\n");
-                        LogDownload(fileName, gifAvatarUrl);
+                        outputTextBox.AppendText($"Downloaded GIF Avatar from '{gifAvatarfileName}' Successfully...\r\n");
+                        await File.AppendAllTextAsync(indexFilePath, $"{username}_GIF_{data.GifAvatarUrls.IndexOf(gifAvatarUrl)}\r\n");
+                        LogDownload(gifAvatarfileName, gifAvatarUrl);
                     }
                 }
                 else
@@ -1211,32 +1429,47 @@ namespace TikTok_Downloader
         {
             string url = "https://api.jettcodey.de/ttd/update/update.json";
 
-            using (HttpClient client = new HttpClient())
+            try
             {
-                var response = client.GetStringAsync(url).Result;
-                var latestVersionInfo = JsonSoft.JsonConvert.DeserializeObject<VersionInfo>(response);
-
-                // Compare versions
-                Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
-                Version latestVersion = new Version(latestVersionInfo.Version);
-
-                if (latestVersion > currentVersion)
+                using (HttpClient client = new HttpClient())
                 {
-                    string tempFolder = Path.Combine(Path.GetTempPath(), "update");
-                    Directory.CreateDirectory(tempFolder);
-                    DownloadFiles(latestVersionInfo.Files, tempFolder);
+                    var response = client.GetStringAsync(url).Result;
+                    var latestVersionInfo = JsonSoft.JsonConvert.DeserializeObject<VersionInfo>(response);
 
-                    DialogResult result = MessageBox.Show("New updates are available. Would you like to restart the application to apply updates?", "Update Available", MessageBoxButtons.YesNo);
-                    if (result == DialogResult.Yes)
+                    // Compare versions
+                    Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                    Version latestVersion = new Version(latestVersionInfo.Version);
+
+                    if (latestVersion > currentVersion)
                     {
-                        CreateBatchFile(tempFolder); // Generate Update.bat
-                        Application.Exit();
+                        string tempFolder = Path.Combine(Path.GetTempPath(), "update");
+                        Directory.CreateDirectory(tempFolder);
+                        DownloadFiles(latestVersionInfo.Files, tempFolder);
+
+                        DialogResult result = MessageBox.Show("New updates are available. Would you like to restart the application to apply updates?", "Update Available", MessageBoxButtons.YesNo);
+                        if (result == DialogResult.Yes)
+                        {
+                            CreateBatchFile(tempFolder); // Generate Update.bat
+                            Application.Exit();
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("You are already using the latest version.");
                     }
                 }
-                else
-                {
-                    MessageBox.Show("You are already using the latest version.");
-                }
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                MessageBox.Show("You´re sending Too Many Requests to The Update Server!", "Too Many Requests!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                MessageBox.Show("Update Server Not Found!, Please Check the Github Repository for further Information", "Update Server Not Found", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (HttpRequestException ex)
+            {
+                MessageBox.Show($"An error occurred while checking for updates: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -1317,11 +1550,6 @@ namespace TikTok_Downloader
             CheckForUpdates();
         }
 
-        public void SetUseOldFileStructure(bool value)
-        {
-            useOldFileStructure = value;
-        }
-
         public void LogJsonCheckBox(bool value)
         {
             logJsonEnabled = value;
@@ -1342,11 +1570,6 @@ namespace TikTok_Downloader
         public void DownloadImagesOnlyCheckBox(bool value)
         {
             DownloadImagesOnly = value;
-        }
-
-        private void outputTextBox_TextChanged(object sender, EventArgs e)
-        {
-
         }
 
         private async void LinkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -1397,21 +1620,6 @@ namespace TikTok_Downloader
                 noWatermarkCheckBox.Visible = false;
                 noWatermarkCheckBox.Checked = false;
             }
-        }
-
-        private void progressBar_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void fileToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void filePathTextBox_TextChanged(object sender, EventArgs e)
-        {
-
         }
 
         private void downloadAvatarsCheckBox_CheckedChanged(object sender, EventArgs e)
