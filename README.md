@@ -105,7 +105,7 @@ After installing TikTok Downloader, open the application and complete the First-
 - **Mass Download by Username**
 - **Mass Download from Text File Links**
 - **HD Download Single Video**
-- **HD Download´From Text File Links**
+- **HD Download From Text File Links**
 
 ### 🛠️ How to Use Each Option:
 
@@ -118,7 +118,7 @@ After installing TikTok Downloader, open the application and complete the First-
 - Solve a simple puzzle to verify you're human, and accept/deny cookies (these will be deleted post-download). 
 - When prompted with a Login Popup, select **"Continue as Guest"**. 
 - The browser will scroll through the profile, saving links to a text file (`Username_combined_links.txt`) in the default storage location. 
-- The downloader will then retrieve all video/image posts from the saved links.
+- The downloader will then retrieve all video/image posts from the saved links and begin Downloading.
 
 #### 3. Mass Download from Text File Links
 - Create a `.txt` file with each TikTok link* on a new line. 

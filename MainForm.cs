@@ -21,10 +21,6 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
-using System.Linq.Expressions;
-using System.Security.Policy;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using System;
 
 namespace TikTok_Downloader
@@ -337,11 +333,15 @@ namespace TikTok_Downloader
                 string HDUrl = urlTextBox.Text.Trim();
                 await HDGetMediaID(HDUrl);
             }
-            else if (choice == "HD Download´From Text File Links")
+            else if (choice == "HD Download From Text File Links")
             {
                 string filePath = urlTextBox.Text.Trim();
                 LogMessage(logFilePath, $"Selected file path: {filePath}");
                 await HDVideoDownloadFromTextFile(filePath);
+            }
+            else if (choice == "HD Mass Download by Username")
+            {
+                await MassDownloadByUsername();
             }
         }
 
@@ -524,7 +524,15 @@ namespace TikTok_Downloader
                 LogMessage(logFilePath, "Browser Page and context closed successfully");
 
                 // Download all Videos and Images from the combined links file
-                await DownloadFromCombinedLinksFile(combinedLinksFilePath);
+                string choice = cmbChoice.SelectedItem.ToString();
+                if (choice == "Mass Download by Username")
+                {
+                    await DownloadFromCombinedLinksFile(combinedLinksFilePath);
+                }
+                else if (choice == "HD Mass Download by Username")
+                {
+                    await HDVideoDownloadFromTextFile(combinedLinksFilePath);
+                }
             }
             catch (Exception ex)
             {
@@ -788,22 +796,29 @@ namespace TikTok_Downloader
                 MessageBox.Show("Error: The provided file path does not exist.", "File Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
             var urls = await File.ReadAllLinesAsync(filePath);
             LogMessage(logFilePath, $"Read {urls.Length} URLs from file: {filePath}");
+
             progressBar.Minimum = 0;
             progressBar.Maximum = urls.Length;
             progressBar.Value = 0;
+
             using (var settingsDialog = new SettingsDialog(this))
             {
+
                 foreach (var url in urls)
                 {
-                    string HDUrl = url.Trim();
-                    if (!string.IsNullOrEmpty(HDUrl))
+                    string trimmedUrl = url.Trim();
+                    if (!string.IsNullOrEmpty(trimmedUrl))
                     {
-                        LogMessage(logFilePath, $"Downloading HD Video {HDUrl} ...");
-                        await HDGetMediaID(HDUrl);
+                        LogMessage(logFilePath, $"Downloading {trimmedUrl} ...");
+
+                        await HDVideoDownload(trimmedUrl);
+
                         progressBar.Value++;
-                        await Task.Delay(1000);
+
+                        await Task.Delay(2000);
                     }
                 }
             }
@@ -1070,7 +1085,7 @@ namespace TikTok_Downloader
                     {
                         // Extract username and video ID from the TikTok URL
                         var videoURL = await GetMediaUrl(tiktokUrl);
-                        string username = Regex.Match(tiktokUrl, @"@(\w+)").Groups[1].Value;
+                        string username = await ExtractUsernameFromUrl(tiktokUrl);
                         string videoId = Regex.Match(tiktokUrl, @"/video/(\d+)").Groups[1].Value;
                         string userFolderPath = Path.Combine(downloadFolderPath, username);
                         string indexFilePath = Path.Combine(userFolderPath, $"{username}_index.txt");
@@ -1427,7 +1442,8 @@ namespace TikTok_Downloader
 
         private void CheckForUpdates()
         {
-            string url = "https://api.jettcodey.de/ttd/update/update.json";
+            //string url = "https://api.jettcodey.de/ttd/update/update.json";
+            string url = "https://api.jettcodey.de/ttd/dev_update/dev_update.json"; //  Dev Update Server URL
 
             try
             {
@@ -1444,18 +1460,18 @@ namespace TikTok_Downloader
                     {
                         string tempFolder = Path.Combine(Path.GetTempPath(), "update");
                         Directory.CreateDirectory(tempFolder);
-                        DownloadFiles(latestVersionInfo.Files, tempFolder);
 
-                        DialogResult result = MessageBox.Show("New updates are available. Would you like to restart the application to apply updates?", "Update Available", MessageBoxButtons.YesNo);
+                        DialogResult result = MessageBox.Show($"New Version {latestVersionInfo.Version} available. Would you like to restart the application to apply updates?\nIf you don't trust this Updater, you can always install the latest version from the Github Repository", "Update Available", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                         if (result == DialogResult.Yes)
                         {
+                            DownloadFiles(latestVersionInfo.Files, tempFolder);
                             CreateBatchFile(tempFolder); // Generate Update.bat
                             Application.Exit();
                         }
                     }
                     else
                     {
-                        MessageBox.Show("You are already using the latest version.");
+                        MessageBox.Show($"You are already using the latest Version {latestVersionInfo.Version}.", "No Updates Available", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
             }

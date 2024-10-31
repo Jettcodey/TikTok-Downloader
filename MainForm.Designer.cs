@@ -98,7 +98,7 @@ namespace TikTok_Downloader
             // cmbChoice
             // 
             cmbChoice.FormattingEnabled = true;
-            cmbChoice.Items.AddRange(new object[] { "Single Video/Image Download", "Mass Download by Username", "Mass Download from Text File Links", "HD Download Single Video", "HD Download´From Text File Links" });
+            cmbChoice.Items.AddRange(new object[] { "Single Video/Image Download", "Mass Download by Username", "Mass Download from Text File Links", "HD Download Single Video", "HD Download From Text File Links", "HD Mass Download by Username" });
             cmbChoice.Location = new Point(149, 36);
             cmbChoice.Name = "cmbChoice";
             cmbChoice.Size = new Size(275, 23);
@@ -368,6 +368,13 @@ namespace TikTok_Downloader
                     urlTextBox.PlaceholderText = "Enter/Select Path to Text File";
                     label3.Text = "HD Download Text file:";
                     browseFileButton.Visible = true;
+                    withWatermarkCheckBox.Visible = false;
+                    downloadAvatarsCheckBox.Visible = false;
+                    break;
+                case 5:
+                    urlTextBox.PlaceholderText = "HD Mass Download by Username";
+                    label3.Text = "HD Download by Username:";
+                    browseFileButton.Visible = false;
                     withWatermarkCheckBox.Visible = false;
                     downloadAvatarsCheckBox.Visible = false;
                     break;
