@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TikTok Downloader", "TikTok Downloader.csproj", "{33037B65-91C7-4289-ABA1-69D46E402375}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TikTok Downloader", "src\TikTok Downloader.csproj", "{33037B65-91C7-4289-ABA1-69D46E402375}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

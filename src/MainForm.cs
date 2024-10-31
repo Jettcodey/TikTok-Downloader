@@ -43,6 +43,7 @@ namespace TikTok_Downloader
 
         private bool isLoggingInitialized = false;
         public AppSettings AppSettings => settings;
+        private CacheManager cacheManager;
 
         private Task LogSystemInformation(string logFilePath)
         {
@@ -96,6 +97,7 @@ namespace TikTok_Downloader
         public MainForm()
         {
             InitializeComponent();
+            cacheManager = new CacheManager();
             settings = new AppSettings();
             LoadSettingsatbeginning();
             InitializeLoggingFolder();
@@ -1465,7 +1467,7 @@ namespace TikTok_Downloader
                         if (result == DialogResult.Yes)
                         {
                             DownloadFiles(latestVersionInfo.Files, tempFolder);
-                            CreateBatchFile(tempFolder); // Generate Update.bat
+                            CreateBatchFile(tempFolder, latestVersionInfo.Version); // Generate Update.bat
                             Application.Exit();
                         }
                     }
@@ -1489,7 +1491,7 @@ namespace TikTok_Downloader
             }
         }
 
-        private void CreateBatchFile(string tempFolder)
+        private void CreateBatchFile(string tempFolder, string newVersion)
         {
             string appFolder = AppDomain.CurrentDomain.BaseDirectory;
             string batchFilePath = Path.Combine(Path.GetTempPath(), "update.bat");
@@ -1505,6 +1507,8 @@ namespace TikTok_Downloader
                     string destinationPath = Path.Combine(appFolder, fileName);
                     writer.WriteLine($"copy /y \"{file}\" \"{destinationPath}\"");
                 }
+
+                writer.WriteLine($"reg add \"HKEY_LOCAL_MACHINE\\SOFTWARE\\Jettcodey\\TikTok Downloader\" /v Version /t REG_SZ /d \"{newVersion}\" /f");
 
                 writer.WriteLine($"rmdir /s /q \"{tempFolder}\"");
             }
