@@ -373,7 +373,7 @@ namespace TikTok_Downloader
                     break;
                 case 5:
                     urlTextBox.PlaceholderText = "HD Mass Download by Username";
-                    label3.Text = "HD Download by Username:";
+                    label3.Text = "HD Download Username:";
                     browseFileButton.Visible = false;
                     withWatermarkCheckBox.Visible = false;
                     downloadAvatarsCheckBox.Visible = false;

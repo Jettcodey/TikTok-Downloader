@@ -106,6 +106,7 @@ After installing TikTok Downloader, open the application and complete the First-
 - **Mass Download from Text File Links**
 - **HD Download Single Video**
 - **HD Download From Text File Links**
+- **HD Download By Username**
 
 ### 🛠️ How to Use Each Option:
 
@@ -130,6 +131,9 @@ After installing TikTok Downloader, open the application and complete the First-
 
 #### 5. HD Download from Text File Links
 - Similar to the Mass Download from Text File Links option, but this can Only download **Videos** in HD quality.
+
+#### 6. HD Download by Username
+-  Similar to the Download by Username option, but this can Only download **Videos** in HD quality.
 
 \* TikTok Links format: `https://www.tiktok.com/@user/video|photo/123456789` or `https://vm.tiktok.com/a1b2c3d4`.  
 **TikTok Profile Links format: `https://www.tiktok.com/@user`.

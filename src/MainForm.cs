@@ -1444,8 +1444,8 @@ namespace TikTok_Downloader
 
         private void CheckForUpdates()
         {
-            //string url = "https://api.jettcodey.de/ttd/update/update.json";
-            string url = "https://api.jettcodey.de/ttd/dev_update/dev_update.json"; //  Dev Update Server URL
+            string url = "https://api.jettcodey.de/ttd/update/update.json";
+            //string url = "https://api.jettcodey.de/ttd/dev_update/dev_update.json"; //  Dev Update Server URL
 
             try
             {
