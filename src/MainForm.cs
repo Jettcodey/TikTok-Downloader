@@ -1077,68 +1077,75 @@ namespace TikTok_Downloader
             string apiEndpoint = "https://www.tikwm.com/api/";
             using (HttpClient client = new HttpClient())
             {
-                var urlWithParams = $"{apiEndpoint}?url={tiktokUrl}&hd=1"; // Set hd=1 for HD download
-                HttpResponseMessage response = await client.GetAsync(urlWithParams);
-                if (response.IsSuccessStatusCode)
-                {
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    dynamic responseData = JsonSoft.JsonConvert.DeserializeObject(responseBody);
-                    if (responseData.code == 0)
+                try
+                {    var urlWithParams = $"{apiEndpoint}?url={tiktokUrl}&hd=1"; // Set hd=1 for HD download
+                    HttpResponseMessage response = await client.GetAsync(urlWithParams);
+                    if (response.IsSuccessStatusCode)
                     {
-                        // Extract username and video ID from the TikTok URL
-                        var videoURL = await GetMediaUrl(tiktokUrl);
-                        string username = await ExtractUsernameFromUrl(tiktokUrl);
-                        string videoId = Regex.Match(tiktokUrl, @"/video/(\d+)").Groups[1].Value;
-                        string userFolderPath = Path.Combine(downloadFolderPath, username);
-                        string indexFilePath = Path.Combine(userFolderPath, $"{username}_index.txt");
-
-                        if (!Directory.Exists(userFolderPath))
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        dynamic responseData = JsonSoft.JsonConvert.DeserializeObject(responseBody);
+                        if (responseData.code == 0)
                         {
-                            Directory.CreateDirectory(userFolderPath);
-                        }
+                            // Extract username and video ID from the TikTok URL
+                            var videoURL = await GetMediaUrl(tiktokUrl);
+                            string username = await ExtractUsernameFromUrl(tiktokUrl);
+                            string videoId = Regex.Match(tiktokUrl, @"/video/(\d+)").Groups[1].Value;
+                            string userFolderPath = Path.Combine(downloadFolderPath, username);
+                            string indexFilePath = Path.Combine(userFolderPath, $"{username}_index.txt");
 
-                        string videosFolderPath = Path.Combine(userFolderPath, "Videos");
-                        if (!Directory.Exists(videosFolderPath))
-                        {
-                            Directory.CreateDirectory(videosFolderPath);
-                        }
-
-                        string filename = $"{videoId}_HD.mp4";
-                        string fullPath = Path.Combine(videosFolderPath, filename);
-                        LogMessage(logFilePath, $"HD Video File Saved to {fullPath}.");
-
-                        bool videoAlreadyDownloaded = false;
-                        if (File.Exists(indexFilePath))
-                        {
-                            var downloadedIds = await File.ReadAllLinesAsync(indexFilePath);
-                            var HDVideoPattern = $"{videoId}_HD";
-                            if (downloadedIds.Any(id => Regex.IsMatch(id, HDVideoPattern)))
+                            if (!Directory.Exists(userFolderPath))
                             {
-                                outputTextBox.AppendText($"Media {videoId} already downloaded. Skipping...\r\n");
-                                videoAlreadyDownloaded = true;
+                                Directory.CreateDirectory(userFolderPath);
                             }
-                        }
 
-                        if (!videoAlreadyDownloaded)
-                        {
-                            string videoUrl = responseData.data.hdplay; // Get HD video URL
-                            byte[] videoData = await client.GetByteArrayAsync(videoUrl);
-                            await File.WriteAllBytesAsync(fullPath, videoData);
-                            outputTextBox.AppendText($"Downloading HD Video from User: {username}\r\nDownloaded HD Video: '{filename}' Successfully...\r\n");
+                            string videosFolderPath = Path.Combine(userFolderPath, "Videos");
+                            if (!Directory.Exists(videosFolderPath))
+                            {
+                                Directory.CreateDirectory(videosFolderPath);
+                            }
 
-                            await File.AppendAllTextAsync(indexFilePath, $"{videoId}_HD\n");
-                        }
+                            string filename = $"{videoId}_HD.mp4";
+                            string fullPath = Path.Combine(videosFolderPath, filename);
+                            LogMessage(logFilePath, $"HD Video File Saved to {fullPath}.");
+
+                            bool videoAlreadyDownloaded = false;
+                            if (File.Exists(indexFilePath))
+                            {
+                                var downloadedIds = await File.ReadAllLinesAsync(indexFilePath);
+                                var HDVideoPattern = $"{videoId}_HD";
+                                if (downloadedIds.Any(id => Regex.IsMatch(id, HDVideoPattern)))
+                                {
+                                    outputTextBox.AppendText($"Media {videoId} already downloaded. Skipping...\r\n");
+                                    videoAlreadyDownloaded = true;
+                                }
+                            }
+
+                            if (!videoAlreadyDownloaded)
+                            {
+                                string videoUrl = responseData.data.hdplay; // Get HD video URL
+                                byte[] videoData = await client.GetByteArrayAsync(videoUrl);
+                                await File.WriteAllBytesAsync(fullPath, videoData);
+                                outputTextBox.AppendText($"Downloading HD Video from User: {username}\r\nDownloaded HD Video: '{filename}' Successfully...\r\n");
+
+                                await File.AppendAllTextAsync(indexFilePath, $"{videoId}_HD\n");
+                            }
                         
+                        }
+                        else
+                        {
+                            outputTextBox.AppendText($"Error: {responseData.message}\r\n");
+                        }
                     }
                     else
                     {
-                        outputTextBox.AppendText($"Error: {responseData.message}\r\n");
+                        outputTextBox.AppendText("Error: Unable to download video in HD\r\n");
                     }
                 }
-                else
+                catch (HttpRequestException)
                 {
-                    outputTextBox.AppendText("Error: Unable to download video in HD\r\n");
-                }
+                    outputTextBox.AppendText($"Small Cooldown, Continue after 5 Seconds.\r\n");
+                    await Task.Delay(5000);
+                }               
             }
         }
 
