@@ -22,6 +22,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using System;
+using System.Text;
 
 namespace TikTok_Downloader
 {
@@ -808,7 +809,6 @@ namespace TikTok_Downloader
 
             using (var settingsDialog = new SettingsDialog(this))
             {
-
                 foreach (var url in urls)
                 {
                     string trimmedUrl = url.Trim();
@@ -819,8 +819,6 @@ namespace TikTok_Downloader
                         await HDVideoDownload(trimmedUrl);
 
                         progressBar.Value++;
-
-                        await Task.Delay(2000);
                     }
                 }
             }
@@ -830,23 +828,35 @@ namespace TikTok_Downloader
         {
             try
             {
-                if (url.Contains("/photo/"))
+                string redirectedUrl = url;
+
+                if (url.Contains("vm.tiktok.com"))
                 {
-                    outputTextBox.AppendText($"Blocked URL: Image/Photo URLs are not allowed: {url}\r\n");
+                    redirectedUrl = await GetRedirectUrl(url);
+                }
+
+                if (redirectedUrl.Contains("/photo/"))
+                {
+                    int photoIndex = redirectedUrl.IndexOf("/photo/") + 7;
+                    string beforePhoto = redirectedUrl.Substring(0, photoIndex);
+                    string afterPhoto = redirectedUrl.Substring(photoIndex, Math.Min(19, redirectedUrl.Length - photoIndex));
+                    outputTextBox.AppendText($"Image/Photo URL Skipped: {beforePhoto}{afterPhoto}\r\n");
                     return string.Empty;
                 }
 
-                if (url.Contains("/video/"))
+                if (redirectedUrl.Contains("/video/"))
                 {
-                    string redirectedUrl = await GetRedirectUrl(url);
-
-                    if (redirectedUrl.Contains("/photo/"))
+                    var match = Regex.Match(redirectedUrl, @"/video/(\d+)");
+                    if (match.Success)
                     {
-                        outputTextBox.AppendText($"Blocked URL: Image/Photo URLs are not allowed after redirection: {redirectedUrl}\r\n");
+                        string videoId = match.Groups[1].Value;
+                        return videoId;
+                    }
+                    else
+                    {
+                        outputTextBox.AppendText($"Invalid URL: Could not extract video ID from {redirectedUrl}\r\n");
                         return string.Empty;
                     }
-
-                    return redirectedUrl;
                 }
 
                 outputTextBox.AppendText($"Invalid URL: Not a Video URL! URL provided: {url}\r\n");
@@ -930,31 +940,39 @@ namespace TikTok_Downloader
             }
         }
 
+        private static string lastCheckedUsername = string.Empty;
+
         private async Task<VideoData?> GetMedia(string url, bool withWatermark, bool noWatermark)
         {
             var MediaID = await GetMediaID(url);
             var username = await ExtractUsernameFromUrl(url);
+
             string userFolderPath = Path.Combine(downloadFolderPath, username);
             string indexFilePath = Path.Combine(userFolderPath, $"{username}_index.txt");
 
+            if (username != lastCheckedUsername)
+            {
+                lastCheckedUsername = username;
+            }
+
+            bool videoAlreadyDownloaded = false;
+
             if (File.Exists(indexFilePath))
             {
-                var downloadedIds = File.ReadLines(indexFilePath).ToList();
+                var downloadedIds = await ReadDownloadedIdsInChunks(indexFilePath);
 
                 if (downloadAvatarsCheckBox.Checked)
                 {
-                    // Check for Avatar_{indexNumber} (Normal Avatars)
                     var avatarIndexNumberPattern = $"{username}_\\d+";
-                    bool normalAvatarsExist = downloadedIds.Any(id => Regex.IsMatch(id, avatarIndexNumberPattern));
+                    bool normalAvatarsExist = downloadedIds.Any(id => id.StartsWith($"{username}_") && !id.Contains("GIF"));
                     if (normalAvatarsExist)
                     {
                         outputTextBox.AppendText($"Avatars for Media {username} already downloaded. Skipping...\r\n");
                         return null;
                     }
 
-                    // Check for GifAvatar_{indexNumber} (GIF Avatars)
                     var gifAvatarIndexNumberPattern = $"{username}_GIF_\\d+";
-                    if (downloadedIds.Any(id => Regex.IsMatch(id, gifAvatarIndexNumberPattern)))
+                    if (downloadedIds.Any(id => id.StartsWith($"{username}_GIF_") && !id.Contains("Watermark")))
                     {
                         outputTextBox.AppendText($"GIF Avatars for Media {username} already downloaded. Skipping...\r\n");
                         return null;
@@ -963,21 +981,26 @@ namespace TikTok_Downloader
 
                 if (!downloadAvatarsCheckBox.Checked)
                 {
-                    // Check for MediaID (Videos)
                     if (downloadedIds.Contains(MediaID))
                     {
                         outputTextBox.AppendText($"Media {MediaID} already downloaded. Skipping...\r\n");
-                        return null;
+                        videoAlreadyDownloaded = true;
                     }
-
-                    // Check for MediaID_{indexNumber} (Images)
-                    var indexNumberPattern = $"{MediaID}_\\d+";
-                    if (downloadedIds.Any(id => Regex.IsMatch(id, indexNumberPattern)))
+                    else
                     {
-                        outputTextBox.AppendText($"Media {MediaID} already downloaded. Skipping...\r\n");
-                        return null;
+                        var indexNumberPattern = $"{MediaID}_";
+                        if (downloadedIds.Any(id => id.StartsWith(indexNumberPattern)))
+                        {
+                            outputTextBox.AppendText($"Media {MediaID} already downloaded. Skipping...\r\n");
+                            videoAlreadyDownloaded = true;
+                        }
                     }
                 }
+            }
+
+            if (videoAlreadyDownloaded)
+            {
+                return null;
             }
 
             var apiUrl = $"https://api22-normal-c-alisg.tiktokv.com/aweme/v1/feed/?aweme_id={MediaID}&iid=7238789370386695942&device_id=7238787983025079814&resolution=1080*2400&channel=googleplay&app_name=musical_ly&version_code=350103&device_platform=android&device_type=Pixel+7&os_version=13";
@@ -1072,81 +1095,154 @@ namespace TikTok_Downloader
             }
         }
 
-        private async Task HDVideoDownload(string tiktokUrl) // Third-party API endpoint!
+        private async Task HDVideoDownload(string tiktokUrl)
         {
+            string videoId = await GetMediaUrl(tiktokUrl);
+            if (string.IsNullOrEmpty(videoId))
+            {
+                return; // If videoId is empty, it means the URL was blocked (photo URL)
+            }
+
             string apiEndpoint = "https://www.tikwm.com/api/";
             using (HttpClient client = new HttpClient())
             {
                 try
-                {    var urlWithParams = $"{apiEndpoint}?url={tiktokUrl}&hd=1"; // Set hd=1 for HD download
+                {
+                    var urlWithParams = $"{apiEndpoint}?url=https://www.tiktok.com/video/{videoId}&hd=1"; // Set hd=1 for HD download
                     HttpResponseMessage response = await client.GetAsync(urlWithParams);
+
                     if (response.IsSuccessStatusCode)
                     {
                         string responseBody = await response.Content.ReadAsStringAsync();
                         dynamic responseData = JsonSoft.JsonConvert.DeserializeObject(responseBody);
+
                         if (responseData.code == 0)
                         {
-                            // Extract username and video ID from the TikTok URL
-                            var videoURL = await GetMediaUrl(tiktokUrl);
                             string username = await ExtractUsernameFromUrl(tiktokUrl);
-                            string videoId = Regex.Match(tiktokUrl, @"/video/(\d+)").Groups[1].Value;
                             string userFolderPath = Path.Combine(downloadFolderPath, username);
                             string indexFilePath = Path.Combine(userFolderPath, $"{username}_index.txt");
 
-                            if (!Directory.Exists(userFolderPath))
-                            {
-                                Directory.CreateDirectory(userFolderPath);
-                            }
-
+                            Directory.CreateDirectory(userFolderPath);
                             string videosFolderPath = Path.Combine(userFolderPath, "Videos");
-                            if (!Directory.Exists(videosFolderPath))
-                            {
-                                Directory.CreateDirectory(videosFolderPath);
-                            }
+                            Directory.CreateDirectory(videosFolderPath);
 
                             string filename = $"{videoId}_HD.mp4";
                             string fullPath = Path.Combine(videosFolderPath, filename);
                             LogMessage(logFilePath, $"HD Video File Saved to {fullPath}.");
 
                             bool videoAlreadyDownloaded = false;
+                            Dictionary<string, HashSet<string>> usernameToDownloadedIds = new Dictionary<string, HashSet<string>>();
                             if (File.Exists(indexFilePath))
                             {
-                                var downloadedIds = await File.ReadAllLinesAsync(indexFilePath);
+                                var downloadedIds = await ReadDownloadedIdsInChunks(indexFilePath);
                                 var HDVideoPattern = $"{videoId}_HD";
+
+                                // Check if this videoId is already in the list of downloaded videos for the same user
                                 if (downloadedIds.Any(id => Regex.IsMatch(id, HDVideoPattern)))
                                 {
                                     outputTextBox.AppendText($"Media {videoId} already downloaded. Skipping...\r\n");
                                     videoAlreadyDownloaded = true;
+                                }
+                                else
+                                {
+                                    foreach (var line in downloadedIds)
+                                    {
+                                        var split = line.Split('_');
+                                        if (split.Length > 1)
+                                        {
+                                            string idUsername = split[0];
+                                            if (!usernameToDownloadedIds.ContainsKey(idUsername))
+                                            {
+                                                usernameToDownloadedIds[idUsername] = new HashSet<string>();
+                                            }
+                                            usernameToDownloadedIds[idUsername].Add(line);
+                                        }
+                                    }
+
+                                    if (!usernameToDownloadedIds.ContainsKey(username))
+                                    {
+                                        username = await ExtractUsernameFromUrl(tiktokUrl);
+                                    }
                                 }
                             }
 
                             if (!videoAlreadyDownloaded)
                             {
                                 string videoUrl = responseData.data.hdplay; // Get HD video URL
-                                byte[] videoData = await client.GetByteArrayAsync(videoUrl);
-                                await File.WriteAllBytesAsync(fullPath, videoData);
-                                outputTextBox.AppendText($"Downloading HD Video from User: {username}\r\nDownloaded HD Video: '{filename}' Successfully...\r\n");
+                                string hdSize = responseData.data.hd_size.ToString();
+
+                                if (string.IsNullOrEmpty(videoUrl) || hdSize == "0")
+                                {
+                                    return; // Exit if invalid or zero size
+                                }
+
+                                outputTextBox.AppendText($"Downloading HD Video from User: {username}\r\n");
+
+                                await DownloadVideoWithBufferedWrite(client, videoUrl, fullPath);
 
                                 await File.AppendAllTextAsync(indexFilePath, $"{videoId}_HD\n");
+                                outputTextBox.AppendText($"Downloaded HD Video: '{filename}' Successfully...\r\n");
                             }
-                        
                         }
                         else
                         {
-                            outputTextBox.AppendText($"Error: {responseData.message}\r\n");
+                            await Task.Delay(2000);
+                            await HDVideoDownload(tiktokUrl);
                         }
                     }
                     else
                     {
-                        outputTextBox.AppendText("Error: Unable to download video in HD\r\n");
+                        outputTextBox.AppendText("Error: Unable to download video in HD.\r\n");
                     }
                 }
                 catch (HttpRequestException)
                 {
                     outputTextBox.AppendText($"Small Cooldown, Continue after 5 Seconds.\r\n");
                     await Task.Delay(5000);
-                }               
+                }
             }
+        }
+
+        private async Task DownloadVideoWithBufferedWrite(HttpClient client, string videoUrl, string fullPath)
+        {
+            using (var responseStream = await client.GetStreamAsync(videoUrl))
+            using (var fileStream = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
+            {
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+
+                while ((bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                {
+                    await fileStream.WriteAsync(buffer, 0, bytesRead);
+                }
+            }
+        }
+
+        private async Task<HashSet<string>> ReadDownloadedIdsInChunks(string indexFilePath)
+        {
+            var downloadedIds = new HashSet<string>();
+
+            using (var reader = new StreamReader(indexFilePath, Encoding.UTF8, true, 8192))
+            {
+                char[] buffer = new char[8192];
+                int charsRead;
+
+                while ((charsRead = await reader.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                {
+                    string chunk = new string(buffer, 0, charsRead);
+                    var lines = chunk.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (var line in lines)
+                    {
+                        if (!string.IsNullOrWhiteSpace(line))
+                        {
+                            downloadedIds.Add(line.Trim());
+                        }
+                    }
+                }
+            }
+
+            return downloadedIds;
         }
 
         private async Task DownloadMedia(VideoData data, string url, bool withWatermark, bool noWatermark)
