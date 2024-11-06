@@ -16,7 +16,6 @@ namespace TikTok_Downloader
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             menuStrip1 = new MenuStrip();
-            menuStrip1.Renderer = new MyRenderer();
             fileToolStripMenuItem = new ToolStripMenuItem();
             ChangeDownloadFolderToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
@@ -30,6 +29,7 @@ namespace TikTok_Downloader
             withWatermarkCheckBox = new CheckBox();
             downloadAvatarsCheckBox = new CheckBox();
             progressBar = new ProgressBar();
+            pauseButton = new Button();
             outputTextBox = new TextBox();
             label3 = new Label();
             label2 = new Label();
@@ -41,7 +41,6 @@ namespace TikTok_Downloader
             // menuStrip1
             // 
             menuStrip1.BackColor = Color.FromArgb(32, 32, 32);
-            menuStrip1.Renderer = new MyRenderer();
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
@@ -93,7 +92,6 @@ namespace TikTok_Downloader
             checkForUpdateToolStripMenuItem.Size = new Size(208, 22);
             checkForUpdateToolStripMenuItem.Text = "Check for Update";
             checkForUpdateToolStripMenuItem.Click += checkForUpdateToolStripMenuItem_Click;
-            checkForUpdateToolStripMenuItem.Visible = true;
             // 
             // cmbChoice
             // 
@@ -164,7 +162,6 @@ namespace TikTok_Downloader
             withWatermarkCheckBox.Text = "With Watermark";
             withWatermarkCheckBox.TextAlign = ContentAlignment.TopLeft;
             withWatermarkCheckBox.UseVisualStyleBackColor = false;
-            withWatermarkCheckBox.Visible = true;
             withWatermarkCheckBox.CheckedChanged += withWatermarkCheckBox_CheckedChanged;
             // 
             // downloadAvatarsCheckBox
@@ -180,15 +177,25 @@ namespace TikTok_Downloader
             downloadAvatarsCheckBox.Text = "Download Avatars";
             downloadAvatarsCheckBox.TextAlign = ContentAlignment.TopLeft;
             downloadAvatarsCheckBox.UseVisualStyleBackColor = false;
-            downloadAvatarsCheckBox.Visible = true;
             downloadAvatarsCheckBox.CheckedChanged += downloadAvatarsCheckBox_CheckedChanged;
             // 
             // progressBar
             // 
             progressBar.Location = new Point(12, 133);
             progressBar.Name = "progressBar";
-            progressBar.Size = new Size(510, 22);
+            progressBar.Size = new Size(412, 22);
             progressBar.TabIndex = 3;
+            //
+            // Pause Button
+            //
+            pauseButton.BackColor = SystemColors.Control;
+            pauseButton.Location = new Point(434, 133);
+            pauseButton.Name = "pauseButton";
+            pauseButton.Size = new Size(88, 23);
+            pauseButton.TabIndex = 5;
+            pauseButton.Text = "Pause";
+            pauseButton.UseVisualStyleBackColor = true;
+            pauseButton.Click += pauseButton_Click;
             // 
             // outputTextBox
             // 
@@ -268,6 +275,7 @@ namespace TikTok_Downloader
             Controls.Add(withWatermarkCheckBox);
             Controls.Add(downloadAvatarsCheckBox);
             Controls.Add(progressBar);
+            Controls.Add(pauseButton);
             Controls.Add(outputTextBox);
             Controls.Add(label3);
             Controls.Add(label2);
@@ -300,6 +308,7 @@ namespace TikTok_Downloader
         private CheckBox withWatermarkCheckBox;
         private CheckBox downloadAvatarsCheckBox;
         private ProgressBar progressBar;
+        private Button pauseButton;
         private TextBox outputTextBox;
         private Label label3;
         private Label label2;

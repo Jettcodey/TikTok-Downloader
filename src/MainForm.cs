@@ -23,6 +23,7 @@ using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using System;
 using System.Text;
+using System.Threading;
 
 namespace TikTok_Downloader
 {
@@ -43,6 +44,8 @@ namespace TikTok_Downloader
         private List<string> cachedVideoUrls = new List<string>();
 
         private bool isLoggingInitialized = false;
+        private bool _isPaused = false;
+        private CancellationTokenSource _cancellationTokenSource;
         public AppSettings AppSettings => settings;
         private CacheManager cacheManager;
 
@@ -1657,6 +1660,23 @@ namespace TikTok_Downloader
                     urlTextBox.Text = openFileDialog.FileName;
                     LogMessage(logFilePath, $"Selected file path: {openFileDialog.FileName}");
                 }
+            }
+        }
+
+        private void pauseButton_Click(object sender, EventArgs e)
+        {
+            if (_isPaused)
+            {
+                _cancellationTokenSource = new CancellationTokenSource();
+                _isPaused = false;
+                pauseButton.Text = "Pause";
+                //resumeDownload();
+            }
+            else
+            {
+                _cancellationTokenSource?.Cancel();
+                _isPaused = true;
+                pauseButton.Text = "Resume";
             }
         }
 
