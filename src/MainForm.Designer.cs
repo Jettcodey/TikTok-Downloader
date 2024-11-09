@@ -16,6 +16,7 @@ namespace TikTok_Downloader
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             menuStrip1 = new MenuStrip();
+            // menuStrip1.Renderer = new MyRenderer();  <-- Cause VS Removes this Line everytime
             menuStrip1.Renderer = new MyRenderer();
             fileToolStripMenuItem = new ToolStripMenuItem();
             ChangeDownloadFolderToolStripMenuItem = new ToolStripMenuItem();
@@ -43,6 +44,7 @@ namespace TikTok_Downloader
             // menuStrip1
             // 
             menuStrip1.BackColor = Color.FromArgb(32, 32, 32);
+            // menuStrip1.Renderer = new MyRenderer();  <-- Cause VS Removes this Line everytime
             menuStrip1.Renderer = new MyRenderer();
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);

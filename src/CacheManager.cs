@@ -1,4 +1,12 @@
-﻿using System;
+﻿/*
+##########################################
+#           TikTok Downloader            #
+#           Made by Jettcodey            #
+#                © 2024                  #
+#           DO NOT REMOVE THIS           #
+##########################################
+*/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Clock = System.Timers;
