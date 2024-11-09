@@ -16,6 +16,7 @@ namespace TikTok_Downloader
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             menuStrip1 = new MenuStrip();
+            menuStrip1.Renderer = new MyRenderer();
             fileToolStripMenuItem = new ToolStripMenuItem();
             ChangeDownloadFolderToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
@@ -30,6 +31,7 @@ namespace TikTok_Downloader
             downloadAvatarsCheckBox = new CheckBox();
             progressBar = new ProgressBar();
             pauseButton = new Button();
+            stopButton = new Button();
             outputTextBox = new TextBox();
             label3 = new Label();
             label2 = new Label();
@@ -41,6 +43,7 @@ namespace TikTok_Downloader
             // menuStrip1
             // 
             menuStrip1.BackColor = Color.FromArgb(32, 32, 32);
+            menuStrip1.Renderer = new MyRenderer();
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
@@ -183,19 +186,33 @@ namespace TikTok_Downloader
             // 
             progressBar.Location = new Point(12, 133);
             progressBar.Name = "progressBar";
-            progressBar.Size = new Size(412, 22);
+            progressBar.Size = new Size(412, 25);
             progressBar.TabIndex = 3;
-            //
-            // Pause Button
-            //
+            // 
+            // pauseButton
+            // 
             pauseButton.BackColor = SystemColors.Control;
-            pauseButton.Location = new Point(434, 133);
+            pauseButton.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            pauseButton.Location = new Point(430, 133);
             pauseButton.Name = "pauseButton";
-            pauseButton.Size = new Size(88, 23);
+            pauseButton.RightToLeft = RightToLeft.Yes;
+            pauseButton.Size = new Size(30, 25);
             pauseButton.TabIndex = 5;
-            pauseButton.Text = "Pause";
+            pauseButton.Text = "||";
+            pauseButton.TextImageRelation = TextImageRelation.TextBeforeImage;
             pauseButton.UseVisualStyleBackColor = true;
             pauseButton.Click += pauseButton_Click;
+            // 
+            // stopButton
+            // 
+            stopButton.BackColor = SystemColors.Control;
+            stopButton.Location = new Point(466, 133);
+            stopButton.Name = "stopButton";
+            stopButton.Size = new Size(56, 25);
+            stopButton.TabIndex = 5;
+            stopButton.Text = "Stop";
+            stopButton.UseVisualStyleBackColor = true;
+            stopButton.Click += stopButton_Click;
             // 
             // outputTextBox
             // 
@@ -276,6 +293,7 @@ namespace TikTok_Downloader
             Controls.Add(downloadAvatarsCheckBox);
             Controls.Add(progressBar);
             Controls.Add(pauseButton);
+            Controls.Add(stopButton);
             Controls.Add(outputTextBox);
             Controls.Add(label3);
             Controls.Add(label2);
@@ -309,6 +327,7 @@ namespace TikTok_Downloader
         private CheckBox downloadAvatarsCheckBox;
         private ProgressBar progressBar;
         private Button pauseButton;
+        private Button stopButton;
         private TextBox outputTextBox;
         private Label label3;
         private Label label2;
