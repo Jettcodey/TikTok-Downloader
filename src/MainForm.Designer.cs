@@ -101,7 +101,7 @@ namespace TikTok_Downloader
             // cmbChoice
             // 
             cmbChoice.FormattingEnabled = true;
-            cmbChoice.Items.AddRange(new object[] { "Single Video/Image Download", "Mass Download by Username", "Mass Download from Text File Links", "HD Download Single Video", "HD Download From Text File Links", "HD Mass Download by Username" });
+            cmbChoice.Items.AddRange(new object[] { "Single Video/Image Download", "Mass Download from Text File Links", "Mass Download by Username", "HD Download Single Video", "HD Download From Text File Links", "HD Mass Download by Username" });
             cmbChoice.Location = new Point(149, 36);
             cmbChoice.Name = "cmbChoice";
             cmbChoice.Size = new Size(275, 23);
@@ -374,21 +374,21 @@ namespace TikTok_Downloader
                     downloadAvatarsCheckBox.Visible = true;
                     break;
                 case 1:
-                    urlTextBox.PlaceholderText = "Enter TikTok link/Username";
-                    label3.Text = "Download by Username:";
-                    browseFileButton.Visible = false;
-                    withWatermarkCheckBox.Visible = true;
-                    downloadAvatarsCheckBox.Visible = true;
-                    break;
-                case 2:
                     urlTextBox.PlaceholderText = "Enter/Select Path to Text File";
                     label3.Text = "Download from Text file:";
                     browseFileButton.Visible = true;
                     withWatermarkCheckBox.Visible = true;
                     downloadAvatarsCheckBox.Visible = true;
                     break;
+                case 2:
+                    urlTextBox.PlaceholderText = "Enter TikTok link/Username";
+                    label3.Text = "Download by Username:";
+                    browseFileButton.Visible = false;
+                    withWatermarkCheckBox.Visible = true;
+                    downloadAvatarsCheckBox.Visible = true;
+                    break;
                 case 3:
-                    urlTextBox.PlaceholderText = "HD Download Single Video";
+                    urlTextBox.PlaceholderText = "Enter TikTok Video Link";
                     label3.Text = "HD Download Video:";
                     browseFileButton.Visible = false;
                     withWatermarkCheckBox.Visible = false;
@@ -402,7 +402,7 @@ namespace TikTok_Downloader
                     downloadAvatarsCheckBox.Visible = false;
                     break;
                 case 5:
-                    urlTextBox.PlaceholderText = "HD Mass Download by Username";
+                    urlTextBox.PlaceholderText = "Enter TikTok link/Username";
                     label3.Text = "HD Download Username:";
                     browseFileButton.Visible = false;
                     withWatermarkCheckBox.Visible = false;

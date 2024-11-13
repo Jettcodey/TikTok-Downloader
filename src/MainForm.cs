@@ -1256,7 +1256,11 @@ namespace TikTok_Downloader
 
                                 if (string.IsNullOrEmpty(videoUrl) || hdSize == "0")
                                 {
-                                    return; // Exit if invalid or zero size
+                                    //outputTextBox.AppendText($"Error: Unable to download HD video for MediaID: {videoId}\r\n");
+                                    Task.Delay(2000, token).Wait();
+                                    //outputTextBox.AppendText($"Task.Delay(2000.token).Wait(); Triggered\r\n");
+                                    await HDVideoDownload(tiktokUrl, token);
+                                    //return; // Exit if invalid or zero size
                                 }
 
                                 AppendTextToOutput($"Downloading HD Video from User: {username}\r\n");
@@ -1267,13 +1271,22 @@ namespace TikTok_Downloader
                                 {
                                     try
                                     {
+                                        outputTextBox.AppendText($"{videoId}\r\n");
                                         await DownloadVideoWithBufferedWrite(client, videoUrl, fullPath, token);
                                         success = true;
                                     }
                                     catch (OperationCanceledException)
                                     {
-                                        outputTextBox.AppendText("Download Canceled.\r\n");
-                                        return;
+                                        retryCount--;
+                                        if (retryCount > 0)
+                                        {
+                                            outputTextBox.AppendText("Connection lost. Retrying download...\r\n");
+                                        }
+                                        else
+                                        {
+                                            outputTextBox.AppendText($"Failed to Download {videoId}\r\n");
+                                            return;
+                                        }
                                     }
                                     catch (IOException ex) when (ex.InnerException is SocketException)
                                     {
@@ -1296,6 +1309,7 @@ namespace TikTok_Downloader
                         }
                         else
                         {
+                            //outputTextBox.AppendText("Delay 2000, token Triggered.\r\n");
                             await Task.Delay(2000, token);
                             await HDVideoDownload(tiktokUrl, token);
                         }
@@ -1336,6 +1350,7 @@ namespace TikTok_Downloader
                         if (!string.IsNullOrWhiteSpace(line))
                         {
                             downloadedIds.Add(line.Trim());
+                            //outputTextBox.AppendText($"Downloaded ID: {line}\r\n");
                         }
                     }
                 }
@@ -1482,6 +1497,11 @@ namespace TikTok_Downloader
             if (File.Exists(fullPath))
             {
                 totalBytesRead = new FileInfo(fullPath).Length;
+            }
+            else
+            {
+                //AppendTextToOutput($"Delay 1900, token Triggered\r\n");
+                await Task.Delay(1900, token);
             }
 
             using (var response = await client.GetAsync(videoUrl, HttpCompletionOption.ResponseHeadersRead, token))
