@@ -52,7 +52,7 @@ namespace TikTok_Downloader
             titleLabel.BackColor = Color.Transparent;
             titleLabel.Font = new Font("Arial", 12F, FontStyle.Bold);
             titleLabel.ForeColor = Color.Aquamarine;
-            titleLabel.Location = new Point(40, 27);
+            titleLabel.Location = new Point(46, 24);
             titleLabel.Name = "titleLabel";
             titleLabel.Size = new Size(157, 19);
             titleLabel.TabIndex = 0;
@@ -63,7 +63,7 @@ namespace TikTok_Downloader
             versionLabel.AutoSize = true;
             versionLabel.BackColor = Color.Transparent;
             versionLabel.ForeColor = Color.Aqua;
-            versionLabel.Location = new Point(60, 65);
+            versionLabel.Location = new Point(65, 65);
             versionLabel.Name = "versionLabel";
             versionLabel.Size = new Size(117, 15);
             versionLabel.TabIndex = 1;
@@ -74,7 +74,7 @@ namespace TikTok_Downloader
             descriptionLabel.AutoSize = true;
             descriptionLabel.BackColor = Color.Transparent;
             descriptionLabel.ForeColor = Color.Aqua;
-            descriptionLabel.Location = new Point(21, 128);
+            descriptionLabel.Location = new Point(26, 128);
             descriptionLabel.Name = "descriptionLabel";
             descriptionLabel.Size = new Size(196, 15);
             descriptionLabel.TabIndex = 2;
@@ -83,7 +83,7 @@ namespace TikTok_Downloader
             // okButton
             // 
             okButton.BackColor = SystemColors.Control;
-            okButton.Location = new Point(80, 175);
+            okButton.Location = new Point(86, 175);
             okButton.Name = "okButton";
             okButton.Size = new Size(75, 23);
             okButton.TabIndex = 3;
@@ -96,7 +96,7 @@ namespace TikTok_Downloader
             linkLabel.AutoSize = true;
             linkLabel.BackColor = Color.Transparent;
             linkLabel.LinkColor = Color.Aquamarine;
-            linkLabel.Location = new Point(20, 145);
+            linkLabel.Location = new Point(25, 145);
             linkLabel.Name = "linkLabel";
             linkLabel.Size = new Size(199, 15);
             linkLabel.TabIndex = 5;
@@ -110,7 +110,7 @@ namespace TikTok_Downloader
             label2.AutoSize = true;
             label2.BackColor = Color.Transparent;
             label2.ForeColor = Color.Aqua;
-            label2.Location = new Point(65, 80);
+            label2.Location = new Point(71, 80);
             label2.Name = "label2";
             label2.Size = new Size(107, 15);
             label2.TabIndex = 7;
@@ -122,7 +122,7 @@ namespace TikTok_Downloader
             AutoScaleMode = AutoScaleMode.Dpi;
             BackColor = SystemColors.ControlDarkDark;
             BackgroundImage = Properties.Resources.bg;
-            ClientSize = new Size(240, 217);
+            ClientSize = new Size(246, 217);
             Controls.Add(label2);
             Controls.Add(linkLabel);
             Controls.Add(titleLabel);
