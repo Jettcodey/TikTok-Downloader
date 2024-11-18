@@ -885,35 +885,23 @@ namespace TikTok_Downloader
         {
             try
             {
-                string redirectedUrl = url;
-
-                if (url.Contains("vm.tiktok.com"))
+                if (url.Contains("/photo/"))
                 {
-                    redirectedUrl = await GetRedirectUrl(url, token);
-                }
-
-                if (redirectedUrl.Contains("/photo/"))
-                {
-                    int photoIndex = redirectedUrl.IndexOf("/photo/") + 7;
-                    string beforePhoto = redirectedUrl.Substring(0, photoIndex);
-                    string afterPhoto = redirectedUrl.Substring(photoIndex, Math.Min(19, redirectedUrl.Length - photoIndex));
-                    outputTextBox.AppendText($"Image/Photo URL Skipped: {beforePhoto}{afterPhoto}\r\n");
+                    outputTextBox.AppendText($"Blocked URL: Image/Photo URLs are not allowed: {url}\r\n");
                     return string.Empty;
                 }
 
-                if (redirectedUrl.Contains("/video/"))
+                if (url.Contains("/video/"))
                 {
-                    var match = Regex.Match(redirectedUrl, @"/video/(\d+)");
-                    if (match.Success)
+                    string redirectedUrl = await GetRedirectUrl(url, token);
+
+                    if (redirectedUrl.Contains("/photo/"))
                     {
-                        string videoId = match.Groups[1].Value;
-                        return videoId;
-                    }
-                    else
-                    {
-                        outputTextBox.AppendText($"Invalid URL: Could not extract video ID from {redirectedUrl}\r\n");
+                        outputTextBox.AppendText($"Blocked URL: Image/Photo URLs are not allowed after redirection: {redirectedUrl}\r\n");
                         return string.Empty;
                     }
+
+                    return redirectedUrl;
                 }
 
                 outputTextBox.AppendText($"Invalid URL: Not a Video URL! URL provided: {url}\r\n");
@@ -950,12 +938,12 @@ namespace TikTok_Downloader
                 var matching = url.Contains("/video/");
                 var matchingPhoto = url.Contains("/photo/");
                 var startIndex = url.IndexOf("/video/") + 7;
-                var endIndex = url.IndexOf("/video/") + 26;
+                var endIndex = startIndex + 19;
 
                 if (matchingPhoto)
                 {
                     startIndex = url.IndexOf("/photo/") + 7;
-                    endIndex = url.IndexOf("/photo/") + 26;
+                    endIndex = startIndex + 19;
                 }
                 else if (!matching)
                 {
@@ -967,7 +955,21 @@ namespace TikTok_Downloader
                     return string.Empty;
                 }
 
-                if (endIndex > url.Length || startIndex < 0 || endIndex < startIndex)
+                if (endIndex > url.Length)
+                {
+                    endIndex = startIndex + 18;
+                    if (endIndex > url.Length || endIndex <= startIndex)
+                    {
+                        if (!token.IsCancellationRequested)
+                        {
+                            outputTextBox.AppendText($"Error: Invalid URL format or insufficient length - {url}\r\n");
+                            LogMessage(logFilePath, $"Error: Invalid URL format or insufficient length - {url}");
+                        }
+                        return string.Empty;
+                    }
+                }
+
+                if (startIndex < 0 || endIndex < startIndex)
                 {
                     if (!token.IsCancellationRequested)
                     {
@@ -1114,11 +1116,20 @@ namespace TikTok_Downloader
                     var data = JsonSoft.JsonConvert.DeserializeObject<ApiData>(json);
                     if (data?.aweme_list == null || data.aweme_list.Count == 0)
                     {
+                        LogError($"No aweme_list found in JSON response for MediaID: {MediaID}");
                         outputTextBox.AppendText($"Error: No aweme_list found in JSON response for MediaID: {MediaID}\r\n");
                         return null;
                     }
 
                     var video = data.aweme_list.FirstOrDefault();
+
+                    if (video?.aweme_id != MediaID)
+                    {
+                        LogError($"MediaID mismatch in JSON response for MediaID: {MediaID}");
+                        outputTextBox.AppendText($"Error: MediaID mismatch in JSON response for MediaID: {MediaID}\r\n");
+                        return null;
+                    }
+
                     var urlMedia = noWatermark ? video?.video?.play_addr?.url_list.FirstOrDefault()
                                                : (withWatermark ? video?.video?.download_addr?.url_list.FirstOrDefault()
                                                                 : video?.video?.play_addr?.url_list.FirstOrDefault());
@@ -1183,7 +1194,7 @@ namespace TikTok_Downloader
             string videoId = await GetMediaUrl(tiktokUrl, token);
             if (string.IsNullOrEmpty(videoId))
             {
-                return; // If videoId is empty, it means the URL was blocked (photo URL)
+                return; // If videoId is empty, it means the URL was blocked or invalid (photo URL)
             }
 
             string apiEndpoint = "https://www.tikwm.com/api/";
@@ -1191,7 +1202,7 @@ namespace TikTok_Downloader
             {
                 try
                 {
-                    var urlWithParams = $"{apiEndpoint}?url=https://www.tiktok.com/video/{videoId}&hd=1"; // Set hd=1 for HD download
+                    var urlWithParams = $"{apiEndpoint}?url={videoId}&hd=1"; // Set hd=1 for HD download
                     HttpResponseMessage response = await client.GetAsync(urlWithParams, token);
 
                     if (response.IsSuccessStatusCode)
