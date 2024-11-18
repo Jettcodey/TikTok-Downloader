@@ -885,23 +885,35 @@ namespace TikTok_Downloader
         {
             try
             {
-                if (url.Contains("/photo/"))
+                string redirectedUrl = url;
+
+                if (url.Contains("vm.tiktok.com"))
                 {
-                    outputTextBox.AppendText($"Blocked URL: Image/Photo URLs are not allowed: {url}\r\n");
+                    redirectedUrl = await GetRedirectUrl(url, token);
+                }
+
+                if (redirectedUrl.Contains("/photo/"))
+                {
+                    int photoIndex = redirectedUrl.IndexOf("/photo/") + 7;
+                    string beforePhoto = redirectedUrl.Substring(0, photoIndex);
+                    string afterPhoto = redirectedUrl.Substring(photoIndex, Math.Min(19, redirectedUrl.Length - photoIndex));
+                    outputTextBox.AppendText($"Image/Photo URL Skipped: {beforePhoto}{afterPhoto}\r\n");
                     return string.Empty;
                 }
 
-                if (url.Contains("/video/"))
+                if (redirectedUrl.Contains("/video/"))
                 {
-                    string redirectedUrl = await GetRedirectUrl(url, token);
-
-                    if (redirectedUrl.Contains("/photo/"))
+                    var match = Regex.Match(redirectedUrl, @"/video/(\d+)");
+                    if (match.Success)
                     {
-                        outputTextBox.AppendText($"Blocked URL: Image/Photo URLs are not allowed after redirection: {redirectedUrl}\r\n");
+                        var videoId = redirectedUrl;
+                        return videoId;
+                    }
+                    else
+                    {
+                        outputTextBox.AppendText($"Invalid URL: Could not extract video ID from {redirectedUrl}\r\n");
                         return string.Empty;
                     }
-
-                    return redirectedUrl;
                 }
 
                 outputTextBox.AppendText($"Invalid URL: Not a Video URL! URL provided: {url}\r\n");
@@ -1220,7 +1232,17 @@ namespace TikTok_Downloader
                             string videosFolderPath = Path.Combine(userFolderPath, "Videos");
                             Directory.CreateDirectory(videosFolderPath);
 
+                            var videoIdPattern = @"(?:https:\/\/www\.tiktok\.com\/(?:@[\w\.]+\/video\/))(\d+)";
+                            var match = Regex.Match(videoId, videoIdPattern);
+
+                            var Vid = match.Groups[1].Value;
+                            
                             string filename = $"{videoId}_HD.mp4";
+                            if (match.Success)
+                            {
+                                filename = $"{match.Groups[1].Value}_HD.mp4";
+                            }
+
                             string fullPath = Path.Combine(videosFolderPath, filename);
                             LogMessage(logFilePath, $"HD Video File Saved to {fullPath}.");
 
@@ -1229,12 +1251,11 @@ namespace TikTok_Downloader
                             if (File.Exists(indexFilePath))
                             {
                                 var downloadedIds = await ReadDownloadedIdsInChunks(indexFilePath, token);
-                                var HDVideoPattern = $"{videoId}_HD";
+                                var HDVideoPattern = $"{Vid}_HD";
 
-                                // Check if this videoId is already in the list of downloaded videos for the same user
                                 if (downloadedIds.Any(id => Regex.IsMatch(id, HDVideoPattern)))
                                 {
-                                    outputTextBox.AppendText($"Media {videoId} already downloaded. Skipping...\r\n");
+                                    outputTextBox.AppendText($"Media {filename} already downloaded. Skipping...\r\n");
                                     videoAlreadyDownloaded = true;
                                 }
                                 else
@@ -1285,6 +1306,7 @@ namespace TikTok_Downloader
                                         outputTextBox.AppendText($"{videoId}\r\n");
                                         await DownloadVideoWithBufferedWrite(client, videoUrl, fullPath, token);
                                         success = true;
+                                        //outputTextBox.AppendText($"Download returned Success\r\n");
                                     }
                                     catch (OperationCanceledException)
                                     {
@@ -1314,7 +1336,7 @@ namespace TikTok_Downloader
                                     }
                                 }
 
-                                await File.AppendAllTextAsync(indexFilePath, $"{videoId}_HD\n");
+                                await File.AppendAllTextAsync(indexFilePath, $"{Vid}_HD\n");
                                 outputTextBox.AppendText($"Downloaded HD Video: '{filename}' Successfully...\r\n");
                             }
                         }
