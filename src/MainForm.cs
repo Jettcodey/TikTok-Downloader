@@ -885,12 +885,16 @@ namespace TikTok_Downloader
         {
             try
             {
+                token.ThrowIfCancellationRequested();
+
                 string redirectedUrl = url;
 
                 if (url.Contains("vm.tiktok.com"))
                 {
                     redirectedUrl = await GetRedirectUrl(url, token);
                 }
+
+                token.ThrowIfCancellationRequested();
 
                 if (redirectedUrl.Contains("/photo/"))
                 {
@@ -900,6 +904,8 @@ namespace TikTok_Downloader
                     outputTextBox.AppendText($"Image/Photo URL Skipped: {beforePhoto}{afterPhoto}\r\n");
                     return string.Empty;
                 }
+
+                token.ThrowIfCancellationRequested();
 
                 if (redirectedUrl.Contains("/video/"))
                 {
@@ -919,10 +925,17 @@ namespace TikTok_Downloader
                 outputTextBox.AppendText($"Invalid URL: Not a Video URL! URL provided: {url}\r\n");
                 return string.Empty;
             }
+            catch (TaskCanceledException)
+            {
+                return string.Empty;
+            }
             catch (Exception ex)
             {
-                outputTextBox.AppendText($"Error occurred while extracting MediaID: {ex.Message} - {url}\r\n");
-                LogMessage(logFilePath, $"Error occurred while extracting MediaID: {ex.Message} - {url}");
+                if (!token.IsCancellationRequested)
+                {
+                    outputTextBox.AppendText($"Error occurred while extracting MediaID: {ex.Message} - {url}\r\n");
+                    LogMessage(logFilePath, $"Error occurred while extracting MediaID: {ex.Message} - {url}");
+                }
                 return string.Empty;
             }
         }
@@ -1308,6 +1321,10 @@ namespace TikTok_Downloader
                                         success = true;
                                         //outputTextBox.AppendText($"Download returned Success\r\n");
                                     }
+                                    catch (TaskCanceledException)
+                                    {
+                                        return;
+                                    }
                                     catch (OperationCanceledException)
                                     {
                                         retryCount--;
@@ -1536,6 +1553,8 @@ namespace TikTok_Downloader
                 //AppendTextToOutput($"Delay 1900, token Triggered\r\n");
                 await Task.Delay(1900, token);
             }
+
+            token.ThrowIfCancellationRequested();
 
             using (var response = await client.GetAsync(videoUrl, HttpCompletionOption.ResponseHeadersRead, token))
             {
