@@ -1543,37 +1543,68 @@ namespace TikTok_Downloader
 
         private async Task DownloadVideoWithBufferedWrite(HttpClient client, string videoUrl, string fullPath, CancellationToken token)
         {
-            long totalBytesRead = 0;
-            if (File.Exists(fullPath))
+            int retryCount = 3;
+            while (retryCount > 0)
             {
-                totalBytesRead = new FileInfo(fullPath).Length;
-            }
-            else
-            {
-                //AppendTextToOutput($"Delay 1900, token Triggered\r\n");
-                await Task.Delay(1900, token);
-            }
-
-            token.ThrowIfCancellationRequested();
-
-            using (var response = await client.GetAsync(videoUrl, HttpCompletionOption.ResponseHeadersRead, token))
-            {
-                response.EnsureSuccessStatusCode();
-
-                using (var responseStream = await response.Content.ReadAsStreamAsync(token))
-                using (var fileStream = new FileStream(fullPath, FileMode.Append, FileAccess.Write, FileShare.None, 8192, true))
+                try
                 {
-                    byte[] buffer = new byte[8192];
-                    int bytesRead;
-
-                    while ((bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length, token)) > 0)
+                    long totalBytesRead = 0;
+                    if (File.Exists(fullPath))
                     {
-                        await fileStream.WriteAsync(buffer, 0, bytesRead, token);
-                        totalBytesRead += bytesRead;
+                        totalBytesRead = new FileInfo(fullPath).Length;
+                    }
+                    else
+                    {
+                        //AppendTextToOutput($"Delay 1900, token Triggered\r\n");
+                        await Task.Delay(1900, token);
+                    }
 
-                        await CheckPauseStatusAsync();
+                    token.ThrowIfCancellationRequested();
+
+                    using (var response = await client.GetAsync(videoUrl, HttpCompletionOption.ResponseHeadersRead, token))
+                    {
+                        response.EnsureSuccessStatusCode();
+
+                        using (var responseStream = await response.Content.ReadAsStreamAsync(token))
+                        using (var fileStream = new FileStream(fullPath, FileMode.Append, FileAccess.Write, FileShare.None, 8192, true))
+                        {
+                            byte[] buffer = new byte[8192];
+                            int bytesRead;
+
+                            while ((bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length, token)) > 0)
+                            {
+                                await fileStream.WriteAsync(buffer, 0, bytesRead, token);
+                                totalBytesRead += bytesRead;
+
+                                await CheckPauseStatusAsync();
+                            }
+                        }
+
                     }
                 }
+                catch (TaskCanceledException)
+                {
+                    return;
+                }
+                catch (IOException ex) when (ex.InnerException is SocketException)
+                {
+                    retryCount--;
+                    if (retryCount > 0)
+                    {
+                        outputTextBox.AppendText("Connection lost. Retrying download...\r\n");
+                    }
+                    else
+                    {
+                        outputTextBox.AppendText("Failed to resume download after multiple attempts.\r\n");
+                        return;
+                    }
+                }
+                catch (HttpRequestException)
+                {
+                    outputTextBox.AppendText("Small Cooldown, Continue after 5 Seconds.\r\n");
+                    await Task.Delay(5000, token);
+                }
+
             }
         }
 
