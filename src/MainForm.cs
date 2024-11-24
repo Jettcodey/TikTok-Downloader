@@ -1599,10 +1599,15 @@ namespace TikTok_Downloader
                         return;
                     }
                 }
-                catch (HttpRequestException)
+                catch (IOException ex)
                 {
-                    outputTextBox.AppendText("Small Cooldown, Continue after 5 Seconds.\r\n");
-                    await Task.Delay(5000, token);
+                    
+                    if (!ex.Message.StartsWith("The response ended prematurely"))
+                    {
+                        outputTextBox.AppendText($"The API response ended prematurely. Retrying download...\r\n");
+                        LogError($"Error: {ex.Message}");
+                        Task.Delay(2000, token).Wait();
+                    }
                 }
 
             }
