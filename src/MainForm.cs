@@ -43,7 +43,7 @@ namespace TikTok_Downloader
         private readonly AppSettings settings;
         private SettingsDialog settingsDialog;
         private List<string> cachedVideoUrls = new List<string>();
-
+        private bool _stopLoggingForCooldown;
         private bool isLoggingInitialized = false;
         private bool _isPaused = false;
         private CancellationTokenSource _cancellationTokenSource;
@@ -199,7 +199,7 @@ namespace TikTok_Downloader
 
         private void LogMessage(string logFilePath, string message)
         {
-            if (!EnableDownloadLogs)
+            if (!EnableDownloadLogs || _stopLoggingForCooldown)
             {
                 return;
             }
@@ -210,8 +210,6 @@ namespace TikTok_Downloader
                 File.AppendAllText(logFilePath, $"{DateTime.Now}: {redactedMessage}\n");
             }
         }
-
-
 
         private void LogDownload(string fileName, string url)
         {
@@ -1886,10 +1884,16 @@ namespace TikTok_Downloader
 
         private void stopButton_Click(object sender, EventArgs e)
         {
-            _isPaused = false;
+            if (_isPaused)
+            {
+                pauseButton_Click(sender, e);
+            }
             _cancellationTokenSource?.Cancel();
             outputTextBox.AppendText("Download Stopped!\r\n");
             LogMessage(logFilePath, "Download got Stopped by User");
+            _stopLoggingForCooldown = true;
+            Task.Delay(1000).ContinueWith(_ => _stopLoggingForCooldown = false);
+
         }
 
         public void pauseButton_Click(object sender, EventArgs e)
