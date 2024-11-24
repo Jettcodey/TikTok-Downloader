@@ -1257,7 +1257,7 @@ namespace TikTok_Downloader
                             }
 
                             string fullPath = Path.Combine(videosFolderPath, filename);
-                            LogMessage(logFilePath, $"HD Video File Saved to {fullPath}.");
+
 
                             bool videoAlreadyDownloaded = false;
                             Dictionary<string, HashSet<string>> usernameToDownloadedIds = new Dictionary<string, HashSet<string>>();
@@ -1354,6 +1354,7 @@ namespace TikTok_Downloader
                                 }
 
                                 await File.AppendAllTextAsync(indexFilePath, $"{Vid}_HD\n");
+                                LogMessage(logFilePath, $"HD Video File Saved to {fullPath}.");
                                 outputTextBox.AppendText($"Downloaded HD Video: '{filename}' Successfully...\r\n");
                             }
                         }
@@ -1581,6 +1582,7 @@ namespace TikTok_Downloader
                         }
 
                     }
+                    return;
                 }
                 catch (TaskCanceledException)
                 {
@@ -1606,7 +1608,7 @@ namespace TikTok_Downloader
                     {
                         outputTextBox.AppendText($"The API response ended prematurely. Retrying download...\r\n");
                         LogError($"Error: {ex.Message}");
-                        Task.Delay(2000, token).Wait();
+                        return;
                     }
                 }
 
@@ -1884,12 +1886,13 @@ namespace TikTok_Downloader
 
         private void stopButton_Click(object sender, EventArgs e)
         {
+            _isPaused = false;
             _cancellationTokenSource?.Cancel();
             outputTextBox.AppendText("Download Stopped!\r\n");
             LogMessage(logFilePath, "Download got Stopped by User");
         }
 
-        private void pauseButton_Click(object sender, EventArgs e)
+        public void pauseButton_Click(object sender, EventArgs e)
         {
             if (_isPaused)
             {
