@@ -1763,7 +1763,7 @@ namespace TikTok_Downloader
             }
             else
             {
-                MessageBox.Show("Script1 failed to execute. Setup scripts cannot proceed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Script 1 failed to execute. Setup scripts cannot proceed.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
