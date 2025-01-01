@@ -367,3 +367,4 @@ FodyWeavers.xsd
 /.editorconfig
 /icon.png
 /src/.editorconfig
+/src/scripts/old
