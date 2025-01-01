@@ -163,7 +163,7 @@ namespace TikTok_Downloader
 
             if (currentSettings != null && !currentSettings.FirstRun)
             {
-                DialogResult result = MessageBox.Show("It seems this is your first time opening the application. If you want to use Firefox for mass downloading, you need to run the Firefox script first!", "Firefox Install Script", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                DialogResult result = MessageBox.Show("It seems this is your first time opening the application. If you want to use Firefox for mass downloading, you need to run the Firefox script first! Make sure Powershell 7 is Already Installed!", "Firefox Install Script", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
                     try
@@ -1743,7 +1743,7 @@ namespace TikTok_Downloader
             }
             else
             {
-                MessageBox.Show("The Firefox script failed to execute. Please try running the script manually again. If the issue persists, open an issue on GitHub.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("The Firefox script failed to execute. Please check if Powershell 7 is Installed & try running the script manually again. If the issue persists, open an issue on GitHub.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
