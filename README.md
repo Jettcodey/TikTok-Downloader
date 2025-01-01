@@ -43,15 +43,16 @@ C# and Microsoft Playwright
 **TikTok Downloader** is a Simple application that allows you to:
 
 - **Download individual Video or Image Posts**
+- **Download Videos in HD Quality**
 - **Mass Download Content** using Links from a Text file or by Username
 
-### 💾 Storage Information
+### 💾 App Information
 - **Install Location**: TikTok Downloader will be Installed at `C:\Program Files\Jettcodey\TikTok Downloader\TikTok Downloader`
 - **Default Location**: Downloads are saved in a folder on your desktop named `TikTokDownloads\{@Username}\`, organized into **Videos**, **Images**, and **Avatars**.
 - **Settings File**: Configuration is stored in the user's Documents folder at `Jettcodey\TikTok Downloader\appsettings.xml`.
 
 ### ❓ Questions?
-For any questions, feel free to Open an [Issue](https://github.com/Jettcodey/TikTok-Downloader/issues) or reach out on Discord: **`jettcodey`**.
+For any questions, feel free to [Open an Issue](https://github.com/Jettcodey/TikTok-Downloader/issues) or reach out to me on Discord: **`jettcodey`**.
 
 <p align="right"><a href="#tiktok-downloader">Back to top</a></p>
 
@@ -126,14 +127,8 @@ After installing TikTok Downloader, open the application and complete the First-
 - Select the **"Browse"** button to locate and choose your text file. 
 - Click **Download** to start the process.
 
-#### 4. HD Download Single Video
-- Similar to the Single Video/Image Download option, but this can Only download **Videos** in HD quality.
-
-#### 5. HD Download from Text File Links
-- Similar to the Mass Download from Text File Links option, but this can Only download **Videos** in HD quality.
-
-#### 6. HD Download by Username
--  Similar to the Download by Username option, but this can Only download **Videos** in HD quality.
+#### 4. The HD Variants
+The HD Variants are the Same but can Only download **Videos** in HD quality.
 
 \* TikTok Links format: `https://www.tiktok.com/@user/video|photo/123456789` or `https://vm.tiktok.com/a1b2c3d4`.  
 **TikTok Profile Links format: `https://www.tiktok.com/@user`.
