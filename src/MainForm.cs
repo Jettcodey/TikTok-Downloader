@@ -1226,7 +1226,7 @@ namespace TikTok_Downloader
                             if (File.Exists(indexFilePath))
                             {
                                 var downloadedIds = await ReadDownloadedIdsInChunks(indexFilePath, token);
-                                var HDVideoPattern = $"{Vid}_HD";
+                                var HDVideoPattern = $"{videoId}_HD";
 
                                 if (downloadedIds.Any(id => Regex.IsMatch(id, HDVideoPattern)))
                                 {
@@ -1320,7 +1320,7 @@ namespace TikTok_Downloader
                                     }
                                 }
 
-                                await File.AppendAllTextAsync(indexFilePath, $"{Vid}_HD\n");
+                                await File.AppendAllTextAsync(indexFilePath, $"{videoId}_HD\n");
                                 LogMessage(logFilePath, $"HD Video File Saved to {fullPath}");
                                 outputTextBox.AppendText($"Downloaded HD Video: '{filename}' Successfully...\r\n");
                             }
