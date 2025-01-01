@@ -318,6 +318,7 @@ namespace TikTok_Downloader
         private async void btnDownload_Click(object sender, EventArgs e)
         {
             outputTextBox.Clear();
+            progressBar.Value = 0;
             string choice = cmbChoice.SelectedItem.ToString();
             LogMessage(logFilePath, $"Selected option: {choice}");
             _cancellationTokenSource = new CancellationTokenSource();
@@ -1077,7 +1078,7 @@ namespace TikTok_Downloader
                     if (response.StatusCode == HttpStatusCode.TooManyRequests)
                     {
                         LogMessage(logFilePath, "Received a Http 429 error (TooManyRequests), retrying after 5 Second delay...");
-                        outputTextBox.AppendText($"The TikTok API received too many requests. Waiting 5 seconds before retrying the download...\r\n");
+                        outputTextBox.AppendText($"TikTok API received too many requests. Waiting 5 seconds before retrying the download...\r\n");
                         await Task.Delay(5000, token);
                         return await GetMedia(url, withWatermark, noWatermark, _cancellationTokenSource.Token);
                     }
