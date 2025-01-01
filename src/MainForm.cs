@@ -257,6 +257,7 @@ namespace TikTok_Downloader
             public string Id { get; set; } = string.Empty;
             public List<string> AvatarUrls { get; set; }
             public List<string> GifAvatarUrls { get; set; }
+            public string Name { get; set; } = string.Empty;
         }
 
         class ApiData
@@ -297,6 +298,7 @@ namespace TikTok_Downloader
         {
             public Avatar avatar_medium { get; set; } = new Avatar();
             public Avatar video_icon { get; set; } = new Avatar();
+            public string unique_Id { get; set; } = string.Empty;
         }
         class Avatar
         {
@@ -842,6 +844,7 @@ namespace TikTok_Downloader
                 token.ThrowIfCancellationRequested();
 
                 string redirectedUrl = url;
+                string videoId = string.Empty;
 
                 if (url.Contains("vm.tiktok.com"))
                 {
@@ -866,18 +869,17 @@ namespace TikTok_Downloader
                     var match = Regex.Match(redirectedUrl, @"/video/(\d+)");
                     if (match.Success)
                     {
-                        var videoId = redirectedUrl;
-                        return videoId;
-                    }
-                    else
-                    {
-                        outputTextBox.AppendText($"Invalid URL: Could not extract video ID from {redirectedUrl}\r\n");
-                        return string.Empty;
+                        videoId = match.Groups[1].Value;
                     }
                 }
 
-                outputTextBox.AppendText($"Invalid URL: Not a Video URL! URL provided: {url}\r\n");
-                return string.Empty;
+                if (!string.IsNullOrEmpty(videoId))
+                {
+                    return videoId;
+                }
+
+                // This is Stupid (I know and gonna fix it at somepoint maybe)
+                return redirectedUrl;
             }
             catch (TaskCanceledException)
             {
@@ -1116,6 +1118,7 @@ namespace TikTok_Downloader
                     var imageUrls = video?.image_post_info?.images?.Select(img => img.display_image.url_list.FirstOrDefault()).ToList();
                     var avatarUrls = video?.author?.avatar_medium?.url_list ?? new List<string>();
                     var gifAvatarUrls = video?.author?.video_icon?.url_list ?? new List<string>();
+                    var uniqueId = video?.author?.unique_Id;
 
                     if (urlMedia == null)
                     {
@@ -1144,7 +1147,8 @@ namespace TikTok_Downloader
                         Images = imageUrls ?? new List<string>(),
                         Id = MediaID,
                         AvatarUrls = avatarUrls,
-                        GifAvatarUrls = gifAvatarUrls
+                        GifAvatarUrls = gifAvatarUrls,
+                        Name = uniqueId?.ToString() ?? string.Empty,
                     };
                 }
                 catch (TaskCanceledException)
@@ -1177,6 +1181,9 @@ namespace TikTok_Downloader
                 return; // If videoId is empty, it means the URL was blocked or invalid (photo URL)
             }
 
+            // For Testing Purposes
+            //outputTextBox.AppendText($"This is the videoId: {videoId}\r\n");
+
             string apiEndpoint = "https://www.tikwm.com/api/";
             using (HttpClient client = new HttpClient())
             {
@@ -1192,7 +1199,7 @@ namespace TikTok_Downloader
 
                         if (responseData.code == 0)
                         {
-                            string username = await ExtractUsernameFromUrl(tiktokUrl, token);
+                            string username = responseData.data.author.unique_id;
                             string userFolderPath = Path.Combine(downloadFolderPath, username);
                             string indexFilePath = Path.Combine(userFolderPath, $"{username}_index.txt");
 
@@ -1245,7 +1252,7 @@ namespace TikTok_Downloader
 
                                     if (!usernameToDownloadedIds.ContainsKey(username))
                                     {
-                                        username = await ExtractUsernameFromUrl(tiktokUrl, token);
+                                        username = responseData.data.author.unique_id;
                                     }
                                 }
                             }
@@ -1378,7 +1385,7 @@ namespace TikTok_Downloader
             {
                 try
                 {
-                    string username = await ExtractUsernameFromUrl(url, _cancellationTokenSource.Token);
+                    string username = data.Name;
                     string userFolderPath = Path.Combine(downloadFolderPath, username);
                     string indexFilePath = Path.Combine(userFolderPath, $"{username}_index.txt");
 
