@@ -1475,6 +1475,12 @@ namespace TikTok_Downloader
                     LogMessage(logFilePath, $"Error: The media download failed with a 429 error: {ex.Message}");
                     await Task.Delay(5000, cancellationToken);
                 }
+                catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
+                {
+                    outputTextBox.AppendText($"Error: The download request was blocked by the API. This might be because your IP address is restricted. To resolve this, try connecting through a VPN and retrying the download.\r\n");
+                    LogMessage(logFilePath, $"Error: The media download failed with a 403 error: {ex.Message}");
+                    break;
+                }
                 catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
                 {
                     outputTextBox.AppendText($"Error: The media download failed with a 404 error: {url}\r\n");
