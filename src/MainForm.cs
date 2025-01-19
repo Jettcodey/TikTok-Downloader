@@ -180,7 +180,7 @@ namespace TikTok_Downloader
                 }
                 else
                 {
-                    MessageBox.Show("The feature 'Mass Download by Username' will not work with Firefox until the script has been run. If you want to use Firefox as your browser, you must execute the script manually.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("The feature '(HD)Mass Download by Username' will not work with Firefox until the script has been run. If you want to use Firefox as your browser, you must execute the script manually.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     currentSettings.FirstRun = true;
                     settings.SaveSettings();
                 }

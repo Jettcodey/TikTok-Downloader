@@ -33,6 +33,7 @@ namespace TikTok_Downloader
         private Label descriptionLabel;
         private Button okButton;
         private Label label2;
+        private Label label3;
         private LinkLabel linkLabel;
 
         private void InitializeComponent()
@@ -44,6 +45,7 @@ namespace TikTok_Downloader
             okButton = new Button();
             linkLabel = new LinkLabel();
             label2 = new Label();
+            label3 = new Label();
             SuspendLayout();
             // 
             // titleLabel
@@ -67,7 +69,7 @@ namespace TikTok_Downloader
             versionLabel.Name = "versionLabel";
             versionLabel.Size = new Size(117, 15);
             versionLabel.TabIndex = 1;
-            versionLabel.Text = "Version: Release 1.3.4";
+            versionLabel.Text = "Version: Release 1.3.5";
             // 
             // descriptionLabel
             // 
@@ -112,9 +114,20 @@ namespace TikTok_Downloader
             label2.ForeColor = Color.Aqua;
             label2.Location = new Point(71, 80);
             label2.Name = "label2";
-            label2.Size = new Size(107, 15);
+            label2.Size = new Size(109, 15);
             label2.TabIndex = 7;
             label2.Text = "TikTok Downloader";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.BackColor = Color.Transparent;
+            label3.ForeColor = Color.Aqua;
+            label3.Location = new Point(8, 95);
+            label3.Name = "label3";
+            label3.Size = new Size(234, 15);
+            label3.TabIndex = 8;
+            label3.Text = "Made w/ Love by Jettcodey && Contributors";
             // 
             // AboutWindow
             // 
@@ -124,6 +137,7 @@ namespace TikTok_Downloader
             BackgroundImage = Properties.Resources.bg;
             ClientSize = new Size(246, 217);
             Controls.Add(label2);
+            Controls.Add(label3);
             Controls.Add(linkLabel);
             Controls.Add(titleLabel);
             Controls.Add(versionLabel);
@@ -134,7 +148,7 @@ namespace TikTok_Downloader
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "AboutWindow";
-            Text = "TikTok Downloader by Jettcodey";
+            Text = "TikTok Downloader Version 1.3.5";
             ResumeLayout(false);
             PerformLayout();
         }
