@@ -1174,12 +1174,18 @@ namespace TikTok_Downloader
             }
         }
 
-        private async Task HDVideoDownload(string tiktokUrl, CancellationToken token)
+        private async Task HDVideoDownload(string tiktokUrl, CancellationToken token, int retryDepth = 0)
         {
             string videoId = await GetMediaUrl(tiktokUrl, token);
             if (string.IsNullOrEmpty(videoId))
             {
                 return; // If videoId is empty, it means the URL was blocked or invalid (photo URL)
+            }
+
+            if (retryDepth >= 3)
+            {
+                outputTextBox.AppendText($"Failed 3 retries... skipping video {videoId}.\r\n");
+                return;
             }
 
             // For Testing Purposes
@@ -1328,9 +1334,9 @@ namespace TikTok_Downloader
                         }
                         else
                         {
-                            //outputTextBox.AppendText("Delay 2000, token Triggered.\r\n");
+                            outputTextBox.AppendText($"Media {videoId} does not exist or token is rate limited, trying again {3 - retryDepth} times...\r\n");
                             await Task.Delay(2000, token);
-                            await HDVideoDownload(tiktokUrl, token);
+                            await HDVideoDownload(tiktokUrl, token, retryDepth + 1);
                         }
                     }
                     else
