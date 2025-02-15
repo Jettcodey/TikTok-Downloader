@@ -856,11 +856,11 @@ namespace TikTok_Downloader
 
                 if (redirectedUrl.Contains("/photo/"))
                 {
-                    int photoIndex = redirectedUrl.IndexOf("/photo/") + 7;
-                    string beforePhoto = redirectedUrl.Substring(0, photoIndex);
-                    string afterPhoto = redirectedUrl.Substring(photoIndex, Math.Min(19, redirectedUrl.Length - photoIndex));
-                    outputTextBox.AppendText($"Image/Photo URL Skipped: {beforePhoto}{afterPhoto}\r\n");
-                    return string.Empty;
+                    var match = Regex.Match(redirectedUrl, @"/photo/(\d+)");
+                    if (match.Success)
+                    {
+                        videoId = match.Groups[1].Value;
+                    }
                 }
 
                 token.ThrowIfCancellationRequested();
