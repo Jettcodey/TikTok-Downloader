@@ -34,7 +34,6 @@ C# and Microsoft Playwright
 <!--![csharpIcon](https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/aca578ae-4c24-490f-96f2-4c19a16fe9e6)
 ![Playwright](https://github.com/Jettcodey/TikTok-Downloader/assets/163922510/e36d2e7e-689f-4927-aadb-42b8a7d1de2d)-->
 
-
 <p align="right"><a href="#tiktok-downloader">Back to top</a></p>
 
 <!-- ABOUT THE PROJECT -->
@@ -51,8 +50,9 @@ C# and Microsoft Playwright
 - **Default Location**: Downloads are saved in a folder on your desktop named `TikTokDownloads\{@Username}\`, organized into **Videos**, **Images**, and **Avatars**.
 - **Settings File**: Configuration is stored in the user's Documents folder at `Jettcodey\TikTok Downloader\appsettings.xml`.
 
-### ❓ Questions?
-For any questions, feel free to [Open an Issue](https://github.com/Jettcodey/TikTok-Downloader/issues) or reach out to me on Discord: **`jettcodey`**.
+### ❓ Questions?  
+If you have any questions, feel free to [open an issue](https://github.com/Jettcodey/TikTok-Downloader/issues) or reach out to me on Discord: **`jettcodey`**.  
+Please note that it may take me 1-2 days to respond—I'm just one person with a life outside of coding. Thanks for your patience!
 
 <p align="right"><a href="#tiktok-downloader">Back to top</a></p>
 
@@ -105,7 +105,7 @@ After installing TikTok Downloader, open the application and complete the First-
 - **Single Video/Image Download**
 - **Mass Download by Username**
 - **Mass Download from Text File Links**
-- **HD Download Single Video**
+- **HD Download Video/Image**
 - **HD Download From Text File Links**
 - **HD Download By Username**
 
@@ -128,7 +128,7 @@ After installing TikTok Downloader, open the application and complete the First-
 - Click **Download** to start the process.
 
 #### 4. The HD Variants
-The HD Variants are the Same but can Only download **Videos** in HD quality.
+The HD Variants are the Same but download **Videos** and **Images** (if Possible) in HD quality.
 
 \* TikTok Links format: `https://www.tiktok.com/@user/video|photo/123456789` or `https://vm.tiktok.com/a1b2c3d4`.  
 **TikTok Profile Links format: `https://www.tiktok.com/@user`.
