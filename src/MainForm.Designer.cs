@@ -55,7 +55,7 @@ namespace TikTok_Downloader
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.BackColor = Color.FromArgb(32, 32, 32);
+            fileToolStripMenuItem.BackColor = Color.FromArgb(58, 58, 58);
             fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { ChangeDownloadFolderToolStripMenuItem, aboutToolStripMenuItem, settingsToolStripMenuItem, checkForUpdateToolStripMenuItem });
             fileToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
@@ -101,7 +101,7 @@ namespace TikTok_Downloader
             // cmbChoice
             // 
             cmbChoice.FormattingEnabled = true;
-            cmbChoice.Items.AddRange(new object[] { "Single Video/Image Download", "Mass Download from Text File Links", "Mass Download by Username", "HD Download Single Video", "HD Download From Text File Links", "HD Mass Download by Username" });
+            cmbChoice.Items.AddRange(new object[] { "Single Video/Image Download", "Mass Download from Text File Links", "Mass Download by Username", "HD Download Video/Image", "HD Download From Text File Links", "HD Mass Download by Username" });
             cmbChoice.Location = new Point(149, 36);
             cmbChoice.Name = "cmbChoice";
             cmbChoice.Size = new Size(275, 23);
@@ -388,8 +388,8 @@ namespace TikTok_Downloader
                     downloadAvatarsCheckBox.Visible = true;
                     break;
                 case 3:
-                    urlTextBox.PlaceholderText = "Enter TikTok Video Link";
-                    label3.Text = "HD Download Video:";
+                    urlTextBox.PlaceholderText = "Enter TikTok Video/Image Link";
+                    label3.Text = "HD Single Video/Image:";
                     browseFileButton.Visible = false;
                     withWatermarkCheckBox.Visible = false;
                     downloadAvatarsCheckBox.Visible = false;
