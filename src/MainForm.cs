@@ -325,7 +325,7 @@ namespace TikTok_Downloader
 
             if (choice == "Single Video/Image Download")
             {
-                await SingleVideoDownload();
+                await SingleMediaDownload();
             }
             else if (choice == "Mass Download by Username")
             {
@@ -337,10 +337,10 @@ namespace TikTok_Downloader
                 LogMessage(logFilePath, $"Selected file path: {filePath}");
                 await DownloadFromTextFile(filePath, _cancellationTokenSource.Token);
             }
-            else if (choice == "HD Download Single Video")
+            else if (choice == "HD Download Video/Image")
             {
                 string HDUrl = urlTextBox.Text.Trim();
-                await HDGetMediaID(HDUrl);
+                await HDSingleMediaDownload(HDUrl);
             }
             else if (choice == "HD Download From Text File Links")
             {
@@ -700,7 +700,7 @@ namespace TikTok_Downloader
             cmbChoice.Enabled = true;
         }
 
-        private async Task SingleVideoDownload()
+        private async Task SingleMediaDownload()
         {
             outputTextBox.Clear();
             downloadButton.Enabled = false;
@@ -760,7 +760,7 @@ namespace TikTok_Downloader
             }
         }
 
-        private async Task HDGetMediaID(string HDUrl)
+        private async Task HDSingleMediaDownload(string HDUrl)
         {
             outputTextBox.Clear();
             downloadButton.Enabled = false;
@@ -786,7 +786,7 @@ namespace TikTok_Downloader
                 }
                 else
                 {
-                    await HDVideoDownload(tiktokUrl, _cancellationTokenSource.Token);
+                    await HDMediaDownload(tiktokUrl, _cancellationTokenSource.Token);
                 }
             }
             catch (Exception ex)
@@ -827,7 +827,7 @@ namespace TikTok_Downloader
                     string trimmedUrl = url.Trim();
                     if (!string.IsNullOrEmpty(trimmedUrl))
                     {
-                        await HDVideoDownload(trimmedUrl, _cancellationTokenSource.Token);
+                        await HDMediaDownload(trimmedUrl, _cancellationTokenSource.Token);
 
                         progressBar.Value++;
                     }
@@ -1174,7 +1174,7 @@ namespace TikTok_Downloader
             }
         }
 
-        private async Task HDVideoDownload(string tiktokUrl, CancellationToken token, int retryDepth = 0)
+        private async Task HDMediaDownload(string tiktokUrl, CancellationToken token, int retryDepth = 0)
         {
             string videoId = await GetMediaUrl(tiktokUrl, token);
             if (string.IsNullOrEmpty(videoId))
@@ -1336,12 +1336,12 @@ namespace TikTok_Downloader
                         {
                             outputTextBox.AppendText($"Media {videoId} does not exist or token is rate limited, trying again {3 - retryDepth} times...\r\n");
                             await Task.Delay(2000, token);
-                            await HDVideoDownload(tiktokUrl, token, retryDepth + 1);
+                            await HDMediaDownload(tiktokUrl, token, retryDepth + 1);
                         }
                     }
                     else
                     {
-                        outputTextBox.AppendText("Error: Unable to download video in HD.\r\n");
+                        outputTextBox.AppendText("Error: Unable to download media in HD.\r\n");
                     }
                 }
                 catch (HttpRequestException)
