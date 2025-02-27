@@ -10,7 +10,7 @@
     <Company>$(Authors)</Company>
     <Authors>Jettcodey</Authors>
     <Title>TikTok Downloader</Title>
-    <Version>1.3.5</Version>
+    <Version>1.3.6</Version>
     <Copyright>Jettcodey ©2024</Copyright>
     <PackageIcon>Assets\icon.png</PackageIcon>
     <NeutralLanguage>en-US</NeutralLanguage>
