@@ -1182,9 +1182,9 @@ namespace TikTok_Downloader
                 return; // URL was invalid or cancelled.
             }
 
-            if (retryDepth >= 3)
+            if (retryDepth >= 5)
             {
-                outputTextBox.AppendText($"Failed 3 retries... skipping media {mediaId}.\r\n");
+                outputTextBox.AppendText($"Failed 5 retries... skipping media {mediaId}.\r\n");
                 return;
             }
             string apiEndpoint = "https://www.tikwm.com/api/";
@@ -1199,6 +1199,7 @@ namespace TikTok_Downloader
                     {
                         string responseBody = await response.Content.ReadAsStringAsync();
                         dynamic responseData = JsonSoft.JsonConvert.DeserializeObject(responseBody);
+                        LogJson($"API_Response_For_{mediaId}", responseBody);
 
                         if (responseData.code == 0)
                         {
@@ -1207,7 +1208,7 @@ namespace TikTok_Downloader
                             Directory.CreateDirectory(userFolderPath);
 
                             // Check whether the response contains an HD video
-                            if (responseData.data.hdplay != null && responseData.data.hd_size != "0")
+                            if (responseData.data.hdplay != null && (responseData.data.size != "0" || responseData.data.hd_size != "0"))
                             {
                                 // Make video directory
                                 string videosFolderPath = Path.Combine(userFolderPath, "Videos");
@@ -1252,7 +1253,7 @@ namespace TikTok_Downloader
 
                                     // Download the video
                                     bool success = false;
-                                    int retryCount = 3;
+                                    int retryCount = 5;
                                     while (!success && retryCount > 0)
                                     {
                                         try
@@ -1305,7 +1306,7 @@ namespace TikTok_Downloader
                             else if (responseData.data.images != null)
                             {
                                 // make photos directory
-                                string photosFolderPath = Path.Combine(userFolderPath, "Photos");
+                                string photosFolderPath = Path.Combine(userFolderPath, "Images");
                                 Directory.CreateDirectory(photosFolderPath);
                                 
                                 // Check if the media has already been downloaded.
@@ -1321,7 +1322,7 @@ namespace TikTok_Downloader
 
                                     for (int i = 0; i < imageCount; i++)
                                     {
-                                        if (!downloadedIds.Contains($"{mediaId}_{i + 1}"))
+                                        if (!downloadedIds.Contains($"{mediaId}_{i + 1}.jpg"))
                                         {
                                             allImagesDownloaded = false; // Found a missing file, so we need to download (yes we redownload all)
                                             break;
@@ -1347,12 +1348,12 @@ namespace TikTok_Downloader
                                     for (int i = 0; i < imageCount; i++)
                                     {
                                         string imageUrl = images[i].ToString();
-                                        string filename = $"{mediaId}_{i + 1}";
+                                        string filename = $"{mediaId}_{i + 1}.jpg";
                                         string fullPath = Path.Combine(photosFolderPath, filename);
 
                                         // Download the image(s)
                                         bool success = false;
-                                        int retryCount = 3;
+                                        int retryCount = 5;
                                         while (!success && retryCount > 0)
                                         {
                                             try
@@ -1409,7 +1410,7 @@ namespace TikTok_Downloader
                         }
                         else
                         {
-                            outputTextBox.AppendText($"Media {mediaId} does not exist or token is rate limited, trying again {3 - retryDepth} times...\r\n");
+                            outputTextBox.AppendText($"Media {mediaId} does not exist or token is rate limited, trying again {5 - retryDepth} times...\r\n");
                             await Task.Delay(2000, token);
                             await HDMediaDownload(tiktokUrl, token, retryDepth + 1);
                         }
