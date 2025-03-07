@@ -1176,10 +1176,32 @@ namespace TikTok_Downloader
 
         private async Task HDMediaDownload(string tiktokUrl, CancellationToken token, int retryDepth = 0)
         {
+            // Extract username and video ID from the TikTok URL for an early check
+            string usernameFromUrl = null;
+            string vid = null;
+            var videoIdPattern = @"https:\/\/www\.tiktok\.com\/@([\w\.]+)\/video\/(\d+)";
+            var match = Regex.Match(tiktokUrl, videoIdPattern);
+            if (match.Success)
+            {
+                usernameFromUrl = match.Groups[1].Value;
+                vid = match.Groups[2].Value;
+                string userFolderPath = Path.Combine(downloadFolderPath, usernameFromUrl);
+                string indexFilePath = Path.Combine(userFolderPath, $"{usernameFromUrl}_index.txt");
+                if (File.Exists(indexFilePath))
+                {
+                    var downloadedIds = await ReadDownloadedIdsInChunks(indexFilePath, token);
+                    if (downloadedIds.Any(id => id.Contains($"{vid}_HD")))
+                    {
+                        outputTextBox.AppendText($"Media {vid}_HD.mp4 already downloaded. Skipping...\r\n");
+                        return;
+                    }
+                }
+            }
+
             string mediaId = await GetMediaUrl(tiktokUrl, token);
             if (string.IsNullOrEmpty(mediaId))
             {
-                return; // URL was invalid or cancelled.
+                return; // URL was invalid or cancelled
             }
 
             if (retryDepth >= 5)
@@ -1187,6 +1209,7 @@ namespace TikTok_Downloader
                 outputTextBox.AppendText($"Failed 5 retries... skipping media {mediaId}.\r\n");
                 return;
             }
+
             string apiEndpoint = "https://www.tikwm.com/api/";
             using (HttpClient client = new HttpClient())
             {
@@ -1203,132 +1226,128 @@ namespace TikTok_Downloader
 
                         if (responseData.code == 0)
                         {
+                            // get Username from response otherwise fallback to URL
                             string username = responseData.data.author.unique_id;
+                            if (string.IsNullOrEmpty(username) && usernameFromUrl != null)
+                            {
+                                username = usernameFromUrl;
+                            }
+
                             string userFolderPath = Path.Combine(downloadFolderPath, username);
                             Directory.CreateDirectory(userFolderPath);
 
                             // Check whether the response contains an HD video
                             if (responseData.data.hdplay != null && (responseData.data.size != "0" || responseData.data.hd_size != "0"))
                             {
-                                // Make video directory
                                 string videosFolderPath = Path.Combine(userFolderPath, "Videos");
                                 Directory.CreateDirectory(videosFolderPath);
 
-                                // Extract video ID from the URL
-                                var videoIdPattern = @"(?:https:\/\/www\.tiktok\.com\/(?:@[\w\.]+\/video\/))(\d+)";
-                                var match = Regex.Match(mediaId, videoIdPattern);
-                                string vid = match.Success ? match.Groups[1].Value : mediaId;
+                                if (string.IsNullOrEmpty(vid))
+                                {
+                                    var videoIdPatternFallback = @"(?:https:\/\/www\.tiktok\.com\/(?:@[\w\.]+\/video\/))(\d+)";
+                                    var matchFallback = Regex.Match(mediaId, videoIdPatternFallback);
+                                    vid = matchFallback.Success ? matchFallback.Groups[1].Value : mediaId;
+                                }
                                 string filename = $"{vid}_HD.mp4";
                                 string fullPath = Path.Combine(videosFolderPath, filename);
 
-                                // Check if the video has already been downloaded.
+                                // Check if the video has already been downloaded
                                 string indexFilePath = Path.Combine(userFolderPath, $"{username}_index.txt");
-                                bool alreadyDownloaded = false;
                                 if (File.Exists(indexFilePath))
                                 {
                                     var downloadedIds = await ReadDownloadedIdsInChunks(indexFilePath, token);
                                     if (downloadedIds.Any(id => id.Contains($"{vid}_HD")))
                                     {
                                         outputTextBox.AppendText($"Media {filename} already downloaded. Skipping...\r\n");
-                                        alreadyDownloaded = true;
-                                    }
-                                }
-
-                                // If the video has not been downloaded, download it. (woah)
-                                if (!alreadyDownloaded)
-                                {
-                                    string videoUrl = responseData.data.hdplay;
-                                    string hdSize = responseData.data.hd_size.ToString();
-
-                                    // double check response data for completeness
-                                    if (string.IsNullOrEmpty(videoUrl) || hdSize == "0")
-                                    {
-                                        await Task.Delay(2000, token);
-                                        await HDMediaDownload(tiktokUrl, token, retryDepth + 1);
+                                        LogMessage(logFilePath, $"Media {filename} already exists.");
                                         return;
                                     }
+                                }
 
-                                    AppendTextToOutput($"Downloading HD Video from User: {username}\r\n");
-                                    LogMessage(logFilePath, $"Downloading HD Video from User: {username}");
+                                // double check response data for completeness
+                                string videoUrl = responseData.data.hdplay;
+                                string hdSize = responseData.data.hd_size.ToString();
+                                if (string.IsNullOrEmpty(videoUrl) || hdSize == "0")
+                                {
+                                    await Task.Delay(2000, token);
+                                    await HDMediaDownload(tiktokUrl, token, retryDepth + 1);
+                                    return;
+                                }
 
-                                    // Download the video
-                                    bool success = false;
-                                    int retryCount = 5;
-                                    while (!success && retryCount > 0)
+                                AppendTextToOutput($"Downloading HD Video from User: {username}\r\n");
+                                LogMessage(logFilePath, $"Downloading HD Video from User: {username}");
+
+                                // Download the video
+                                bool success = false;
+                                int retryCount = 5;
+                                while (!success && retryCount > 0)
+                                {
+                                    try
                                     {
-                                        try
+                                        LogMessage(logFilePath, $"Downloading {vid}");
+                                        await DownloadVideoWithBufferedWrite(client, videoUrl, fullPath, token);
+                                        success = true;
+                                    }
+                                    catch (TaskCanceledException)
+                                    {
+                                        return;
+                                    }
+                                    catch (OperationCanceledException)
+                                    {
+                                        retryCount--;
+                                        if (retryCount > 0)
                                         {
-                                            LogMessage(logFilePath, $"Downloading {vid}");
-                                            await DownloadVideoWithBufferedWrite(client, videoUrl, fullPath, token);
-                                            success = true;
+                                            outputTextBox.AppendText("Connection lost. Retrying download...\r\n");
                                         }
-                                        catch (TaskCanceledException)
+                                        else
                                         {
+                                            outputTextBox.AppendText($"Failed to Download {vid}\r\n");
+                                            LogError($"Failed to Download {vid}");
                                             return;
                                         }
-                                        catch (OperationCanceledException)
+                                    }
+                                    catch (IOException ex) when (ex.InnerException is SocketException)
+                                    {
+                                        retryCount--;
+                                        if (retryCount > 0)
                                         {
-                                            retryCount--;
-                                            if (retryCount > 0)
-                                            {
-                                                outputTextBox.AppendText("Connection lost. Retrying download...\r\n");
-                                            }
-                                            else
-                                            {
-                                                outputTextBox.AppendText($"Failed to Download {vid}\r\n");
-                                                LogError($"Failed to Download {vid}");
-                                                return;
-                                            }
+                                            outputTextBox.AppendText("Connection lost. Retrying download...\r\n");
                                         }
-                                        catch (IOException ex) when (ex.InnerException is SocketException)
+                                        else
                                         {
-                                            retryCount--;
-                                            if (retryCount > 0)
-                                            {
-                                                outputTextBox.AppendText("Connection lost. Retrying download...\r\n");
-                                            }
-                                            else
-                                            {
-                                                outputTextBox.AppendText("Failed to resume download after multiple attempts.\r\n");
-                                                LogError("Failed to resume download after multiple attempts.");
-                                                return;
-                                            }
+                                            outputTextBox.AppendText("Failed to resume download after multiple attempts.\r\n");
+                                            LogError("Failed to resume download after multiple attempts.");
+                                            return;
                                         }
                                     }
-
-                                    await File.AppendAllTextAsync(indexFilePath, $"{vid}_HD\n");
-                                    LogMessage(logFilePath, $"HD Video File Saved to {fullPath}");
-                                    outputTextBox.AppendText($"Downloaded HD Video: '{filename}' Successfully...\r\n");
                                 }
+
+                                await File.AppendAllTextAsync(indexFilePath, $"{vid}_HD\n");
+                                LogMessage(logFilePath, $"HD Video File Saved to {fullPath}");
+                                outputTextBox.AppendText($"Downloaded HD Video: '{filename}' Successfully...\r\n");
                             }
-                            
-                            // Check whether the response contains image data
+                            // Download Images if response contains images instead of a video
                             else if (responseData.data.images != null)
                             {
-                                // make photos directory
-                                string photosFolderPath = Path.Combine(userFolderPath, "Images");
-                                Directory.CreateDirectory(photosFolderPath);
-                                
-                                // Check if the media has already been downloaded.
+                                string imagesFolderPath = Path.Combine(userFolderPath, "Images");
+                                Directory.CreateDirectory(imagesFolderPath);
+
                                 string indexFilePath = Path.Combine(userFolderPath, $"{username}_index.txt");
                                 bool alreadyDownloaded = false;
                                 if (File.Exists(indexFilePath))
                                 {
                                     var images = responseData.data.images;
                                     int imageCount = images.Count;
-
                                     var downloadedIds = await ReadDownloadedIdsInChunks(indexFilePath, token);
-                                    bool allImagesDownloaded = true; // Assume all are downloaded until proven otherwise
-
+                                    bool allImagesDownloaded = true;
                                     for (int i = 0; i < imageCount; i++)
                                     {
                                         if (!downloadedIds.Contains($"{mediaId}_{i + 1}.jpg"))
                                         {
-                                            allImagesDownloaded = false; // Found a missing file, so we need to download (yes we redownload all)
+                                            allImagesDownloaded = false;
                                             break;
                                         }
                                     }
-
                                     if (allImagesDownloaded)
                                     {
                                         outputTextBox.AppendText($"Media set {mediaId} already downloaded. Skipping...\r\n");
@@ -1336,7 +1355,6 @@ namespace TikTok_Downloader
                                     }
                                 }
 
-                                // If the media has not been downloaded, download it. (woah)
                                 if (!alreadyDownloaded)
                                 {
                                     var images = responseData.data.images;
@@ -1344,21 +1362,19 @@ namespace TikTok_Downloader
                                     AppendTextToOutput($"Downloading {imageCount} Photos from User: {username}\r\n");
                                     LogMessage(logFilePath, $"Downloading {imageCount} Photos from User: {username}");
 
-                                    // Loop through all image URLs provided in the API response.
                                     for (int i = 0; i < imageCount; i++)
                                     {
                                         string imageUrl = images[i].ToString();
                                         string filename = $"{mediaId}_{i + 1}.jpg";
-                                        string fullPath = Path.Combine(photosFolderPath, filename);
+                                        string fullPath = Path.Combine(imagesFolderPath, filename);
 
-                                        // Download the image(s)
                                         bool success = false;
                                         int retryCount = 5;
                                         while (!success && retryCount > 0)
                                         {
                                             try
                                             {
-                                                outputTextBox.AppendText($"Downloaing Image {filename}\r\n");
+                                                outputTextBox.AppendText($"Downloading Image {filename}\r\n");
                                                 LogMessage(logFilePath, $"Downloading {filename}");
                                                 await DownloadVideoWithBufferedWrite(client, imageUrl, fullPath, token);
                                                 success = true;
@@ -1398,8 +1414,8 @@ namespace TikTok_Downloader
                                             }
                                         }
                                     }
-                                    LogMessage(logFilePath, $"Photos saved to {photosFolderPath}");
-                                    outputTextBox.AppendText($"Downloaded {imageCount} Photos from {username} Successfully...\r\n");
+                                    LogMessage(logFilePath, $"Images saved to {imagesFolderPath}");
+                                    outputTextBox.AppendText($"Downloaded {imageCount} Images from {username} Successfully...\r\n");
                                 }
                             }
                             else
@@ -1410,6 +1426,22 @@ namespace TikTok_Downloader
                         }
                         else
                         {
+                            // If the response is not successful, check again if the media is already downloaded
+                            if (!string.IsNullOrEmpty(vid) && !string.IsNullOrEmpty(usernameFromUrl))
+                            {
+                                string userFolderPath = Path.Combine(downloadFolderPath, usernameFromUrl);
+                                string indexFilePath = Path.Combine(userFolderPath, $"{usernameFromUrl}_index.txt");
+                                if (File.Exists(indexFilePath))
+                                {
+                                    var downloadedIds = await ReadDownloadedIdsInChunks(indexFilePath, token);
+                                    if (downloadedIds.Any(id => id.Contains($"{vid}_HD")))
+                                    {
+                                        outputTextBox.AppendText($"Media {vid}_HD.mp4 already downloaded. Skipping...\r\n");
+                                        return;
+                                    }
+                                }
+                            }
+
                             outputTextBox.AppendText($"Media {mediaId} does not exist or token is rate limited, trying again {5 - retryDepth} times...\r\n");
                             await Task.Delay(2000, token);
                             await HDMediaDownload(tiktokUrl, token, retryDepth + 1);
@@ -1603,7 +1635,7 @@ namespace TikTok_Downloader
 
         private async Task DownloadVideoWithBufferedWrite(HttpClient client, string videoUrl, string fullPath, CancellationToken token)
         {
-            int retryCount = 3;
+            int retryCount = 5;
             while (retryCount > 0)
             {
                 try
