@@ -1050,7 +1050,7 @@ namespace TikTok_Downloader
                     else
                     {
                         var indexNumberPattern = $"{MediaID}_";
-                        if (downloadedIds.Any(id => id.StartsWith(indexNumberPattern)))
+                        if (downloadedIds.Any(id => id.StartsWith(indexNumberPattern) && !id.Contains("_HD")))
                         {
                             outputTextBox.AppendText($"Media {MediaID} already downloaded. Skipping...\r\n");
                             videoAlreadyDownloaded = true;
