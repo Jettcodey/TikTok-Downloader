@@ -573,6 +573,7 @@ namespace TikTok_Downloader
                 LogMessage(logFilePath, "Browser closed successfully");
                 downloadButton.Enabled = true;
                 cmbChoice.Enabled = true;
+                outputTextBox.AppendText("Download Completed!\r\n");
             }
         }
 
@@ -698,6 +699,7 @@ namespace TikTok_Downloader
             downloadButton.Enabled = true;
             browseFileButton.Enabled = true;
             cmbChoice.Enabled = true;
+            outputTextBox.AppendText("Download Completed!\r\n");
         }
 
         private async Task SingleMediaDownload()
@@ -757,6 +759,7 @@ namespace TikTok_Downloader
             {
                 downloadButton.Enabled = true;
                 cmbChoice.Enabled = true;
+                outputTextBox.AppendText("Download Completed!\r\n");
             }
         }
 
@@ -797,6 +800,7 @@ namespace TikTok_Downloader
             {
                 downloadButton.Enabled = true;
                 cmbChoice.Enabled = true;
+                outputTextBox.AppendText("Download Completed!\r\n");
             }
         }
 
@@ -836,6 +840,7 @@ namespace TikTok_Downloader
             downloadButton.Enabled = true;
             browseFileButton.Enabled = true;
             cmbChoice.Enabled = true;
+            outputTextBox.AppendText("Download Completed!\r\n");
         }
 
         public async Task<string> GetMediaUrl(string url, CancellationToken token)
