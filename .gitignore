@@ -368,3 +368,5 @@ FodyWeavers.xsd
 /icon.png
 /src/.editorconfig
 /src/scripts/old
+/src/ToastNotification.cs
+.gitignore
