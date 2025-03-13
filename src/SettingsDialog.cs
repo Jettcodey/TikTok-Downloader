@@ -407,12 +407,27 @@ namespace TikTok_Downloader
                 }
                 else if (string.Equals(browserName, "Mozilla Firefox", StringComparison.OrdinalIgnoreCase))
                 {
-                    var firefoxDir = Directory.GetDirectories(
-                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ms-playwright"),
-                        "firefox-*"
-                    ).FirstOrDefault();
-
-                    browserPath = firefoxDir != null ? Path.Combine(firefoxDir, "firefox", "firefox.exe") : throw new Exception("Firefox executable not found.");
+                    string msPlaywrightPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ms-playwright");
+                    if (!Directory.Exists(msPlaywrightPath))
+                    {
+                        MessageBox.Show(
+                            "It appears you haven't run the Firefox install script. The 'ms-playwright' directory was not found. Please run the install script or select a different browser.",
+                            "MS-Playwright Firefox Build Not Installed",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
+                        return "";
+                    }
+                    var firefoxDir = Directory.GetDirectories(msPlaywrightPath, "firefox-*").FirstOrDefault();
+                    if (firefoxDir == null)
+                    {
+                        MessageBox.Show(
+                            "It appears you haven't run the Firefox install script. No 'firefox-*' folder was found in the 'ms-playwright' directory. Please run the install script or select a different browser.",
+                            "MS-Playwright Firefox Build Not Installed",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
+                        return "";
+                    }
+                    browserPath = Path.Combine(firefoxDir, "firefox", "firefox.exe");
                 }
                 else if (string.Equals(browserName, "Chromium", StringComparison.OrdinalIgnoreCase))
                 {
