@@ -148,7 +148,7 @@ namespace TikTok_Downloader
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "AboutWindow";
-            Text = "TikTok Downloader Version 1.3.6";
+            Text = "TikTok Downloader Version 1.3.7";
             ResumeLayout(false);
             PerformLayout();
         }
