@@ -367,6 +367,7 @@ namespace TikTok_Downloader
 
             public async Task<string> GetSystemDefaultBrowser()
             {
+                await Task.Yield();
                 string executablePath = string.Empty;
                 RegistryKey regKey = null;
 
@@ -380,11 +381,30 @@ namespace TikTok_Downloader
 
                     if (!executablePath.EndsWith("exe"))
                         executablePath = executablePath.Substring(0, executablePath.LastIndexOf(".exe") + 4);
-                    
+
                     if (executablePath.Contains("firefox"))
                     {
-                        var playwright = await Playwright.CreateAsync();
-                        executablePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"ms-playwright\firefox-1447\firefox\firefox.exe");
+                        var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                        var msPlaywrightPath = Path.Combine(localAppData, "ms-playwright");
+
+                        var firefoxDirectories = Directory.GetDirectories(msPlaywrightPath, "firefox-*");
+
+                        bool found = false;
+                        foreach (var dir in firefoxDirectories)
+                        {
+                            var candidatePath = Path.Combine(dir, "firefox", "firefox.exe");
+                            if (File.Exists(candidatePath))
+                            {
+                                executablePath = candidatePath;
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (!found)
+                        {
+                            mainForm.LogError("Firefox executable was not found in the expected ms-playwright folder structure.");
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -2081,7 +2101,7 @@ namespace TikTok_Downloader
         {
             string url = "https://github.com/Jettcodey/TikTok-Downloader/issues";
 
-            string browserPath = await browserUtility.GetSystemDefaultBrowser();
+            string browserPath = await browserUtility.GetBrowserExecutablePath();
 
             try
             {
