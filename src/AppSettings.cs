@@ -23,7 +23,7 @@ namespace TikTok_Downloader
 
         public class Settings
         {
-            public bool DownloadVideosOnly { get; set; }
+            public bool ToastsAllowed { get; set; }
             public bool DownloadImagesOnly { get; set; }
             public bool EnableJsonLogs { get; set; }
             public bool EnableDownloadLogs { get; set; }
@@ -72,7 +72,7 @@ namespace TikTok_Downloader
             {
                 CurrentSettings = new Settings
                 {
-                    DownloadVideosOnly = false,
+                    ToastsAllowed = false,
                     DownloadImagesOnly = false,
                     EnableJsonLogs = false,
                     EnableDownloadLogs = false,

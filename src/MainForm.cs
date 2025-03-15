@@ -38,7 +38,7 @@ namespace TikTok_Downloader
         private bool logJsonEnabled;
         private string jsonLogFilePath;
         private object jsonLock = new object();
-        private bool DownloadVideosOnly;
+        private bool ToastsAllowed;
         private bool DownloadImagesOnly;
         private readonly AppSettings settings;
         private SettingsDialog settingsDialog;
@@ -861,6 +861,7 @@ namespace TikTok_Downloader
             browseFileButton.Enabled = true;
             cmbChoice.Enabled = true;
             outputTextBox.AppendText("Download Completed!\r\n");
+            // ToastNotification.ShowToast($"Download Completed!", "Finished downloading all {0} Videos from ur Text File.", urls.Length, _cancellationTokenSource);
         }
 
         public async Task<string> GetMediaUrl(string url, CancellationToken token)
@@ -1312,6 +1313,7 @@ namespace TikTok_Downloader
                                         LogMessage(logFilePath, $"Downloading {vid}");
                                         await DownloadVideoWithBufferedWrite(client, videoUrl, fullPath, token);
                                         success = true;
+                                        // ToastNotification.ShowToast("HD Video Downloaded", "Download of {0}_HD.mp4 completed successfully!", vid);
                                     }
                                     catch (TaskCanceledException)
                                     {
@@ -2015,6 +2017,7 @@ namespace TikTok_Downloader
                 pauseButton_Click(sender, e);
             }
             _cancellationTokenSource?.Cancel();
+            ToastNotification.ShowToast("Download Stopped!", "You stopped the download process.");
             outputTextBox.AppendText("Download Stopped!\r\n");
             LogMessage(logFilePath, "Download got Stopped by User");
             _stopLoggingForCooldown = true;
@@ -2087,11 +2090,6 @@ namespace TikTok_Downloader
         {
             EnableDownloadLogs = value;
             InitializeLoggingFolder();
-        }
-
-        public void DownloadVideosOnlyCheckBox(bool value)
-        {
-            DownloadVideosOnly = value;
         }
 
         public void DownloadImagesOnlyCheckBox(bool value)

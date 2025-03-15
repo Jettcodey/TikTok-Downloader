@@ -41,7 +41,7 @@ namespace TikTok_Downloader
         {
             if (sender is CheckBox checkBox)
             {
-                mainForm.DownloadVideosOnlyCheckBox(checkBox.Checked);
+                ToastNotification.ToastsAllowedCheckBox(checkBox.Checked);
             }
         }
 
@@ -151,9 +151,8 @@ namespace TikTok_Downloader
             setting1CheckBox.Name = "setting1CheckBox";
             setting1CheckBox.Size = new Size(146, 19);
             setting1CheckBox.TabIndex = 5;
-            setting1CheckBox.Text = "Download Videos Only";
+            setting1CheckBox.Text = "Enable Windows Notifications";
             setting1CheckBox.UseVisualStyleBackColor = false;
-            setting1CheckBox.Visible = false;
             setting1CheckBox.CheckedChanged += Setting1CheckBox_CheckedChanged;
             // 
             // setting2CheckBox
@@ -271,7 +270,7 @@ namespace TikTok_Downloader
         {
             try
             {
-                settings.DownloadVideosOnly = setting1CheckBox.Checked;
+                settings.ToastsAllowed = setting1CheckBox.Checked;
                 settings.DownloadImagesOnly = setting2CheckBox.Checked;
                 settings.EnableJsonLogs = setting3CheckBox.Checked;
                 settings.EnableDownloadLogs = setting4CheckBox.Checked;
@@ -302,7 +301,7 @@ namespace TikTok_Downloader
                         XmlSerializer serializer = new XmlSerializer(typeof(AppSettings.Settings));
                         settings = (AppSettings.Settings)serializer.Deserialize(reader);
                     }
-                    setting1CheckBox.Checked = settings.DownloadVideosOnly;
+                    setting1CheckBox.Checked = settings.ToastsAllowed;
                     setting2CheckBox.Checked = settings.DownloadImagesOnly;
                     setting3CheckBox.Checked = settings.EnableJsonLogs;
                     setting4CheckBox.Checked = settings.EnableDownloadLogs;
@@ -343,7 +342,7 @@ namespace TikTok_Downloader
                         {
                             XmlSerializer serializer = new XmlSerializer(typeof(AppSettings.Settings));
                             AppSettings.Settings settings = (AppSettings.Settings)serializer.Deserialize(streamReader);
-                            setting1CheckBox.Checked = settings.DownloadVideosOnly;
+                            setting1CheckBox.Checked = settings.ToastsAllowed;
                             setting2CheckBox.Checked = settings.DownloadImagesOnly;
                             setting3CheckBox.Checked = settings.EnableJsonLogs;
                             setting4CheckBox.Checked = settings.EnableDownloadLogs;
@@ -373,7 +372,7 @@ namespace TikTok_Downloader
                     {
                         AppSettings.Settings settings = new AppSettings.Settings
                         {
-                            DownloadVideosOnly = setting1CheckBox.Checked,
+                            ToastsAllowed = setting1CheckBox.Checked,
                             DownloadImagesOnly = setting2CheckBox.Checked,
                             EnableJsonLogs = setting3CheckBox.Checked,
                             EnableDownloadLogs = setting4CheckBox.Checked,
