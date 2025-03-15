@@ -1961,6 +1961,8 @@ namespace TikTok_Downloader
                 writer.WriteLine($"reg add \"HKEY_LOCAL_MACHINE\\SOFTWARE\\Jettcodey\\TikTok Downloader\" /v Version /t REG_SZ /d \"{newVersion}\" /f");
 
                 writer.WriteLine($"rmdir /s /q \"{tempFolder}\"");
+
+                writer.WriteLine($"start \"\" \"{Path.Combine(appFolder, "TikTok Downloader.exe")}\"");
             }
 
             // Start the Update.bat file
