@@ -13,7 +13,7 @@ namespace TikTok_Downloader
 {
     public class ToastNotification
     {
-        public static bool ToastsAllowed { get; private set; } = true;
+        public static bool ToastsAllowed { get; set; }
         public static void ToastsAllowedCheckBox(bool value)
         {
             ToastsAllowed = value;
