@@ -593,6 +593,7 @@ namespace TikTok_Downloader
                 LogMessage(logFilePath, "Browser closed successfully");
                 downloadButton.Enabled = true;
                 cmbChoice.Enabled = true;
+                ToastNotification.ShowToast($"Download Completed!", "Finished downloading all Images/Videos from {0}.", username, _cancellationTokenSource);
                 outputTextBox.AppendText("Download Completed!\r\n");
             }
         }
@@ -719,6 +720,7 @@ namespace TikTok_Downloader
             downloadButton.Enabled = true;
             browseFileButton.Enabled = true;
             cmbChoice.Enabled = true;
+            ToastNotification.ShowToast($"Download Completed!", $"Finished downloading all {urls.Length} Videos from your Text File.", _cancellationTokenSource);
             outputTextBox.AppendText("Download Completed!\r\n");
         }
 
@@ -860,8 +862,8 @@ namespace TikTok_Downloader
             downloadButton.Enabled = true;
             browseFileButton.Enabled = true;
             cmbChoice.Enabled = true;
+            ToastNotification.ShowToast($"Download Completed!", $"Finished downloading all {urls.Length} Videos from your Text File.", _cancellationTokenSource);
             outputTextBox.AppendText("Download Completed!\r\n");
-            // ToastNotification.ShowToast($"Download Completed!", "Finished downloading all {0} Videos from ur Text File.", urls.Length, _cancellationTokenSource);
         }
 
         public async Task<string> GetMediaUrl(string url, CancellationToken token)
@@ -1312,8 +1314,7 @@ namespace TikTok_Downloader
                                     {
                                         LogMessage(logFilePath, $"Downloading {vid}");
                                         await DownloadVideoWithBufferedWrite(client, videoUrl, fullPath, token);
-                                        success = true;
-                                        // ToastNotification.ShowToast("HD Video Downloaded", "Download of {0}_HD.mp4 completed successfully!", vid);
+                                        success = true;                                        
                                     }
                                     catch (TaskCanceledException)
                                     {
@@ -1352,6 +1353,11 @@ namespace TikTok_Downloader
 
                                 await File.AppendAllTextAsync(indexFilePath, $"{vid}_HD\n");
                                 LogMessage(logFilePath, $"HD Video File Saved to {fullPath}");
+                                string choice = cmbChoice.SelectedItem.ToString();
+                                if (choice == "HD Download Video/Image")
+                                {
+                                    ToastNotification.ShowToast("HD Video Downloaded", $"Download of {vid}_HD.mp4 completed successfully!");
+                                }
                                 outputTextBox.AppendText($"Downloaded HD Video: '{filename}' Successfully...\r\n");
                             }
                             // Download Images if response contains images instead of a video
@@ -1444,12 +1450,16 @@ namespace TikTok_Downloader
                                     }
                                     LogMessage(logFilePath, $"Images saved to {imagesFolderPath}");
                                     outputTextBox.AppendText($"Downloaded {imageCount} Images from {username} Successfully...\r\n");
+                                    string choice = cmbChoice.SelectedItem.ToString();
+                                    if (choice == "HD Download Video/Image")
+                                    {
+                                        ToastNotification.ShowToast("HD Image(s) Downloaded", $"Download of {imageCount} Image(s) completed successfully!");
+                                    }
                                 }
                             }
                             else
                             {
                                 outputTextBox.AppendText($"No downloadable media found for {tiktokUrl}\r\n");
-                                LogMessage(logFilePath, $"{responseData}");
                                 LogError($"No downloadable media found for {tiktokUrl}");
                             }
                         }
@@ -1570,6 +1580,11 @@ namespace TikTok_Downloader
                             outputTextBox.AppendText($"Downloaded Image: '{imageFileName}' successfully.\r\n");
                             await File.AppendAllTextAsync(indexFilePath, $"{data.Id}_{data.Images.IndexOf(imageUrl)}\n");
                         }
+                        string choice = cmbChoice.SelectedItem.ToString();
+                        if (choice == "Single Video/Image Download")
+                        {
+                            ToastNotification.ShowToast("SD Image(s) Downloaded", $"Download of {data.Images.Count} Image(s) completed successfully!");
+                        }
                     }
                     // Download the video only if no images were found/downloaded (I know this is Stupid, but it works)
                     else
@@ -1594,6 +1609,11 @@ namespace TikTok_Downloader
                                 }
 
                                 outputTextBox.AppendText($"Downloaded Video: '{videoFileName}' successfully.\r\n");
+                                string choice = cmbChoice.SelectedItem.ToString();
+                                if (choice == "Single Video/Image Download")
+                                {
+                                    ToastNotification.ShowToast("SD Video Downloaded", $"Download of {data.Id}.mp4 completed successfully!");
+                                }
                                 await File.AppendAllTextAsync(indexFilePath, $"{data.Id}\n");
                             }
                         }
