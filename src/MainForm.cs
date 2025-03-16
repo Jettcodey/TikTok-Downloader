@@ -1325,6 +1325,7 @@ namespace TikTok_Downloader
                                         if (retryCount > 0)
                                         {
                                             outputTextBox.AppendText("Connection lost. Retrying download...\r\n");
+                                            LogMessage(logFilePath, "Connection lost. Retrying download...");
                                         }
                                         else
                                         {
@@ -1449,6 +1450,7 @@ namespace TikTok_Downloader
                             {
                                 outputTextBox.AppendText($"No downloadable media found for {tiktokUrl}\r\n");
                                 LogMessage(logFilePath, $"{responseData}");
+                                LogError($"No downloadable media found for {tiktokUrl}");
                             }
                         }
                         else
@@ -1470,13 +1472,15 @@ namespace TikTok_Downloader
                             }
 
                             outputTextBox.AppendText($"Media {mediaId} does not exist or token is rate limited, trying again {5 - retryDepth} times...\r\n");
+                            LogError($"Media {mediaId} does not exist or token is rate limited.");
                             await Task.Delay(2000, token);
                             await HDMediaDownload(tiktokUrl, token, retryDepth + 1);
                         }
                     }
                     else
                     {
-                        outputTextBox.AppendText("Error: Unable to download media in HD.\r\n");
+                        outputTextBox.AppendText("Error: Download of HD Media failed!\r\n");
+                        LogError($"Download of HD Media failed! Status Response: {response.StatusCode}");
                     }
                 }
                 catch (HttpRequestException)
