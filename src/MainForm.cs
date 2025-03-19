@@ -1393,8 +1393,8 @@ namespace TikTok_Downloader
                                 {
                                     var images = responseData.data.images;
                                     int imageCount = images.Count;
-                                    AppendTextToOutput($"Downloading {imageCount} Photos from User: {username}\r\n");
-                                    LogMessage(logFilePath, $"Downloading {imageCount} Photos from User: {username}");
+                                    AppendTextToOutput($"Downloading {imageCount} Images from User: {username}\r\n");
+                                    LogMessage(logFilePath, $"Downloading {imageCount} Images from User: {username}");
 
                                     for (int i = 0; i < imageCount; i++)
                                     {
