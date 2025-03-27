@@ -27,7 +27,7 @@ namespace TikTok_Downloader
         private CheckBox setting3CheckBox;
         private CheckBox setting4CheckBox;
         private ComboBox browserComboBox;
-        private AppSettings.Settings settings = new AppSettings.Settings();
+        private Settings settings = new Settings();
         private Label BrowserSelect;
         private MainForm mainForm;
         public SettingsDialog(MainForm mainForm)
@@ -239,11 +239,16 @@ namespace TikTok_Downloader
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
+            FormClosing += SettingsDialog_FormClosing;
             Name = "SettingsDialog";
-            Text = "TikTok Downloader Settings";
             Text = $"TikTok Downloader v{ProductVersion}";
             ResumeLayout(false);
             PerformLayout();
+        }
+
+        private void SettingsDialog_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            SaveSettings();
         }
 
         private void OkButton_Click(object sender, EventArgs e)
@@ -310,7 +315,7 @@ namespace TikTok_Downloader
                     string selectedBrowser = GetBrowserNameFromPath(settings.CustomBrowserPath);
                     browserComboBox.SelectedItem = selectedBrowser;
                 }
-                else
+                else if (!File.Exists(SettingsFilePath))
                 {
                     settings = new AppSettings.Settings();
                 }
