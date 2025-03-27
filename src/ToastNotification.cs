@@ -23,10 +23,11 @@ namespace TikTok_Downloader
         {
             if (ToastsAllowed)
             {
+                string formattedTitle = string.Format(title, args);
                 string formattedMessage = string.Format(message, args);
 
                 new ToastContentBuilder()
-                    .AddText(title)
+                    .AddText(formattedTitle)
                     .AddText(formattedMessage)
                     .Show();
             }
