@@ -22,6 +22,8 @@ namespace TikTok_Downloader
             ChangeDownloadFolderToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
             settingsToolStripMenuItem = new ToolStripMenuItem();
+            runFirefoxScriptToolStripMenuItem = new ToolStripMenuItem();
+            tikTokSigninToolStripMenuItem = new ToolStripMenuItem();
             checkForUpdateToolStripMenuItem = new ToolStripMenuItem();
             cmbChoice = new ComboBox();
             urlTextBox = new TextBox();
@@ -56,8 +58,8 @@ namespace TikTok_Downloader
             // fileToolStripMenuItem
             // 
             fileToolStripMenuItem.BackColor = Color.FromArgb(58, 58, 58);
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { ChangeDownloadFolderToolStripMenuItem, aboutToolStripMenuItem, settingsToolStripMenuItem, checkForUpdateToolStripMenuItem });
-            fileToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { ChangeDownloadFolderToolStripMenuItem, aboutToolStripMenuItem, settingsToolStripMenuItem, runFirefoxScriptToolStripMenuItem, tikTokSigninToolStripMenuItem, checkForUpdateToolStripMenuItem });
+            fileToolStripMenuItem.ForeColor = SystemColors.ButtonHighlight;
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(61, 20);
             fileToolStripMenuItem.Text = "Options";
@@ -65,7 +67,7 @@ namespace TikTok_Downloader
             // ChangeDownloadFolderToolStripMenuItem
             // 
             ChangeDownloadFolderToolStripMenuItem.BackColor = Color.FromArgb(32, 32, 32);
-            ChangeDownloadFolderToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
+            ChangeDownloadFolderToolStripMenuItem.ForeColor = SystemColors.Control;
             ChangeDownloadFolderToolStripMenuItem.Name = "ChangeDownloadFolderToolStripMenuItem";
             ChangeDownloadFolderToolStripMenuItem.Size = new Size(208, 22);
             ChangeDownloadFolderToolStripMenuItem.Text = "Change Download Folder";
@@ -74,7 +76,7 @@ namespace TikTok_Downloader
             // aboutToolStripMenuItem
             // 
             aboutToolStripMenuItem.BackColor = Color.FromArgb(32, 32, 32);
-            aboutToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
+            aboutToolStripMenuItem.ForeColor = SystemColors.Control;
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             aboutToolStripMenuItem.Size = new Size(208, 22);
             aboutToolStripMenuItem.Text = "About";
@@ -83,11 +85,29 @@ namespace TikTok_Downloader
             // settingsToolStripMenuItem
             // 
             settingsToolStripMenuItem.BackColor = Color.FromArgb(32, 32, 32);
-            settingsToolStripMenuItem.ForeColor = SystemColors.ButtonFace;
+            settingsToolStripMenuItem.ForeColor = SystemColors.Control;
             settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             settingsToolStripMenuItem.Size = new Size(208, 22);
             settingsToolStripMenuItem.Text = "Settings";
             settingsToolStripMenuItem.Click += settingsToolStripMenuItem_Click;
+            // 
+            // runFirefoxScriptToolStripMenuItem
+            // 
+            runFirefoxScriptToolStripMenuItem.BackColor = Color.FromArgb(32, 32, 32);
+            runFirefoxScriptToolStripMenuItem.ForeColor = SystemColors.Control;
+            runFirefoxScriptToolStripMenuItem.Name = "runFirefoxScriptToolStripMenuItem";
+            runFirefoxScriptToolStripMenuItem.Size = new Size(208, 22);
+            runFirefoxScriptToolStripMenuItem.Text = "Run Firefox Script";
+            runFirefoxScriptToolStripMenuItem.Click += runFirefoxScriptToolStripMenuItem_Click;
+            //
+            // tikTokSigninToolStripMenuItem
+            // 
+            tikTokSigninToolStripMenuItem.BackColor = Color.FromArgb(32, 32, 32);
+            tikTokSigninToolStripMenuItem.ForeColor = SystemColors.Control;
+            tikTokSigninToolStripMenuItem.Name = "tikTokSigninToolStripMenuItem";
+            tikTokSigninToolStripMenuItem.Size = new Size(208, 22);
+            tikTokSigninToolStripMenuItem.Text = "TikTok Sign-in (Soon™)";
+            tikTokSigninToolStripMenuItem.Click += tikTokSigninToolStripMenuItem_Click;
             // 
             // checkForUpdateToolStripMenuItem
             // 
@@ -307,7 +327,6 @@ namespace TikTok_Downloader
             MainMenuStrip = menuStrip1;
             MaximizeBox = false;
             Name = "MainForm";
-            Text = "TikTok Downloader v1.3.7";
             Text = $"TikTok Downloader v{ProductVersion}";
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
@@ -320,6 +339,8 @@ namespace TikTok_Downloader
         private ToolStripMenuItem aboutToolStripMenuItem;
         private ToolStripMenuItem ChangeDownloadFolderToolStripMenuItem;
         private ToolStripMenuItem settingsToolStripMenuItem;
+        private ToolStripMenuItem runFirefoxScriptToolStripMenuItem;
+        private ToolStripMenuItem tikTokSigninToolStripMenuItem;
         private ToolStripMenuItem checkForUpdateToolStripMenuItem;
         private ComboBox cmbChoice;
         private TextBox urlTextBox;

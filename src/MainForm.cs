@@ -40,6 +40,7 @@ namespace TikTok_Downloader
         private string jsonLogFilePath;
         private object jsonLock = new object();
         private bool ToastsAllowed;
+        private bool firefoxfound;
         private bool DownloadImagesOnly;
         private readonly AppSettings settings;
         private SettingsDialog settingsDialog;
@@ -169,7 +170,7 @@ namespace TikTok_Downloader
                 {
                     try
                     {
-                        RunSetupScripts();
+                        RunFirefoxScript();
 
                         currentSettings.FirstRun = true;
                         settings.SaveSettings();
@@ -368,6 +369,7 @@ namespace TikTok_Downloader
             {
                 await Task.Yield();
                 string executablePath = string.Empty;
+                mainForm.firefoxfound = false;
                 RegistryKey regKey = null;
 
                 try
@@ -388,19 +390,18 @@ namespace TikTok_Downloader
 
                         var firefoxDirectories = Directory.GetDirectories(msPlaywrightPath, "firefox-*");
 
-                        bool found = false;
                         foreach (var dir in firefoxDirectories)
                         {
                             var candidatePath = Path.Combine(dir, "firefox", "firefox.exe");
                             if (File.Exists(candidatePath))
                             {
                                 executablePath = candidatePath;
-                                found = true;
+                                mainForm.firefoxfound = true;
                                 break;
                             }
                         }
 
-                        if (!found)
+                        if (!mainForm.firefoxfound)
                         {
                             mainForm.LogError("Firefox executable was not found in the expected ms-playwright folder structure.");
                         }
@@ -1890,20 +1891,43 @@ namespace TikTok_Downloader
             }
         }
 
-        private void RunSetupScripts()
+        private async void runFirefoxScriptToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            await browserUtility.GetSystemDefaultBrowser();
+
+            if (firefoxfound == false)
+            {
+                RunFirefoxScript();
+            }
+            else if (firefoxfound == true)
+            {
+                MessageBox.Show("Firefox is already installed. No need to run the script.", "Firefox Already Installed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+        }
+
+        private void RunFirefoxScript()
         {
             string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string scriptsDirectory = Path.Combine(appDirectory, "scripts");
+            string scriptPath = Path.Combine(appDirectory, "playwright.ps1");
+            string arguments = $"-Command \"& {{ pwsh -File '{scriptPath}' install firefox }}\"";
 
-            Process process1 = Process.Start(new ProcessStartInfo
+            Process process = new Process
             {
-                FileName = Path.Combine(scriptsDirectory, "playwright-ex.bat"),
-                WorkingDirectory = scriptsDirectory
-            });
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "powershell",
+                    Arguments = arguments,
+                    WorkingDirectory = appDirectory,
+                    UseShellExecute = true,
+                    CreateNoWindow = false
+                }
+            };
 
-            process1.WaitForExit();
+            process.Start();
+            process.WaitForExit();
 
-            if (process1.ExitCode == 0)
+            if (process.ExitCode == 0)
             {
                 MessageBox.Show("The Firefox script executed successfully.", "Setup Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -2097,6 +2121,15 @@ namespace TikTok_Downloader
         private void checkForUpdateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CheckForUpdates();
+        }
+
+        private void tikTokSigninToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show($"This feature is still in development and is therefore not available.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            /*using (var tikTokSigninDialog = new TikTokSigninDialog())
+            {
+                tikTokSigninDialog.ShowDialog();
+            }*/
         }
 
         public void LogJsonCheckBox(bool value)
