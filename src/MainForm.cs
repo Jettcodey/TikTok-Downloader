@@ -197,7 +197,6 @@ namespace TikTok_Downloader
             logJsonEnabled = currentSettings.EnableJsonLogs;
         }
 
-
         private void LogMessage(string logFilePath, string message)
         {
             if (!EnableDownloadLogs || _stopLoggingForCooldown)
@@ -236,7 +235,6 @@ namespace TikTok_Downloader
                     catch (Exception ex)
                     {
                         outputTextBox.AppendText($"Error: An error occurred while logging the JSON response: {ex.Message}\r\n");
-                        Console.WriteLine($"Error occurred while logging the JSON response: {ex.Message}");
                         LogError($"An error occurred while logging the JSON response: {ex.Message}");
                     }
                 }
@@ -250,7 +248,6 @@ namespace TikTok_Downloader
                 LogMessage(logFilePath, $"Error: {errorMessage}");
             }
         }
-
 
         class VideoData
         {
@@ -348,7 +345,6 @@ namespace TikTok_Downloader
             {
                 string filePath = urlTextBox.Text.Trim();
                 LogMessage(logFilePath, $"Selected file path: {filePath}");
-                await HDVideoDownloadFromTextFile(filePath, _cancellationTokenSource.Token);
                 await HDDownloadFromTextFile(filePath, _cancellationTokenSource.Token);
             }
             else if (choice == "HD Mass Download by Username")
@@ -578,7 +574,6 @@ namespace TikTok_Downloader
                 }
                 else if (choice == "HD Mass Download by Username")
                 {
-                    await HDVideoDownloadFromTextFile(combinedLinksFilePath, _cancellationTokenSource.Token);
                     await HDDownloadFromTextFile(combinedLinksFilePath, _cancellationTokenSource.Token);
                 }
             }
@@ -597,7 +592,6 @@ namespace TikTok_Downloader
                 LogMessage(logFilePath, "Browser closed successfully");
                 downloadButton.Enabled = true;
                 cmbChoice.Enabled = true;
-                ToastNotification.ShowToast($"Download Completed!", "Finished downloading all Images/Videos from {0}.", username, _cancellationTokenSource);
                 ToastNotification.ShowToast($"Mass Download by Username Completed!", $"Finished downloading all Images/Videos from {username}.", _cancellationTokenSource);
                 outputTextBox.AppendText("Download Completed!\r\n");
             }
@@ -619,7 +613,6 @@ namespace TikTok_Downloader
             progressBar.Maximum = urls.Length;
             progressBar.Value = 0;
 
-            using (var settingsDialog = new SettingsDialog(this))
             {
                 foreach (var url in urls)
                 {
@@ -681,7 +674,6 @@ namespace TikTok_Downloader
             progressBar.Maximum = urls.Length;
             progressBar.Value = 0;
 
-            using (var settingsDialog = new SettingsDialog(this))
             {
 
                 foreach (var url in urls)
@@ -725,7 +717,6 @@ namespace TikTok_Downloader
             downloadButton.Enabled = true;
             browseFileButton.Enabled = true;
             cmbChoice.Enabled = true;
-            ToastNotification.ShowToast($"Download Completed!", $"Finished downloading all {urls.Length} Videos from your Text File.", _cancellationTokenSource);
             ToastNotification.ShowToast($"Mass Download from Text File Completed!", $"Finished downloading all {urls.Length} Videos from your Text File.", _cancellationTokenSource);
             outputTextBox.AppendText("Download Completed!\r\n");
         }
@@ -747,7 +738,6 @@ namespace TikTok_Downloader
 
                 var trimmedUrl = url.Trim();
 
-                using (var settingsDialog = new SettingsDialog(this))
                 {
                     if (withWatermarkCheckBox.Checked)
                     {
@@ -832,7 +822,6 @@ namespace TikTok_Downloader
             }
         }
 
-        private async Task HDVideoDownloadFromTextFile(string filePath, CancellationToken token)
         private async Task HDDownloadFromTextFile(string filePath, CancellationToken token)
         {
             outputTextBox.Clear();
@@ -853,7 +842,6 @@ namespace TikTok_Downloader
             progressBar.Maximum = urls.Length;
             progressBar.Value = 0;
 
-            using (var settingsDialog = new SettingsDialog(this))
             {
                 foreach (var url in urls)
                 {
@@ -869,7 +857,6 @@ namespace TikTok_Downloader
             downloadButton.Enabled = true;
             browseFileButton.Enabled = true;
             cmbChoice.Enabled = true;
-            ToastNotification.ShowToast($"Download Completed!", $"Finished downloading all {urls.Length} Videos from your Text File.", _cancellationTokenSource);
             ToastNotification.ShowToast($"HD Mass Download from Text File Completed!", $"Finished downloading all {urls.Length} Videos from your Text File.", _cancellationTokenSource);
             outputTextBox.AppendText("Download Completed!\r\n");
         }
@@ -1094,7 +1081,6 @@ namespace TikTok_Downloader
                     }
                 }
             }
-
             if (videoAlreadyDownloaded)
             {
                 LogMessage(logFilePath, $"Media {MediaID} already exists.");
@@ -1358,13 +1344,11 @@ namespace TikTok_Downloader
                                         }
                                     }
                                 }
-
                                 await File.AppendAllTextAsync(indexFilePath, $"{vid}_HD\n");
                                 LogMessage(logFilePath, $"HD Video File Saved to {fullPath}");
                                 string choice = cmbChoice.SelectedItem.ToString();
                                 if (choice == "HD Download Video/Image")
                                 {
-                                    ToastNotification.ShowToast("HD Video Downloaded", $"Download of {vid}_HD.mp4 completed successfully!");
                                     ToastNotification.ShowToast($"HD Video from @{username} Downloaded", $"Download of {vid}_HD.mp4 completed successfully!");
                                 }
                                 outputTextBox.AppendText($"Downloaded HD Video: '{filename}' Successfully...\r\n");
@@ -1462,7 +1446,6 @@ namespace TikTok_Downloader
                                     string choice = cmbChoice.SelectedItem.ToString();
                                     if (choice == "HD Download Video/Image")
                                     {
-                                        ToastNotification.ShowToast("HD Image(s) Downloaded", $"Download of {imageCount} Image(s) completed successfully!");
                                         ToastNotification.ShowToast($"HD Image(s) from @{username} Downloaded", $"Download of {imageCount} Image(s) completed successfully!");
                                     }
                                 }
@@ -1539,7 +1522,6 @@ namespace TikTok_Downloader
                     }
                 }
             }
-
             return downloadedIds;
         }
 
@@ -1593,7 +1575,6 @@ namespace TikTok_Downloader
                         string choice = cmbChoice.SelectedItem.ToString();
                         if (choice == "Single Video/Image Download")
                         {
-                            ToastNotification.ShowToast("SD Image(s) Downloaded", $"Download of {data.Images.Count} Image(s) completed successfully!");
                             ToastNotification.ShowToast($"SD Image(s) from @{username} Downloaded", $"Download of {data.Images.Count} Image(s) completed successfully!");
                         }
                     }
@@ -1618,13 +1599,7 @@ namespace TikTok_Downloader
                                 {
                                     await DownloadVideoWithBufferedWrite(client, data.Url, videoFilePath, cancellationToken);
                                 }
-
                                 outputTextBox.AppendText($"Downloaded Video: '{videoFileName}' successfully.\r\n");
-                                string choice = cmbChoice.SelectedItem.ToString();
-                                if (choice == "Single Video/Image Download")
-                                {
-                                    ToastNotification.ShowToast("SD Video Downloaded", $"Download of {data.Id}.mp4 completed successfully!");
-                                }
                                 await File.AppendAllTextAsync(indexFilePath, $"{data.Id}\n");
                             }
                             string choice = cmbChoice.SelectedItem.ToString();
@@ -1738,7 +1713,6 @@ namespace TikTok_Downloader
                                 await CheckPauseStatusAsync();
                             }
                         }
-
                     }
                     return;
                 }
@@ -1828,7 +1802,6 @@ namespace TikTok_Downloader
                 }
                 else
                 {
-                    outputTextBox.AppendText("No avatar images to download.\r\n");
                     LogMessage(logFilePath, "No Avatar images to download.");
                     outputTextBox.AppendText("No Avatar images to download.\r\n");
                 }
@@ -1869,7 +1842,6 @@ namespace TikTok_Downloader
                 outputTextBox.AppendText($"Error downloading avatars: {ex.Message}\r\n");
                 LogError($"Error: {ex.Message}");
             }
-
         }
 
         private async Task<string> ExtractUsernameFromUrl(string url, CancellationToken token)
@@ -1937,7 +1909,6 @@ namespace TikTok_Downloader
             }
             else
             {
-                MessageBox.Show("The Firefox script failed to execute. Please check if Powershell 7 is Installed & try running the script manually again. If the issue persists, open an issue on GitHub.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 MessageBox.Show("The Firefox script failed to execute. Please check if PowerShell 7 is installed and try running the script manually again. If the issue persists, open an issue on GitHub.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
