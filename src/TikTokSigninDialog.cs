@@ -68,6 +68,8 @@ namespace TikTok_Downloader
             // 
             // TikTokSigninDialog
             // 
+            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleMode = AutoScaleMode.Dpi;
             BackColor = Color.FromArgb(32, 32, 32);
             ClientSize = new Size(284, 261);
             Controls.Add(titleLabel);
