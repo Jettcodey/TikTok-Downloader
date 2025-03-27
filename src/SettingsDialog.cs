@@ -241,6 +241,7 @@ namespace TikTok_Downloader
             MinimizeBox = false;
             Name = "SettingsDialog";
             Text = "TikTok Downloader Settings";
+            Text = $"TikTok Downloader v{ProductVersion}";
             ResumeLayout(false);
             PerformLayout();
         }

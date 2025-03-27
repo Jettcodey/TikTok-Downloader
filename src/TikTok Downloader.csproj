@@ -7,11 +7,6 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <PlatformTarget>x64</PlatformTarget>
-    <Company>$(Authors)</Company>
-    <Authors>Jettcodey</Authors>
-    <Title>TikTok Downloader</Title>
-    <Version>1.3.7</Version>
-    <Copyright>Jettcodey ©2024</Copyright>
     <PackageIcon>Assets\icon.png</PackageIcon>
     <NeutralLanguage>en-US</NeutralLanguage>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
@@ -20,9 +15,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>none</DebugType>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="app.manifest" />
@@ -31,21 +28,12 @@
     <None Remove="scripts\pwsh.bat" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="scripts\playwright-ex.bat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Microsoft.Playwright" Version="1.48.0" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Management" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="AboutWindow.cs">
-      <CustomToolNamespace>TikTok_Downloader</CustomToolNamespace>
-      <Generator>MSBuild:Compile</Generator>
-    </Compile>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

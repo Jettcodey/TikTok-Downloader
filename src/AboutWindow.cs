@@ -70,6 +70,7 @@ namespace TikTok_Downloader
             versionLabel.Size = new Size(117, 15);
             versionLabel.TabIndex = 1;
             versionLabel.Text = "Version: Release 1.3.5";
+            versionLabel.Text = $"Version: Release {ProductVersion}";
             // 
             // descriptionLabel
             // 
@@ -149,6 +150,7 @@ namespace TikTok_Downloader
             MinimizeBox = false;
             Name = "AboutWindow";
             Text = "TikTok Downloader Version 1.3.7";
+            Text = $"TikTok Downloader v{ProductVersion}";
             ResumeLayout(false);
             PerformLayout();
         }
