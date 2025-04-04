@@ -14,6 +14,9 @@
 <!-- > [!NOTE]
 > Some features of the application are not always working 100% right now due to changes in the TikTok API. -->
 
+> [!NOTE]
+> The application is currently undergoing refactoring and a small rewrite.
+
 <!-- TABLE OF CONTENTS -->
 <summary>Table of Contents</summary>
  <ol>
