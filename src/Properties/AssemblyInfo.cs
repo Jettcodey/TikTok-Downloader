@@ -16,5 +16,5 @@ using System.Runtime.Versioning;
 
 [assembly: Guid("b52829e7-33b6-4d38-bafb-2396c27cf06b")]
 
-[assembly: AssemblyVersion("1.3.7")]
-[assembly: AssemblyFileVersion("1.3.7")]
+[assembly: AssemblyVersion("1.3.8")]
+[assembly: AssemblyFileVersion("1.3.8")]
