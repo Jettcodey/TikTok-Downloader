@@ -24,16 +24,17 @@ namespace TikTok_Downloader
         public class Settings
         {
             public bool ToastsAllowed { get; set; }
-            public bool DownloadImagesOnly { get; set; }
             public bool EnableJsonLogs { get; set; }
             public bool EnableDownloadLogs { get; set; }
             public string LastDownloadFolderPath { get; set; }
+            public string LastDownloadOption { get; set; }
+            public string LastBrowsingPath { get; set; }
             public bool FirstRun { get; set; }
             public string CustomBrowserPath { get; set; }
         }
 
-        private string directoryPath;
-        private string filePath;
+        private readonly string directoryPath;
+        private readonly string filePath;
 
         public Settings CurrentSettings { get; set; }
 
@@ -73,10 +74,11 @@ namespace TikTok_Downloader
                 CurrentSettings = new Settings
                 {
                     ToastsAllowed = false,
-                    DownloadImagesOnly = false,
                     EnableJsonLogs = false,
                     EnableDownloadLogs = false,
                     LastDownloadFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TiktokDownloads"),
+                    LastDownloadOption = "Single Video/Image Download",
+                    LastBrowsingPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
                     FirstRun = false,
                     CustomBrowserPath = "",
                 };

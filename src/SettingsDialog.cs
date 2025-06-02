@@ -15,21 +15,21 @@ namespace TikTok_Downloader
 {
     public partial class SettingsDialog : Form
     {
-        private string SettingsFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Jettcodey", "TikTok Downloader", "appsettings.xml");
+        private readonly string SettingsFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Jettcodey", "TikTok Downloader", "appsettings.xml");
 
         private Label descriptionLabel;
         private Button okButton;
         private Button saveButton;
         private Button exportButton;
         private Button loadButton;
+        private Button firefoxScript;
         private CheckBox setting1CheckBox;
         private CheckBox setting2CheckBox;
         private CheckBox setting3CheckBox;
-        private CheckBox setting4CheckBox;
         private ComboBox browserComboBox;
         private Settings settings = new Settings();
         private Label BrowserSelect;
-        private MainForm mainForm;
+        private readonly MainForm mainForm;
         public SettingsDialog(MainForm mainForm)
         {
             InitializeComponent();
@@ -49,19 +49,11 @@ namespace TikTok_Downloader
         {
             if (sender is CheckBox checkBox)
             {
-                mainForm.DownloadImagesOnlyCheckBox(checkBox.Checked);
-            }
-        }
-
-        private void Setting3CheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (sender is CheckBox checkBox)
-            {
                 mainForm.LogJsonCheckBox(checkBox.Checked);
             }
         }
 
-        private void Setting4CheckBox_CheckedChanged(object sender, EventArgs e)
+        private void Setting3CheckBox_CheckedChanged(object sender, EventArgs e)
         {
             if (sender is CheckBox checkBox)
             {
@@ -77,10 +69,10 @@ namespace TikTok_Downloader
             saveButton = new Button();
             exportButton = new Button();
             loadButton = new Button();
+            firefoxScript = new Button();
             setting1CheckBox = new CheckBox();
             setting2CheckBox = new CheckBox();
             setting3CheckBox = new CheckBox();
-            setting4CheckBox = new CheckBox();
             browserComboBox = new ComboBox();
             BrowserSelect = new Label();
             SuspendLayout();
@@ -91,7 +83,7 @@ namespace TikTok_Downloader
             descriptionLabel.BackColor = Color.Transparent;
             descriptionLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             descriptionLabel.ForeColor = SystemColors.Control;
-            descriptionLabel.Location = new Point(12, 12);
+            descriptionLabel.Location = new Point(12, 9);
             descriptionLabel.Name = "descriptionLabel";
             descriptionLabel.Size = new Size(224, 21);
             descriptionLabel.TabIndex = 0;
@@ -101,7 +93,7 @@ namespace TikTok_Downloader
             // okButton
             // 
             okButton.BackColor = SystemColors.Control;
-            okButton.Location = new Point(15, 175);
+            okButton.Location = new Point(12, 188);
             okButton.Name = "okButton";
             okButton.Size = new Size(75, 23);
             okButton.TabIndex = 1;
@@ -112,7 +104,7 @@ namespace TikTok_Downloader
             // saveButton
             // 
             saveButton.BackColor = SystemColors.Control;
-            saveButton.Location = new Point(107, 175);
+            saveButton.Location = new Point(110, 188);
             saveButton.Name = "saveButton";
             saveButton.Size = new Size(75, 23);
             saveButton.TabIndex = 2;
@@ -123,7 +115,7 @@ namespace TikTok_Downloader
             // exportButton
             // 
             exportButton.BackColor = SystemColors.Control;
-            exportButton.Location = new Point(202, 175);
+            exportButton.Location = new Point(207, 188);
             exportButton.Name = "exportButton";
             exportButton.Size = new Size(75, 23);
             exportButton.TabIndex = 3;
@@ -134,7 +126,7 @@ namespace TikTok_Downloader
             // loadButton
             // 
             loadButton.BackColor = SystemColors.Control;
-            loadButton.Location = new Point(300, 175);
+            loadButton.Location = new Point(302, 188);
             loadButton.Name = "loadButton";
             loadButton.Size = new Size(75, 23);
             loadButton.TabIndex = 4;
@@ -142,14 +134,25 @@ namespace TikTok_Downloader
             loadButton.UseVisualStyleBackColor = false;
             loadButton.Click += LoadButton_Click;
             // 
+            // firefoxScript
+            // 
+            firefoxScript.BackColor = SystemColors.Control;
+            firefoxScript.Location = new Point(12, 95);
+            firefoxScript.Name = "firefoxScript";
+            firefoxScript.Size = new Size(115, 23);
+            firefoxScript.TabIndex = 10;
+            firefoxScript.Text = "Run Firefox Script";
+            firefoxScript.UseVisualStyleBackColor = false;
+            firefoxScript.Click += FirefoxScript_Click;
+            // 
             // setting1CheckBox
             // 
             setting1CheckBox.AutoSize = true;
             setting1CheckBox.BackColor = Color.Transparent;
             setting1CheckBox.ForeColor = SystemColors.Control;
-            setting1CheckBox.Location = new Point(15, 70);
+            setting1CheckBox.Location = new Point(12, 70);
             setting1CheckBox.Name = "setting1CheckBox";
-            setting1CheckBox.Size = new Size(146, 19);
+            setting1CheckBox.Size = new Size(184, 19);
             setting1CheckBox.TabIndex = 5;
             setting1CheckBox.Text = "Enable Windows Notifications";
             setting1CheckBox.UseVisualStyleBackColor = false;
@@ -160,13 +163,12 @@ namespace TikTok_Downloader
             setting2CheckBox.AutoSize = true;
             setting2CheckBox.BackColor = Color.Transparent;
             setting2CheckBox.ForeColor = SystemColors.Control;
-            setting2CheckBox.Location = new Point(167, 70);
-            setting2CheckBox.Name = "setting4CheckBox";
-            setting2CheckBox.Size = new Size(149, 19);
-            setting2CheckBox.TabIndex = 7;
-            setting2CheckBox.Text = "Download Images Only";
+            setting2CheckBox.Location = new Point(167, 45);
+            setting2CheckBox.Name = "setting3CheckBox";
+            setting2CheckBox.Size = new Size(115, 19);
+            setting2CheckBox.TabIndex = 6;
+            setting2CheckBox.Text = "Enable Json Logs";
             setting2CheckBox.UseVisualStyleBackColor = false;
-            setting2CheckBox.Visible = false;
             setting2CheckBox.CheckedChanged += Setting2CheckBox_CheckedChanged;
             // 
             // setting3CheckBox
@@ -174,33 +176,20 @@ namespace TikTok_Downloader
             setting3CheckBox.AutoSize = true;
             setting3CheckBox.BackColor = Color.Transparent;
             setting3CheckBox.ForeColor = SystemColors.Control;
-            setting3CheckBox.Location = new Point(167, 45);
-            setting3CheckBox.Name = "setting2CheckBox";
-            setting3CheckBox.Size = new Size(115, 19);
-            setting3CheckBox.TabIndex = 6;
-            setting3CheckBox.Text = "Enable Json Logs";
+            setting3CheckBox.Location = new Point(12, 45);
+            setting3CheckBox.Name = "setting4CheckBox";
+            setting3CheckBox.Size = new Size(146, 19);
+            setting3CheckBox.TabIndex = 7;
+            setting3CheckBox.Text = "Enable Download Logs";
             setting3CheckBox.UseVisualStyleBackColor = false;
             setting3CheckBox.CheckedChanged += Setting3CheckBox_CheckedChanged;
-            // 
-            // setting4CheckBox
-            // 
-            setting4CheckBox.AutoSize = true;
-            setting4CheckBox.BackColor = Color.Transparent;
-            setting4CheckBox.ForeColor = SystemColors.Control;
-            setting4CheckBox.Location = new Point(15, 45);
-            setting4CheckBox.Name = "setting5CheckBox";
-            setting4CheckBox.Size = new Size(146, 19);
-            setting4CheckBox.TabIndex = 7;
-            setting4CheckBox.Text = "Enable Download Logs";
-            setting4CheckBox.UseVisualStyleBackColor = false;
-            setting4CheckBox.CheckedChanged += Setting4CheckBox_CheckedChanged;
             // 
             // browserComboBox
             // 
             browserComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             browserComboBox.FormattingEnabled = true;
-            browserComboBox.Items.AddRange(new object[] { "System Default", "Google Chrome", "Mozilla Firefox", "Microsoft Edge", "Chromium", "Brave Browser", "Opera GX (Not Working!)" });
-            browserComboBox.Location = new Point(12, 134);
+            browserComboBox.Items.AddRange(new object[] { "System Default", "Google Chrome", "Mozilla Firefox", "Microsoft Edge", "Chromium", "Brave Browser" });
+            browserComboBox.Location = new Point(12, 149);
             browserComboBox.Name = "browserComboBox";
             browserComboBox.Size = new Size(300, 23);
             browserComboBox.TabIndex = 8;
@@ -211,7 +200,7 @@ namespace TikTok_Downloader
             BrowserSelect.AutoSize = true;
             BrowserSelect.BackColor = Color.Transparent;
             BrowserSelect.ForeColor = SystemColors.Control;
-            BrowserSelect.Location = new Point(11, 117);
+            BrowserSelect.Location = new Point(12, 131);
             BrowserSelect.Name = "BrowserSelect";
             BrowserSelect.Size = new Size(143, 15);
             BrowserSelect.TabIndex = 9;
@@ -221,27 +210,26 @@ namespace TikTok_Downloader
             // 
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
-            BackColor = SystemColors.ControlDarkDark;
-            BackgroundImage = Properties.Resources.bg;
-            ClientSize = new Size(400, 250);
-            Controls.Add(BrowserSelect);
+            BackColor = Color.FromArgb(32, 32, 32);
+            ClientSize = new Size(400, 241);
             Controls.Add(descriptionLabel);
             Controls.Add(okButton);
             Controls.Add(saveButton);
             Controls.Add(exportButton);
             Controls.Add(loadButton);
+            Controls.Add(firefoxScript);
             Controls.Add(setting1CheckBox);
             Controls.Add(setting2CheckBox);
             Controls.Add(setting3CheckBox);
-            Controls.Add(setting4CheckBox);
+            Controls.Add(BrowserSelect);
             Controls.Add(browserComboBox);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             MinimizeBox = false;
-            FormClosing += SettingsDialog_FormClosing;
             Name = "SettingsDialog";
             Text = $"TikTok Downloader v{ProductVersion}";
+            FormClosing += SettingsDialog_FormClosing;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -277,9 +265,8 @@ namespace TikTok_Downloader
             try
             {
                 settings.ToastsAllowed = setting1CheckBox.Checked;
-                settings.DownloadImagesOnly = setting2CheckBox.Checked;
-                settings.EnableJsonLogs = setting3CheckBox.Checked;
-                settings.EnableDownloadLogs = setting4CheckBox.Checked;
+                settings.EnableJsonLogs = setting2CheckBox.Checked;
+                settings.EnableDownloadLogs = setting3CheckBox.Checked;
 
                 string selectedBrowser = browserComboBox.SelectedItem?.ToString();
                 settings.CustomBrowserPath = GetBrowserPath(selectedBrowser);
@@ -296,7 +283,7 @@ namespace TikTok_Downloader
             }
         }
 
-        private void LoadExistingSettings()
+        public void LoadExistingSettings()
         {
             try
             {
@@ -308,9 +295,8 @@ namespace TikTok_Downloader
                         settings = (AppSettings.Settings)serializer.Deserialize(reader);
                     }
                     setting1CheckBox.Checked = settings.ToastsAllowed;
-                    setting2CheckBox.Checked = settings.DownloadImagesOnly;
-                    setting3CheckBox.Checked = settings.EnableJsonLogs;
-                    setting4CheckBox.Checked = settings.EnableDownloadLogs;
+                    setting2CheckBox.Checked = settings.EnableJsonLogs;
+                    setting3CheckBox.Checked = settings.EnableDownloadLogs;
 
                     string selectedBrowser = GetBrowserNameFromPath(settings.CustomBrowserPath);
                     browserComboBox.SelectedItem = selectedBrowser;
@@ -349,9 +335,8 @@ namespace TikTok_Downloader
                             XmlSerializer serializer = new XmlSerializer(typeof(AppSettings.Settings));
                             AppSettings.Settings settings = (AppSettings.Settings)serializer.Deserialize(streamReader);
                             setting1CheckBox.Checked = settings.ToastsAllowed;
-                            setting2CheckBox.Checked = settings.DownloadImagesOnly;
-                            setting3CheckBox.Checked = settings.EnableJsonLogs;
-                            setting4CheckBox.Checked = settings.EnableDownloadLogs;
+                            setting2CheckBox.Checked = settings.EnableJsonLogs;
+                            setting3CheckBox.Checked = settings.EnableDownloadLogs;
                             browserComboBox.SelectedItem = GetBrowserNameFromPath(settings.CustomBrowserPath);
                         }
                     }
@@ -379,9 +364,8 @@ namespace TikTok_Downloader
                         AppSettings.Settings settings = new AppSettings.Settings
                         {
                             ToastsAllowed = setting1CheckBox.Checked,
-                            DownloadImagesOnly = setting2CheckBox.Checked,
-                            EnableJsonLogs = setting3CheckBox.Checked,
-                            EnableDownloadLogs = setting4CheckBox.Checked,
+                            EnableJsonLogs = setting2CheckBox.Checked,
+                            EnableDownloadLogs = setting3CheckBox.Checked,
                         };
 
                         XmlSerializer serializer = new XmlSerializer(typeof(AppSettings.Settings));
@@ -397,6 +381,23 @@ namespace TikTok_Downloader
                         MessageBox.Show("Error exporting settings: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
+            }
+        }
+
+        private async void FirefoxScript_Click(object sender, EventArgs e)
+        {
+            var browserUtility = new BrowserUtility(mainForm, mainForm.AppSettings);
+            var firefoxfound = mainForm.firefoxfound;
+            await browserUtility.GetSystemDefaultBrowser();
+
+            if (firefoxfound == false)
+            {
+                MainForm.RunFirefoxScript();
+            }
+            else if (firefoxfound == true)
+            {
+                MessageBox.Show("Firefox is already installed. No need to run the script.", "Firefox Already Installed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
         }
 
@@ -452,9 +453,6 @@ namespace TikTok_Downloader
                         case "Brave Browser":
                             registryKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\brave.exe";
                             break;
-                        case "Opera GX":
-                            registryKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\opera.exe";
-                            break;
                         default:
                             throw new Exception("Unsupported browser selected.");
                     }
@@ -472,7 +470,7 @@ namespace TikTok_Downloader
             return browserPath;
         }
 
-        private string? GetRegistryBrowserPath(RegistryKey rootKey, string subKeyPath)
+        private static string? GetRegistryBrowserPath(RegistryKey rootKey, string subKeyPath)
         {
             using (RegistryKey key = rootKey.OpenSubKey(subKeyPath))
             {
@@ -492,7 +490,7 @@ namespace TikTok_Downloader
             }
         }
 
-        private string GetBrowserNameFromPath(string browserPath)
+        private static string GetBrowserNameFromPath(string browserPath)
         {
             if (browserPath.Contains("chrome.exe"))
             {
@@ -501,7 +499,6 @@ namespace TikTok_Downloader
             if (browserPath.Contains("firefox.exe")) return "Mozilla Firefox";
             if (browserPath.Contains("msedge.exe")) return "Microsoft Edge";
             if (browserPath.Contains("brave.exe")) return "Brave Browser";
-            if (browserPath.Contains("opera.exe")) return "Opera GX";
             return "System Default";
         }
     }

@@ -22,7 +22,6 @@ namespace TikTok_Downloader
             ChangeDownloadFolderToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
             settingsToolStripMenuItem = new ToolStripMenuItem();
-            runFirefoxScriptToolStripMenuItem = new ToolStripMenuItem();
             tikTokSigninToolStripMenuItem = new ToolStripMenuItem();
             checkForUpdateToolStripMenuItem = new ToolStripMenuItem();
             cmbChoice = new ComboBox();
@@ -58,7 +57,7 @@ namespace TikTok_Downloader
             // fileToolStripMenuItem
             // 
             fileToolStripMenuItem.BackColor = Color.FromArgb(58, 58, 58);
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { ChangeDownloadFolderToolStripMenuItem, aboutToolStripMenuItem, settingsToolStripMenuItem, runFirefoxScriptToolStripMenuItem, tikTokSigninToolStripMenuItem, checkForUpdateToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { ChangeDownloadFolderToolStripMenuItem, settingsToolStripMenuItem, tikTokSigninToolStripMenuItem, checkForUpdateToolStripMenuItem, aboutToolStripMenuItem });
             fileToolStripMenuItem.ForeColor = SystemColors.ButtonHighlight;
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(61, 20);
@@ -80,7 +79,7 @@ namespace TikTok_Downloader
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             aboutToolStripMenuItem.Size = new Size(208, 22);
             aboutToolStripMenuItem.Text = "About";
-            aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
+            aboutToolStripMenuItem.Click += AboutToolStripMenuItem_Click;
             // 
             // settingsToolStripMenuItem
             // 
@@ -89,17 +88,8 @@ namespace TikTok_Downloader
             settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             settingsToolStripMenuItem.Size = new Size(208, 22);
             settingsToolStripMenuItem.Text = "Settings";
-            settingsToolStripMenuItem.Click += settingsToolStripMenuItem_Click;
+            settingsToolStripMenuItem.Click += SettingsToolStripMenuItem_Click;
             // 
-            // runFirefoxScriptToolStripMenuItem
-            // 
-            runFirefoxScriptToolStripMenuItem.BackColor = Color.FromArgb(32, 32, 32);
-            runFirefoxScriptToolStripMenuItem.ForeColor = SystemColors.Control;
-            runFirefoxScriptToolStripMenuItem.Name = "runFirefoxScriptToolStripMenuItem";
-            runFirefoxScriptToolStripMenuItem.Size = new Size(208, 22);
-            runFirefoxScriptToolStripMenuItem.Text = "Run Firefox Script";
-            runFirefoxScriptToolStripMenuItem.Click += runFirefoxScriptToolStripMenuItem_Click;
-            //
             // tikTokSigninToolStripMenuItem
             // 
             tikTokSigninToolStripMenuItem.BackColor = Color.FromArgb(32, 32, 32);
@@ -107,7 +97,7 @@ namespace TikTok_Downloader
             tikTokSigninToolStripMenuItem.Name = "tikTokSigninToolStripMenuItem";
             tikTokSigninToolStripMenuItem.Size = new Size(208, 22);
             tikTokSigninToolStripMenuItem.Text = "TikTok Sign-in (Soon™)";
-            tikTokSigninToolStripMenuItem.Click += tikTokSigninToolStripMenuItem_Click;
+            tikTokSigninToolStripMenuItem.Click += TikTokSigninToolStripMenuItem_Click;
             // 
             // checkForUpdateToolStripMenuItem
             // 
@@ -116,10 +106,11 @@ namespace TikTok_Downloader
             checkForUpdateToolStripMenuItem.Name = "checkForUpdateToolStripMenuItem";
             checkForUpdateToolStripMenuItem.Size = new Size(208, 22);
             checkForUpdateToolStripMenuItem.Text = "Check for Update";
-            checkForUpdateToolStripMenuItem.Click += checkForUpdateToolStripMenuItem_Click;
+            checkForUpdateToolStripMenuItem.Click += CheckForUpdateToolStripMenuItem_Click;
             // 
             // cmbChoice
             // 
+            cmbChoice.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbChoice.FormattingEnabled = true;
             cmbChoice.Items.AddRange(new object[] { "Single Video/Image Download", "Mass Download from Text File Links", "Mass Download by Username", "HD Download Video/Image", "HD Download From Text File Links", "HD Mass Download by Username" });
             cmbChoice.Location = new Point(149, 36);
@@ -146,7 +137,7 @@ namespace TikTok_Downloader
             downloadButton.TabIndex = 1;
             downloadButton.Text = "Download";
             downloadButton.UseVisualStyleBackColor = false;
-            downloadButton.Click += btnDownload_Click;
+            downloadButton.Click += DownloadButton_Click;
             // 
             // browseFileButton
             // 
@@ -157,7 +148,7 @@ namespace TikTok_Downloader
             browseFileButton.Text = "Browse";
             browseFileButton.UseVisualStyleBackColor = true;
             browseFileButton.Visible = false;
-            browseFileButton.Click += browseFileButton_Click;
+            browseFileButton.Click += BrowseFileButton_Click;
             // 
             // noWatermarkCheckBox
             // 
@@ -173,6 +164,7 @@ namespace TikTok_Downloader
             noWatermarkCheckBox.TextAlign = ContentAlignment.TopLeft;
             noWatermarkCheckBox.UseVisualStyleBackColor = false;
             noWatermarkCheckBox.Visible = false;
+            noWatermarkCheckBox.CheckedChanged += NoWatermarkCheckBox_CheckedChanged;
             // 
             // withWatermarkCheckBox
             // 
@@ -187,7 +179,7 @@ namespace TikTok_Downloader
             withWatermarkCheckBox.Text = "With Watermark";
             withWatermarkCheckBox.TextAlign = ContentAlignment.TopLeft;
             withWatermarkCheckBox.UseVisualStyleBackColor = false;
-            withWatermarkCheckBox.CheckedChanged += withWatermarkCheckBox_CheckedChanged;
+            withWatermarkCheckBox.CheckedChanged += WithWatermarkCheckBox_CheckedChanged;
             // 
             // downloadAvatarsCheckBox
             // 
@@ -202,7 +194,7 @@ namespace TikTok_Downloader
             downloadAvatarsCheckBox.Text = "Download Avatars";
             downloadAvatarsCheckBox.TextAlign = ContentAlignment.TopLeft;
             downloadAvatarsCheckBox.UseVisualStyleBackColor = false;
-            downloadAvatarsCheckBox.CheckedChanged += downloadAvatarsCheckBox_CheckedChanged;
+            downloadAvatarsCheckBox.CheckedChanged += DownloadAvatarsCheckBox_CheckedChanged;
             // 
             // progressBar
             // 
@@ -222,8 +214,8 @@ namespace TikTok_Downloader
             pauseButton.TabIndex = 5;
             pauseButton.Text = "||";
             pauseButton.TextImageRelation = TextImageRelation.TextBeforeImage;
-            pauseButton.UseVisualStyleBackColor = true;
-            pauseButton.Click += pauseButton_Click;
+            pauseButton.UseVisualStyleBackColor = false;
+            pauseButton.Click += PauseButton_Click;
             // 
             // stopButton
             // 
@@ -233,8 +225,8 @@ namespace TikTok_Downloader
             stopButton.Size = new Size(56, 25);
             stopButton.TabIndex = 5;
             stopButton.Text = "Stop";
-            stopButton.UseVisualStyleBackColor = true;
-            stopButton.Click += stopButton_Click;
+            stopButton.UseVisualStyleBackColor = false;
+            stopButton.Click += StopButton_Click;
             // 
             // outputTextBox
             // 
@@ -301,9 +293,7 @@ namespace TikTok_Downloader
             // 
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
-            BackColor = SystemColors.ControlDarkDark;
-            BackgroundImage = Properties.Resources.bg;
-            BackgroundImageLayout = ImageLayout.Stretch;
+            BackColor = Color.FromArgb(32, 32, 32);
             ClientSize = new Size(534, 431);
             Controls.Add(menuStrip1);
             Controls.Add(cmbChoice);
@@ -339,20 +329,19 @@ namespace TikTok_Downloader
         private ToolStripMenuItem aboutToolStripMenuItem;
         private ToolStripMenuItem ChangeDownloadFolderToolStripMenuItem;
         private ToolStripMenuItem settingsToolStripMenuItem;
-        private ToolStripMenuItem runFirefoxScriptToolStripMenuItem;
         private ToolStripMenuItem tikTokSigninToolStripMenuItem;
         private ToolStripMenuItem checkForUpdateToolStripMenuItem;
-        private ComboBox cmbChoice;
+        public ComboBox cmbChoice;
         private TextBox urlTextBox;
         private Button downloadButton;
         private Button browseFileButton;
         private CheckBox noWatermarkCheckBox;
         private CheckBox withWatermarkCheckBox;
-        private CheckBox downloadAvatarsCheckBox;
+        public CheckBox downloadAvatarsCheckBox;
         private ProgressBar progressBar;
         private Button pauseButton;
         private Button stopButton;
-        private TextBox outputTextBox;
+        public TextBox outputTextBox;
         private Label label3;
         private Label label2;
         private Label label1;
@@ -392,6 +381,7 @@ namespace TikTok_Downloader
                     urlTextBox.PlaceholderText = "Enter TikTok Video/Image Link";
                     label3.Text = "Download Single Links:";
                     browseFileButton.Visible = false;
+                    urlTextBox.CharacterCasing = CharacterCasing.Normal;
                     withWatermarkCheckBox.Visible = true;
                     downloadAvatarsCheckBox.Visible = true;
                     break;
@@ -399,6 +389,7 @@ namespace TikTok_Downloader
                     urlTextBox.PlaceholderText = "Enter/Select Path to Text File";
                     label3.Text = "Download from Text file:";
                     browseFileButton.Visible = true;
+                    urlTextBox.CharacterCasing = CharacterCasing.Normal;
                     withWatermarkCheckBox.Visible = true;
                     downloadAvatarsCheckBox.Visible = true;
                     break;
@@ -406,6 +397,7 @@ namespace TikTok_Downloader
                     urlTextBox.PlaceholderText = "Enter TikTok link/Username";
                     label3.Text = "Download by Username:";
                     browseFileButton.Visible = false;
+                    urlTextBox.CharacterCasing = CharacterCasing.Lower;
                     withWatermarkCheckBox.Visible = true;
                     downloadAvatarsCheckBox.Visible = true;
                     break;
@@ -413,6 +405,7 @@ namespace TikTok_Downloader
                     urlTextBox.PlaceholderText = "Enter TikTok Video/Image Link";
                     label3.Text = "HD Single Video/Image:";
                     browseFileButton.Visible = false;
+                    urlTextBox.CharacterCasing = CharacterCasing.Normal;
                     withWatermarkCheckBox.Visible = false;
                     downloadAvatarsCheckBox.Visible = false;
                     break;
@@ -420,6 +413,7 @@ namespace TikTok_Downloader
                     urlTextBox.PlaceholderText = "Enter/Select Path to Text File";
                     label3.Text = "HD Download Text file:";
                     browseFileButton.Visible = true;
+                    urlTextBox.CharacterCasing = CharacterCasing.Normal;
                     withWatermarkCheckBox.Visible = false;
                     downloadAvatarsCheckBox.Visible = false;
                     break;
@@ -427,6 +421,7 @@ namespace TikTok_Downloader
                     urlTextBox.PlaceholderText = "Enter TikTok link/Username";
                     label3.Text = "HD Download Username:";
                     browseFileButton.Visible = false;
+                    urlTextBox.CharacterCasing = CharacterCasing.Lower;
                     withWatermarkCheckBox.Visible = false;
                     downloadAvatarsCheckBox.Visible = false;
                     break;
@@ -434,12 +429,14 @@ namespace TikTok_Downloader
                     urlTextBox.PlaceholderText = "Enter TikTok Video/Image Link";
                     label3.Text = "Download Single Links:";
                     browseFileButton.Visible = false;
+                    urlTextBox.CharacterCasing = CharacterCasing.Normal;
                     withWatermarkCheckBox.Visible = true;
                     downloadAvatarsCheckBox.Visible = true;
                     break;
             }
 
             urlTextBox.Text = "";
+            SaveLastDownloadOption();
         }
     }
 }

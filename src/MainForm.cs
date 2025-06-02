@@ -34,16 +34,16 @@ namespace TikTok_Downloader
         private string logFolderPath;
         private string logFilePath;
         private string downloadFolderPath;
+        private string lastBrowsingPath;
         private readonly BrowserUtility browserUtility;
         private bool EnableDownloadLogs;
         private bool logJsonEnabled;
         private string jsonLogFilePath;
-        private object jsonLock = new object();
-        private bool ToastsAllowed;
-        private bool firefoxfound;
-        private bool DownloadImagesOnly;
+        private readonly object jsonLock = new object();
+        private readonly bool ToastsAllowed;
+        public bool firefoxfound;
         private readonly AppSettings settings;
-        private SettingsDialog settingsDialog;
+        private readonly SettingsDialog settingsDialog;
         private List<string> cachedVideoUrls = new List<string>();
         private bool _stopLoggingForCooldown;
         private bool isLoggingInitialized = false;
@@ -52,7 +52,7 @@ namespace TikTok_Downloader
         private TaskCompletionSource<bool> _pauseTaskCompletionSource;
         private readonly StringBuilder _pausedTextBuffer = new StringBuilder();
         public AppSettings AppSettings => settings;
-        private CacheManager cacheManager;
+        private readonly CacheManager cacheManager;
 
         private Task LogSystemInformation(string logFilePath)
         {
@@ -109,10 +109,10 @@ namespace TikTok_Downloader
             cacheManager = new CacheManager();
             settings = new AppSettings();
             LoadSettingsatbeginning();
+            Directory.CreateDirectory(downloadFolderPath);
             InitializeLoggingFolder();
             settings.LoadSettings();
             settingsDialog = new SettingsDialog(this);
-            Directory.CreateDirectory(downloadFolderPath);
 
             Task.Run(async () =>
             {
@@ -123,8 +123,6 @@ namespace TikTok_Downloader
 
             browserUtility = new BrowserUtility(this, settings);
 
-            cmbChoice.SelectedItem = "Single Video/Image Download";
-
             outputTextBox.ReadOnly = true;
         }
 
@@ -134,7 +132,7 @@ namespace TikTok_Downloader
             public List<string> Files { get; set; }
         }
 
-        private void InitializeLoggingFolder()
+        public void InitializeLoggingFolder()
         {
             if (!isLoggingInitialized && (EnableDownloadLogs || logJsonEnabled))
             {
@@ -194,11 +192,26 @@ namespace TikTok_Downloader
                 downloadFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TiktokDownloads");
             }
 
+            lastBrowsingPath = currentSettings.LastBrowsingPath;
+            if (string.IsNullOrEmpty(lastBrowsingPath))
+            {
+                lastBrowsingPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            }
+
+            if (cmbChoice.Items.Contains(currentSettings.LastDownloadOption))
+            {
+                cmbChoice.SelectedItem = currentSettings.LastDownloadOption;
+            }
+            else
+            {
+                cmbChoice.SelectedIndex = 0;
+            }
+
             EnableDownloadLogs = currentSettings.EnableDownloadLogs;
             logJsonEnabled = currentSettings.EnableJsonLogs;
         }
 
-        private void LogMessage(string logFilePath, string message)
+        public void LogMessage(string logFilePath, string message)
         {
             if (!EnableDownloadLogs || _stopLoggingForCooldown)
             {
@@ -212,7 +225,7 @@ namespace TikTok_Downloader
             }
         }
 
-        private void LogDownload(string fileName, string url)
+        public void LogDownload(string fileName, string url)
         {
             if (EnableDownloadLogs)
             {
@@ -220,7 +233,7 @@ namespace TikTok_Downloader
             }
         }
 
-        private void LogJson(string fileName, string jsonContent)
+        public void LogJson(string fileName, string jsonContent)
         {
             if (logJsonEnabled)
             {
@@ -242,7 +255,7 @@ namespace TikTok_Downloader
             }
         }
 
-        private void LogError(string errorMessage)
+        public void LogError(string errorMessage)
         {
             if (EnableDownloadLogs)
             {
@@ -315,7 +328,7 @@ namespace TikTok_Downloader
             public List<string> url_list { get; set; } = new List<string>();
         }
 
-        private async void btnDownload_Click(object sender, EventArgs e)
+        private async void DownloadButton_Click(object sender, EventArgs e)
         {
             outputTextBox.Clear();
             progressBar.Value = 0;
@@ -437,7 +450,7 @@ namespace TikTok_Downloader
                 return await GetSystemDefaultBrowser();
             }
 
-            public IBrowserType GetBrowserTypeForExecutable(string executablePath, IPlaywright playwright)
+            public static IBrowserType GetBrowserTypeForExecutable(string executablePath, IPlaywright playwright)
             {
                 if (executablePath.ToLower().Contains("firefox"))
                 {
@@ -492,13 +505,13 @@ namespace TikTok_Downloader
 
             token.ThrowIfCancellationRequested();
 
-            // Get system default browser executable path
+            // Get Selected browser executable path
             string browserExecutablePath = await browserUtility.GetBrowserExecutablePath();
             LogMessage(logFilePath, $"Browser executable path: {browserExecutablePath}");
 
             // Launch Playwright with the appropriate browser type
             using var playwright = await Playwright.CreateAsync();
-            var browserType = browserUtility.GetBrowserTypeForExecutable(browserExecutablePath, playwright);
+            var browserType = BrowserUtility.GetBrowserTypeForExecutable(browserExecutablePath, playwright);
 
             var browser = await browserType.LaunchAsync(new BrowserTypeLaunchOptions
             {
@@ -544,17 +557,17 @@ namespace TikTok_Downloader
 
                 // Filter links by username using the first pattern
                 var filteredUrls = combinedUrls.Where(url => url.Contains($"/@{username}/")).ToList();
-                LogMessage(logFilePath, $"Filtered {filteredUrls.Count()} URLs by username (@{username})");
+                LogMessage(logFilePath, $"Filtered {filteredUrls.Count} URLs by username (@{username})");
 
                 // If no URLs were found, fallback to the second pattern
-                if (!filteredUrls.Any())
+                if (filteredUrls.Count == 0)
                 {
                     filteredUrls = combinedUrls.Where(url => url.Contains($"/{username}/")).ToList();
-                    LogMessage(logFilePath, $"Filtered {filteredUrls.Count()} URLs by username ({username})");
+                    LogMessage(logFilePath, $"Filtered {filteredUrls.Count} URLs by username ({username})");
                 }
                 else
                 {
-                    LogMessage(logFilePath, $"Filtered {filteredUrls.Count()} URLs by username (@{username})");
+                    LogMessage(logFilePath, $"Filtered {filteredUrls.Count} URLs by username (@{username})");
                 }
 
                 // Save all video and image post links to a single text file
@@ -585,7 +598,7 @@ namespace TikTok_Downloader
             }
             catch (Exception ex)
             {
-                LogError($"An error occurred: {ex.Message}");
+                LogError($"{ex.Message}");
             }
             finally
             {
@@ -593,7 +606,15 @@ namespace TikTok_Downloader
                 LogMessage(logFilePath, "Browser closed successfully");
                 downloadButton.Enabled = true;
                 cmbChoice.Enabled = true;
-                ToastNotification.ShowToast($"Mass Download by Username Completed!", $"Finished downloading all Images/Videos from {username}.", _cancellationTokenSource);
+                string choice = cmbChoice.SelectedItem.ToString();
+                if (choice == "Mass Download by Username")
+                {
+                    ToastNotification.ShowToast($"Mass Download by Username Completed!", $"Finished downloading all Images/Videos from {username}.", _cancellationTokenSource);
+                }
+                else if (choice == "HD Mass Download by Username")
+                {
+                    ToastNotification.ShowToast($"HD Mass Download by Username Completed!", $"Finished downloading all Images/Videos from {username}.", _cancellationTokenSource);
+                }
                 outputTextBox.AppendText("Download Completed!\r\n");
             }
         }
@@ -718,7 +739,7 @@ namespace TikTok_Downloader
             downloadButton.Enabled = true;
             browseFileButton.Enabled = true;
             cmbChoice.Enabled = true;
-            ToastNotification.ShowToast($"Mass Download from Text File Completed!", $"Finished downloading all {urls.Length} Videos from your Text File.", _cancellationTokenSource);
+            ToastNotification.ShowToast($"Mass Download from Text File Completed!", $"Finished downloading all {urls.Length} Images/Videos from your Text File.", _cancellationTokenSource);
             outputTextBox.AppendText("Download Completed!\r\n");
         }
 
@@ -736,6 +757,10 @@ namespace TikTok_Downloader
                     MessageBox.Show("Please enter a valid URL", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
+
+                progressBar.Minimum = 0;
+                progressBar.Maximum = 100;
+                progressBar.Value = 0;
 
                 var trimmedUrl = url.Trim();
 
@@ -776,6 +801,7 @@ namespace TikTok_Downloader
             }
             finally
             {
+                progressBar.Value = 100;
                 downloadButton.Enabled = true;
                 cmbChoice.Enabled = true;
                 outputTextBox.AppendText("Download Completed!\r\n");
@@ -797,6 +823,10 @@ namespace TikTok_Downloader
                     return;
                 }
 
+                progressBar.Minimum = 0;
+                progressBar.Maximum = 100;
+                progressBar.Value = 0;
+
                 var trimmedUrl = url.Trim();
 
                 var tiktokUrl = await GetMediaUrl(trimmedUrl, _cancellationTokenSource.Token);
@@ -817,6 +847,7 @@ namespace TikTok_Downloader
             }
             finally
             {
+                progressBar.Value = 100;
                 downloadButton.Enabled = true;
                 cmbChoice.Enabled = true;
                 outputTextBox.AppendText("Download Completed!\r\n");
@@ -836,7 +867,7 @@ namespace TikTok_Downloader
                 return;
             }
 
-            var urls = await File.ReadAllLinesAsync(filePath);
+            var urls = await File.ReadAllLinesAsync(filePath, token);
             LogMessage(logFilePath, $"Read {urls.Length} URLs from file: {filePath}");
 
             progressBar.Minimum = 0;
@@ -858,8 +889,12 @@ namespace TikTok_Downloader
             downloadButton.Enabled = true;
             browseFileButton.Enabled = true;
             cmbChoice.Enabled = true;
-            ToastNotification.ShowToast($"HD Mass Download from Text File Completed!", $"Finished downloading all {urls.Length} Videos from your Text File.", _cancellationTokenSource);
-            outputTextBox.AppendText("Download Completed!\r\n");
+            string choice = cmbChoice.SelectedItem.ToString();
+            if (choice == "HD Download From Text File Links")
+            {
+                ToastNotification.ShowToast($"HD Mass Download from Text File Completed!", $"Finished downloading all {urls.Length} Images/Videos from your Text File.", _cancellationTokenSource);
+                outputTextBox.AppendText("Download Completed!\r\n");
+            }
         }
 
         public async Task<string> GetMediaUrl(string url, CancellationToken token)
@@ -871,7 +906,7 @@ namespace TikTok_Downloader
                 string redirectedUrl = url;
                 string videoId = string.Empty;
 
-                if (url.Contains("vm.tiktok.com"))
+                if (url.Contains("vm.tiktok.com") || (url.Contains("vt.tiktok.com")))
                 {
                     redirectedUrl = await GetRedirectUrl(url, token);
                 }
@@ -903,7 +938,7 @@ namespace TikTok_Downloader
                     return videoId;
                 }
 
-                // This is Stupid (I know and gonna fix it at somepoint maybe)
+                // Returning the redirected URL as a fallback if a direct video ID isn't found.
                 return redirectedUrl;
             }
             catch (TaskCanceledException)
@@ -956,7 +991,7 @@ namespace TikTok_Downloader
                     if (!token.IsCancellationRequested)
                     {
                         outputTextBox.AppendText($"Error: URL not found - {url}\r\n");
-                        LogMessage(logFilePath, $"Error: URL not found - {url}");
+                        LogError($"URL not found - {url}");
                     }
                     return string.Empty;
                 }
@@ -969,7 +1004,7 @@ namespace TikTok_Downloader
                         if (!token.IsCancellationRequested)
                         {
                             outputTextBox.AppendText($"Error: Invalid URL format or insufficient length - {url}\r\n");
-                            LogMessage(logFilePath, $"Error: Invalid URL format or insufficient length - {url}");
+                            LogError($"Invalid URL format or insufficient length - {url}");
                         }
                         return string.Empty;
                     }
@@ -980,7 +1015,7 @@ namespace TikTok_Downloader
                     if (!token.IsCancellationRequested)
                     {
                         outputTextBox.AppendText($"Error: Invalid URL format - {url}\r\n");
-                        LogMessage(logFilePath, $"Error: Invalid URL format - {url}");
+                        LogError($"Error: Invalid URL format - {url}");
                     }
                     return string.Empty;
                 }
@@ -1706,9 +1741,9 @@ namespace TikTok_Downloader
                             byte[] buffer = new byte[8192];
                             int bytesRead;
 
-                            while ((bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length, token)) > 0)
+                            while ((bytesRead = await responseStream.ReadAsync(buffer, token)) > 0)
                             {
-                                await fileStream.WriteAsync(buffer, 0, bytesRead, token);
+                                await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), token);
                                 totalBytesRead += bytesRead;
 
                                 await CheckPauseStatusAsync();
@@ -1891,26 +1926,37 @@ namespace TikTok_Downloader
             }
         }
 
-        private async void runFirefoxScriptToolStripMenuItem_Click(object sender, EventArgs e)
+        private void BrowseFileButton_Click(object sender, EventArgs e)
         {
-            await browserUtility.GetSystemDefaultBrowser();
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+                openFileDialog.InitialDirectory = lastBrowsingPath;
 
-            if (firefoxfound == false)
-            {
-                RunFirefoxScript();
-            }
-            else if (firefoxfound == true)
-            {
-                MessageBox.Show("Firefox is already installed. No need to run the script.", "Firefox Already Installed", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    urlTextBox.Text = openFileDialog.FileName;
+                    lastBrowsingPath = Path.GetDirectoryName(openFileDialog.FileName);
+                    settings.CurrentSettings.LastBrowsingPath = lastBrowsingPath;
+                    settings.SaveSettings();
+                }
             }
         }
 
-        private void RunFirefoxScript()
+        private void SaveLastDownloadOption()
+        {
+            if (settings?.CurrentSettings != null && cmbChoice.SelectedItem != null)
+            {
+                settings.CurrentSettings.LastDownloadOption = cmbChoice.SelectedItem.ToString();
+                settings.SaveSettings();
+            }
+        }
+
+        public static void RunFirefoxScript()
         {
             string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
             string scriptPath = Path.Combine(appDirectory, "playwright.ps1");
-            string arguments = $"-Command \"& {{ pwsh -File '{scriptPath}' install firefox }}\"";
+            string arguments = $"-Command \"& {{ pwsh -File '{scriptPath}' install firefox; Read-Host -Prompt 'Press Enter to exit' }}\"";
 
             Process process = new Process
             {
@@ -1933,11 +1979,11 @@ namespace TikTok_Downloader
             }
             else
             {
-                MessageBox.Show("The Firefox script failed to execute. Please check if PowerShell 7 is installed and try running the script manually again. If the issue persists, open an issue on GitHub.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("The Firefox script failed to execute. Please check if PowerShell 7 is installed and try running the script again. If the issue persists, open an issue on GitHub.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void CheckForUpdates()
+        private static void CheckForUpdates()
         {
             string url = "https://api.jettcodey.de/ttd/update/update.json";
             //string url = "https://api.jettcodey.de/ttd/dev_update/dev_update.json"; //  Dev Update Server URL
@@ -1986,7 +2032,7 @@ namespace TikTok_Downloader
             }
         }
 
-        private void CreateBatchFile(string tempFolder, string newVersion)
+        private static void CreateBatchFile(string tempFolder, string newVersion)
         {
             string appFolder = AppDomain.CurrentDomain.BaseDirectory;
             string batchFilePath = Path.Combine(Path.GetTempPath(), "update.bat");
@@ -2019,7 +2065,7 @@ namespace TikTok_Downloader
             });
         }
 
-        private void DownloadFiles(List<string> fileUrls, string tempFolder)
+        private static void DownloadFiles(List<string> fileUrls, string tempFolder)
         {
             using (HttpClient client = new HttpClient())
             {
@@ -2033,31 +2079,17 @@ namespace TikTok_Downloader
             }
         }
 
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AboutWindow aboutWindow = new AboutWindow(browserUtility);
             aboutWindow.ShowDialog();
         }
 
-        private void browseFileButton_Click(object sender, EventArgs e)
-        {
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
-            {
-                openFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
-                openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    urlTextBox.Text = openFileDialog.FileName;
-                }
-            }
-        }
-
-        private void stopButton_Click(object sender, EventArgs e)
+        public void StopButton_Click(object sender, EventArgs e)
         {
             if (_isPaused)
             {
-                pauseButton_Click(sender, e);
+                PauseButton_Click(sender, e);
             }
             _cancellationTokenSource?.Cancel();
             ToastNotification.ShowToast("Download Stopped!", "You stopped the download process.");
@@ -2065,10 +2097,9 @@ namespace TikTok_Downloader
             LogMessage(logFilePath, "Download got Stopped by User");
             _stopLoggingForCooldown = true;
             Task.Delay(1000).ContinueWith(_ => _stopLoggingForCooldown = false);
-
         }
 
-        public void pauseButton_Click(object sender, EventArgs e)
+        public void PauseButton_Click(object sender, EventArgs e)
         {
             if (_isPaused)
             {
@@ -2110,7 +2141,7 @@ namespace TikTok_Downloader
             }
         }
 
-        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (var settingsDialog = new SettingsDialog(this))
             {
@@ -2118,18 +2149,16 @@ namespace TikTok_Downloader
             }
         }
 
-        private void checkForUpdateToolStripMenuItem_Click(object sender, EventArgs e)
+        private void CheckForUpdateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CheckForUpdates();
         }
 
-        private void tikTokSigninToolStripMenuItem_Click(object sender, EventArgs e)
+        private void TikTokSigninToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show($"This feature is still in development and is therefore not available.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            /*using (var tikTokSigninDialog = new TikTokSigninDialog())
-            {
-                tikTokSigninDialog.ShowDialog();
-            }*/
+            /*TikTokSigninDialog tikTokSigninDialog = new TikTokSigninDialog(browserUtility);
+            tikTokSigninDialog.ShowDialog();*/
         }
 
         public void LogJsonCheckBox(bool value)
@@ -2142,11 +2171,6 @@ namespace TikTok_Downloader
         {
             EnableDownloadLogs = value;
             InitializeLoggingFolder();
-        }
-
-        public void DownloadImagesOnlyCheckBox(bool value)
-        {
-            DownloadImagesOnly = value;
         }
 
         private async void LinkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -2186,7 +2210,7 @@ namespace TikTok_Downloader
             }
         }
 
-        private void withWatermarkCheckBox_CheckedChanged(object sender, EventArgs e)
+        private void WithWatermarkCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             if (withWatermarkCheckBox.Checked)
             {
@@ -2197,11 +2221,11 @@ namespace TikTok_Downloader
             {
                 noWatermarkCheckBox.Visible = false;
                 noWatermarkCheckBox.Checked = false;
-                LogMessage(logFilePath, "With Watermark Checkbox is Not Checked.");
+                LogMessage(logFilePath, "With Watermark Checkbox is Un-Checked.");
             }
         }
 
-        private void noWatermarkCheckBox_CheckedChanged(object sender, EventArgs e)
+        private void NoWatermarkCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             if (noWatermarkCheckBox.Checked)
             {
@@ -2213,7 +2237,7 @@ namespace TikTok_Downloader
             }
         }
 
-        private void downloadAvatarsCheckBox_CheckedChanged(object sender, EventArgs e)
+        private void DownloadAvatarsCheckBox_CheckedChanged(object sender, EventArgs e)
         {
 
         }
