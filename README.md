@@ -55,7 +55,7 @@ C# and Microsoft Playwright
 
 ### ❓ Questions?  
 If you have any questions, feel free to [open an issue](https://github.com/Jettcodey/TikTok-Downloader/issues) or reach out to me on Discord: **`jettcodey`**.  
-Please note that it may take me 1-2 days to respond—I'm just one person with a life outside of coding. Thanks for your patience!
+Please note that it may take me 1-2 days to respond—I'm just one person with a life outside of coding.
 
 <p align="right"><a href="#tiktok-downloader">Back to top</a></p>
 
@@ -79,7 +79,6 @@ Please note that it may take me 1-2 days to respond—I'm just one person with a
   - ✔ **Chromium**
   - ✔ **Brave**
   - ✔ **Mozilla Firefox** **\*\***
-  - ❌ **Opera (GX)** (coming soon)
 
 **\*** Downloading Videos With a Watermark is **not** working 100% of the time due to changes in the TikTok API.
 
@@ -133,7 +132,7 @@ After installing TikTok Downloader, open the application and complete the First-
 #### 4. The HD Variants
 The HD Variants are the Same but download **Videos** and **Images** (if Possible) in HD quality.
 
-\* TikTok Links format: `https://www.tiktok.com/@user/video|photo/123456789` or `https://vm.tiktok.com/a1b2c3d4`.  
+\* TikTok Links format: `https://www.tiktok.com/@user/video|photo/123456789` or `https://vm|vt.tiktok.com/a1b2c3d4`.  
 **TikTok Profile Links format: `https://www.tiktok.com/@user`.
 
 <p align="right"><a href="#tiktok-downloader">Back to top</a></p>
