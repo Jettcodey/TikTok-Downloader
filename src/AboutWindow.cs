@@ -133,8 +133,7 @@ namespace TikTok_Downloader
             // 
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
-            BackColor = SystemColors.ControlDarkDark;
-            BackgroundImage = Properties.Resources.bg;
+            BackColor = Color.FromArgb(32, 32, 32);
             ClientSize = new Size(246, 217);
             Controls.Add(label2);
             Controls.Add(label3);
