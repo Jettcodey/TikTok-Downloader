@@ -129,6 +129,7 @@ namespace TikTok_Downloader
         public class VersionInfo
         {
             public string Version { get; set; }
+            public string Message { get; set; }
             public List<string> Files { get; set; }
         }
 
@@ -2286,9 +2287,30 @@ namespace TikTok_Downloader
                         string tempFolder = Path.Combine(Path.GetTempPath(), "update");
                         Directory.CreateDirectory(tempFolder);
 
-                        DialogResult result = MessageBox.Show($"New Version {latestVersionInfo.Version} available. Would you like to restart the application to apply updates?\nIf you don't trust this Updater, you can always install the latest version from the Github Repository", "Update Available", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                        DialogResult result = MessageBox.Show(
+                            $"New Version {latestVersionInfo.Version} available. Would you like to restart the application to apply updates?\nIf you don't trust this Updater, you can always install the latest version from the Github Repository",
+                            "Update Available",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Information);
+
                         if (result == DialogResult.Yes)
                         {
+                            // Check if there is a Warning message associated with the Update!
+                            if (!string.IsNullOrWhiteSpace(latestVersionInfo.Message))
+                            {
+                                DialogResult confirm = MessageBox.Show(
+                                    latestVersionInfo.Message + "\n\nDo you want to continue with the update?",
+                                    "Update Warning",
+                                    MessageBoxButtons.YesNo,
+                                    MessageBoxIcon.Warning);
+
+                                if (confirm != DialogResult.Yes)
+                                {
+                                    // Cancel the update
+                                    return;
+                                }
+                            }
+
                             DownloadFiles(latestVersionInfo.Files, tempFolder);
                             CreateBatchFile(tempFolder, latestVersionInfo.Version); // Generate Update.bat
                             Application.Exit();
