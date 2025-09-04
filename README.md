@@ -14,8 +14,12 @@
 <!-- > [!NOTE]
 > Some features of the application are not always working 100% right now due to changes in the TikTok API. -->
 
-> [!NOTE]
-> The application is currently undergoing refactoring and a small rewrite.
+<!-- > [!NOTE]
+> The application is currently undergoing refactoring and a small rewrite. -->
+
+> [!NOTE] 
+> As of [Release v1.3.9](https://github.com/Jettcodey/TikTok-Downloader/releases/tag/Release-1.3.9), this project is not being actively maintained.\
+While I **may** answer questions, updates of any kind (new features, bug fixes, etc.) will not be made until I return to the project.
 
 <!-- TABLE OF CONTENTS -->
 <summary>Table of Contents</summary>
